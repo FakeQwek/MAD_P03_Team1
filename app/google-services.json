@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "712758508408",
+    "project_id": "inkwell-d3bd7",
+    "storage_bucket": "inkwell-d3bd7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712758508408:android:171076d4b209b172ef668d",
+        "android_client_info": {
+          "package_name": "sg.edu.np.mad.inkwell"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRmYIW4fRe65cLRpQJcA2Y415FlBud02Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
