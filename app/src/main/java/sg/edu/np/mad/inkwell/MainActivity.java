@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -101,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
         noteTitle.setText(note.title);
         noteBody.setText(note.body);
 
-
         db.collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -155,6 +155,11 @@ public class MainActivity extends AppCompatActivity {
                                 LinearLayout noteList = findViewById(R.id.noteList);
                                 noteList.addView(noteButton);
                             }
+
+                            TextView inkwellDetails = findViewById(R.id.inkwellDetails);
+                            String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), currentNoteId);
+                            inkwellDetails.setText(inkwellDetailsText);
+
                         } else {
                             Log.d("testing", "Error getting documents: ", task.getException());
                         }
@@ -258,6 +263,10 @@ public class MainActivity extends AppCompatActivity {
 
                 LinearLayout noteList = findViewById(R.id.noteList);
                 noteList.addView(noteButton);
+
+                TextView inkwellDetails = findViewById(R.id.inkwellDetails);
+                String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), currentNoteId);
+                inkwellDetails.setText(inkwellDetailsText);
             }
         });
 
