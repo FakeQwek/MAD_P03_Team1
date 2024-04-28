@@ -14,5 +14,7 @@
     <string name="new_note_title">Title</string>
     <string name="new_note_body">Enter your text</string>
 
+    <string name="new_folder_title">Folder</string>
+
     <string name="inkwell_details_text">%1$d files</string>
 </resources>

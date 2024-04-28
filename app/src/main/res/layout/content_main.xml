@@ -49,8 +49,18 @@
         android:id="@+id/addNoteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="472dp"
-        android:text="Button"
-        app:layout_constraintTop_toBottomOf="@+id/noteBody"
-        tools:layout_editor_absoluteX="30dp" />
+        android:layout_marginTop="460dp"
+        app:layout_constraintStart_toStartOf="@+id/noteBody"
+        app:layout_constraintTop_toBottomOf="@+id/noteBody" />
+
+    <Button
+        android:id="@+id/addFolderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="460dp"
+        android:text="folder"
+        app:layout_constraintStart_toEndOf="@+id/addNoteButton"
+        app:layout_constraintTop_toBottomOf="@+id/noteBody" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

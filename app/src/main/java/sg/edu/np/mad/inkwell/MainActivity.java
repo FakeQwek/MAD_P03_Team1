@@ -19,6 +19,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -33,7 +35,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import sg.edu.np.mad.inkwell.databinding.ActivityMainBinding;
@@ -109,51 +116,164 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Button noteButton = new Button(getApplicationContext());
-                                noteButton.setBackgroundColor(Color.WHITE);
-                                noteButton.setGravity(Gravity.START);
+                                String docNoteType = document.getData().get("type").toString();
 
-                                int noteId = Integer.parseInt(document.getId());
+                                if (docNoteType.equals("file")) {
+                                    Button noteButton = new Button(getApplicationContext());
+                                    noteButton.setBackgroundColor(Color.WHITE);
+                                    noteButton.setGravity(Gravity.START);
 
-                                if (noteId == 1) {
-                                    DocumentReference docRef = db.collection("notes").document(String.valueOf(noteId));
-                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    int noteId = Integer.parseInt(document.getId());
+
+                                    currentNoteId++;
+
+                                    noteButton.setId(noteId);
+                                    noteButton.setText(document.getData().get("title").toString());
+
+                                    noteButton.setOnClickListener(new View.OnClickListener() {
+                                        public void onClick(View v) {
+                                            DocumentReference docRef = db.collection("notes").document(String.valueOf(noteId));
+                                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    selectedNoteId = v.getId();
+                                                    Log.d("testing", String.valueOf(selectedNoteId));
+
+                                                    DocumentSnapshot document = task.getResult();
+                                                    String docNoteTitle = document.getData().get("title").toString();
+                                                    String docNoteBody = document.getData().get("body").toString();
+                                                    noteTitle.setText(docNoteTitle);
+                                                    noteBody.setText(docNoteBody);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    LinearLayout noteList = findViewById(R.id.noteList);
+                                    noteList.addView(noteButton);
+                                } else if (docNoteType.equals("folder")) {
+                                    Button folderButton = new Button(getApplicationContext());
+                                    folderButton.setBackgroundColor(Color.WHITE);
+                                    folderButton.setGravity(Gravity.START);
+
+                                    int folderId = Integer.parseInt(document.getId());
+
+                                    currentNoteId++;
+
+                                    folderButton.setId(folderId);
+                                    folderButton.setText(document.getData().get("title").toString());
+
+                                    LinearLayout noteList = findViewById(R.id.noteList);
+                                    noteList.addView(folderButton);
+
+                                    LinearLayout folderLayout = new LinearLayout(getApplicationContext());
+                                    folderLayout.setOrientation(LinearLayout.VERTICAL);
+
+                                    folderButton.setOnLongClickListener(new View.OnLongClickListener() {
                                         @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            DocumentSnapshot document = task.getResult();
-                                            String docNoteTitle = document.getData().get("title").toString();
-                                            String docNoteBody = document.getData().get("body").toString();
-                                            noteTitle.setText(docNoteTitle);
-                                            noteBody.setText(docNoteBody);
+                                        public boolean onLongClick(View v) {
+                                            Button noteButton = new Button(getApplicationContext());
+                                            noteButton.setBackgroundColor(Color.WHITE);
+                                            noteButton.setGravity(Gravity.START);
+
+                                            currentNoteId++;
+                                            int noteId = currentNoteId;
+                                            Log.d("testing", String.valueOf(currentNoteId));
+
+                                            Map<String, Object> noteData = new HashMap<>();
+                                            noteData.put("type", "file");
+                                            noteData.put("title", "Title");
+                                            noteData.put("body", "Enter your text");
+                                            noteData.put("parentId", folderId);
+
+                                            db.collection("notes").document(String.valueOf(folderId)).collection("files").document(String.valueOf(noteId)).set(noteData);
+
+                                            noteButton.setId(noteId);
+
+                                            noteButton.setText(R.string.new_note_title);
+
+                                            noteButton.setOnClickListener(new View.OnClickListener() {
+                                                public void onClick(View v) {
+                                                    DocumentReference docRef = db.collection("notes").document(String.valueOf(folderId)).collection("files").document(String.valueOf(noteId));
+                                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            selectedNoteId = v.getId();
+
+                                                            DocumentSnapshot document = task.getResult();
+                                                            String docNoteTitle = document.getData().get("title").toString();
+                                                            String docNoteBody = document.getData().get("body").toString();
+                                                            noteTitle.setText(docNoteTitle);
+                                                            noteBody.setText(docNoteBody);
+                                                        }
+                                                    });
+                                                }
+                                            });
+
+                                            folderLayout.addView(noteButton);
+                                            return true;
+                                        }
+                                    });
+
+                                    db.collection("notes")
+                                            .document(String.valueOf(folderId))
+                                            .collection("files")
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            Button noteButton = new Button(getApplicationContext());
+                                                            noteButton.setBackgroundColor(Color.WHITE);
+                                                            noteButton.setGravity(Gravity.START);
+
+                                                            int noteId = Integer.parseInt(document.getId());
+
+                                                            currentNoteId++;
+
+                                                            noteButton.setId(noteId);
+                                                            noteButton.setText(document.getData().get("title").toString());
+
+                                                            noteButton.setOnClickListener(new View.OnClickListener() {
+                                                                public void onClick(View v) {
+                                                                    DocumentReference docRef = db.collection("notes").document(String.valueOf(folderId)).collection("files").document(String.valueOf(noteId));
+                                                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                            selectedNoteId = v.getId();
+                                                                            Log.d("testing", String.valueOf(selectedNoteId));
+
+                                                                            DocumentSnapshot document = task.getResult();
+                                                                            String docNoteTitle = document.getData().get("title").toString();
+                                                                            String docNoteBody = document.getData().get("body").toString();
+                                                                            noteTitle.setText(docNoteTitle);
+                                                                            noteBody.setText(docNoteBody);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+
+                                                            folderLayout.addView(noteButton);
+                                                        }
+                                                    } else {
+                                                        Log.d("testing", "Error getting documents: ", task.getException());
+                                                    }
+                                                }
+                                            });
+                                    noteList.addView(folderLayout);
+
+                                    folderButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (folderLayout.getVisibility() == View.VISIBLE) {
+                                                folderLayout.setVisibility(View.GONE);
+                                            } else {
+                                                folderLayout.setVisibility(View.VISIBLE);
+                                            }
                                         }
                                     });
                                 }
-
-                                currentNoteId++;
-
-                                noteButton.setId(noteId);
-                                noteButton.setText(document.getData().get("title").toString());
-
-                                noteButton.setOnClickListener(new View.OnClickListener() {
-                                    public void onClick(View v) {
-                                        DocumentReference docRef = db.collection("notes").document(String.valueOf(noteId));
-                                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                selectedNoteId = v.getId();
-
-                                                DocumentSnapshot document = task.getResult();
-                                                String docNoteTitle = document.getData().get("title").toString();
-                                                String docNoteBody = document.getData().get("body").toString();
-                                                noteTitle.setText(docNoteTitle);
-                                                noteBody.setText(docNoteBody);
-                                            }
-                                        });
-                                    }
-                                });
-
-                                LinearLayout noteList = findViewById(R.id.noteList);
-                                noteList.addView(noteButton);
                             }
 
                             TextView inkwellDetails = findViewById(R.id.inkwellDetails);
@@ -176,19 +296,20 @@ public class MainActivity extends AppCompatActivity {
                 newNote.put("title", note.title);
 
                 db.collection("notes").document(String.valueOf(selectedNoteId))
-                        .update(newNote)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        .update(newNote);
+
+                db.collection("notes")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("testing", "DocumentSnapshot successfully written!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("testing", "Error writing document", e);
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("testing", document.getId() + " => " + document.getData());
+                                    document.getReference().collection("files").document(String.valueOf(selectedNoteId)).update(newNote);
+                                }
                             }
                         });
+
                 Button buttonTitle = findViewById(selectedNoteId);
                 buttonTitle.setText(note.title);
             }
@@ -205,17 +326,17 @@ public class MainActivity extends AppCompatActivity {
 
 
                 db.collection("notes").document(String.valueOf(selectedNoteId))
-                        .update(newNote)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        .update(newNote);
+
+                db.collection("notes")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("testing", "DocumentSnapshot successfully written!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("testing", "Error writing document", e);
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("testing", document.getId() + " => " + document.getData());
+                                    document.getReference().collection("files").document(String.valueOf(selectedNoteId)).update(newNote);
+                                }
                             }
                         });
             }
@@ -230,10 +351,9 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNoteId++;
                 int noteId = currentNoteId;
-                Log.d("testing", String.valueOf(currentNoteId));
-
 
                 Map<String, Object> noteData = new HashMap<>();
+                noteData.put("type", "file");
                 noteData.put("title", "Title");
                 noteData.put("body", "Enter your text");
 
@@ -275,6 +395,96 @@ public class MainActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 Log.d("testing", "apple");
                 return true;
+            }
+        });
+
+        Button addFolderButton = findViewById(R.id.addFolderButton);
+
+        addFolderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button folderButton = new Button(getApplicationContext());
+                folderButton.setBackgroundColor(Color.WHITE);
+                folderButton.setGravity(Gravity.START);
+
+                currentNoteId++;
+                int folderId = currentNoteId;
+
+                Map<String, Object> folderData = new HashMap<>();
+                folderData.put("type", "folder");
+                folderData.put("title", "Folder");
+                folderData.put("body", "");
+
+                db.collection("notes").document(String.valueOf(folderId)).set(folderData);
+
+                folderButton.setId(folderId);
+
+                folderButton.setText(R.string.new_folder_title);
+
+                LinearLayout noteList = findViewById(R.id.noteList);
+                noteList.addView(folderButton);
+
+                LinearLayout folderLayout = new LinearLayout(getApplicationContext());
+                folderLayout.setOrientation(LinearLayout.VERTICAL);
+
+                folderButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Button noteButton = new Button(getApplicationContext());
+                        noteButton.setBackgroundColor(Color.WHITE);
+                        noteButton.setGravity(Gravity.START);
+
+                        currentNoteId++;
+                        int noteId = currentNoteId;
+
+                        Map<String, Object> noteData = new HashMap<>();
+                        noteData.put("type", "file");
+                        noteData.put("title", "Title");
+                        noteData.put("body", "Enter your text");
+                        noteData.put("parentId", folderId);
+
+                        db.collection("notes").document(String.valueOf(folderId)).collection("files").document(String.valueOf(noteId)).set(noteData);
+
+                        noteButton.setId(noteId);
+
+                        noteButton.setText(R.string.new_note_title);
+
+                        noteButton.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                DocumentReference docRef = db.collection("notes").document(String.valueOf(folderId)).collection("files").document(String.valueOf(noteId));
+                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        selectedNoteId = v.getId();
+
+                                        DocumentSnapshot document = task.getResult();
+                                        String docNoteTitle = document.getData().get("title").toString();
+                                        String docNoteBody = document.getData().get("body").toString();
+                                        noteTitle.setText(docNoteTitle);
+                                        noteBody.setText(docNoteBody);
+                                    }
+                                });
+                            }
+                        });
+
+                        folderLayout.addView(noteButton);
+                        return true;
+                    }
+                });
+
+                noteList.addView(folderLayout);
+
+                folderButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (folderLayout.getVisibility() == View.VISIBLE) {
+                            folderLayout.setVisibility(View.GONE);
+                        } else {
+                            folderLayout.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
             }
         });
     }
