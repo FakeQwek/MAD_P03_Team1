@@ -3,13 +3,10 @@ package sg.edu.np.mad.inkwell;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Menu;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,11 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.Group;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -30,7 +25,7 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.navigation.NavigationView;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,11 +40,10 @@ import sg.edu.np.mad.inkwell.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityMainBinding binding;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public abstract class TextChangedListener<T> implements TextWatcher {
+    public abstract static class TextChangedListener<T> implements TextWatcher {
         private T target;
 
         public TextChangedListener(T target) {
@@ -70,9 +64,15 @@ public class MainActivity extends AppCompatActivity {
         public abstract void onTextChanged(T target, Editable s);
     }
 
+    private int currentNoteId;
+
+    private int selectedNoteId = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ActivityMainBinding binding;
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -93,13 +93,14 @@ public class MainActivity extends AppCompatActivity {
 
         Button addNoteButton = findViewById(R.id.addNoteButton);
 
-        Note note = new Note("Title", "Enter your text");
+        Note note = new Note("", "");
 
         EditText noteTitle = findViewById(R.id.noteTitle);
         EditText noteBody = findViewById(R.id.noteBody);
 
         noteTitle.setText(note.title);
         noteBody.setText(note.body);
+
 
         db.collection("notes")
                 .get()
@@ -110,9 +111,25 @@ public class MainActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Button noteButton = new Button(getApplicationContext());
                                 noteButton.setBackgroundColor(Color.WHITE);
-                                noteButton.setGravity(Gravity.LEFT);
+                                noteButton.setGravity(Gravity.START);
 
                                 int noteId = Integer.parseInt(document.getId());
+
+                                if (noteId == 1) {
+                                    DocumentReference docRef = db.collection("notes").document(String.valueOf(noteId));
+                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            DocumentSnapshot document = task.getResult();
+                                            String docNoteTitle = document.getData().get("title").toString();
+                                            String docNoteBody = document.getData().get("body").toString();
+                                            noteTitle.setText(docNoteTitle);
+                                            noteBody.setText(docNoteBody);
+                                        }
+                                    });
+                                }
+
+                                currentNoteId++;
 
                                 noteButton.setId(noteId);
                                 noteButton.setText(document.getData().get("title").toString());
@@ -123,9 +140,13 @@ public class MainActivity extends AppCompatActivity {
                                         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                selectedNoteId = v.getId();
+
                                                 DocumentSnapshot document = task.getResult();
                                                 String docNoteTitle = document.getData().get("title").toString();
+                                                String docNoteBody = document.getData().get("body").toString();
                                                 noteTitle.setText(docNoteTitle);
+                                                noteBody.setText(docNoteBody);
                                             }
                                         });
                                     }
@@ -139,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
         noteTitle.addTextChangedListener(new TextChangedListener<EditText>(noteTitle) {
             @Override
             public void onTextChanged(EditText noteTitle, Editable s) {
@@ -148,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 Map<String, Object> newNote = new HashMap<>();
                 newNote.put("title", note.title);
 
-                db.collection("notes").document("one")
+                db.collection("notes").document(String.valueOf(selectedNoteId))
                         .update(newNote)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -162,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
                                 Log.w("testing", "Error writing document", e);
                             }
                         });
+                Button buttonTitle = findViewById(selectedNoteId);
+                buttonTitle.setText(note.title);
             }
         });
 
@@ -175,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 newNote.put("body", note.body);
 
 
-                db.collection("notes").document("one")
+                db.collection("notes").document(String.valueOf(selectedNoteId))
                         .update(newNote)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -197,9 +221,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Button noteButton = new Button(getApplicationContext());
                 noteButton.setBackgroundColor(Color.WHITE);
-                noteButton.setGravity(Gravity.LEFT);
+                noteButton.setGravity(Gravity.START);
 
-                int noteId = noteButton.generateViewId();
+                currentNoteId++;
+                int noteId = currentNoteId;
+                Log.d("testing", String.valueOf(currentNoteId));
+
 
                 Map<String, Object> noteData = new HashMap<>();
                 noteData.put("title", "Title");
@@ -209,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
                 noteButton.setId(noteId);
 
-                noteButton.setText("new note");
+                noteButton.setText(R.string.new_note_title);
 
                 noteButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -217,9 +244,13 @@ public class MainActivity extends AppCompatActivity {
                         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                selectedNoteId = v.getId();
+
                                 DocumentSnapshot document = task.getResult();
                                 String docNoteTitle = document.getData().get("title").toString();
+                                String docNoteBody = document.getData().get("body").toString();
                                 noteTitle.setText(docNoteTitle);
+                                noteBody.setText(docNoteBody);
                             }
                         });
                     }
@@ -227,6 +258,14 @@ public class MainActivity extends AppCompatActivity {
 
                 LinearLayout noteList = findViewById(R.id.noteList);
                 noteList.addView(noteButton);
+            }
+        });
+
+        addNoteButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d("testing", "apple");
+                return true;
             }
         });
     }

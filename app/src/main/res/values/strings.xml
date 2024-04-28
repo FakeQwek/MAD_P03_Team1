@@ -10,4 +10,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <string name="new_note_title">Title</string>
+    <string name="new_note_body">Enter your text</string>
 </resources>
