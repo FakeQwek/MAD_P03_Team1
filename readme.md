@@ -2,6 +2,7 @@
 ## Introduction ##
 Inkwell is a productivity app that allows users to stay organised by notetaking and keeping regular schedules. 
 *Mindfulness is king* when it comes to Inkwell with its many useful features such as the calender, inkwells (notepages) and voice memos.
+
 **Stay organised today with Inkwell!**
 
 ## Objective ##
