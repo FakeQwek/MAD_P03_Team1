@@ -1,7 +1,7 @@
 # Inkwell #
 ## Introduction ##
 Inkwell is a productivity app that allows users to stay organised by notetaking and keeping regular schedules. 
-* *Mindfulness is king* * when it comes to Inkwell with its many useful features such as the calender, inkwells (notepages) and voice memos.
+*Mindfulness is king* when it comes to Inkwell with its many useful features such as the calender, inkwells (notepages) and voice memos.
 **Stay organised today with Inkwell!**
 
 ## Objective ##
@@ -22,7 +22,7 @@ Productivity
 
 ## Task Allocation ##
 **Stage 1**
-* *Features and Pages:* *
+*Features and Pages:* 
 - Navigations bar design and implementation – Tsun Yang 
 - Logo design and Name – Tsun Yang 
 - Typing and notes page and implementation – Chin Teck 
@@ -30,13 +30,13 @@ Productivity
 - Timetable implementation and timetable page - Rithika 
 - Login implementation and login page – Jin Xuan 
 
-* *Concepts:* *
+*Concepts:* 
 - Database storage – Chin Teck 
 - RecyclerView – Rithika 
 - Responsive Layout – Tsun Yang 
 - Authentication – Jin Xuan 
 
-* *Other* *
+*Other* 
 - Padlet and Readme - Tsun Yang
 
 **Stage 2** - TBD
@@ -45,6 +45,6 @@ Features and Pages:
 
 Concepts:
 
-* *Other* *
+*Other* 
 - Publishing App - Tsun Yang
  
