@@ -22,6 +22,7 @@ Productivity
 
 ## Task Allocation ##
 **Stage 1**
+
 *Features and Pages:* 
 - Navigations bar design and implementation – Tsun Yang 
 - Logo design and Name – Tsun Yang 
