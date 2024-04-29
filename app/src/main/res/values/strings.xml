@@ -3,11 +3,18 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">vault name</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_subtitle">x files</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <string name="new_note_title">Title</string>
+    <string name="new_note_body">Enter your text</string>
+
+    <string name="new_folder_title">Folder</string>
+
+    <string name="inkwell_details_text">%1$d files</string>
 </resources>
