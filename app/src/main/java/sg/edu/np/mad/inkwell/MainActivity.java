@@ -7,9 +7,11 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                                     Button noteButton = new Button(getApplicationContext());
                                     noteButton.setBackgroundColor(Color.WHITE);
                                     noteButton.setGravity(Gravity.START);
+                                    noteButton.setBackgroundColor(Color.TRANSPARENT);
 
                                     int noteId = Integer.parseInt(document.getId());
 
@@ -155,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                                     Button folderButton = new Button(getApplicationContext());
                                     folderButton.setBackgroundColor(Color.WHITE);
                                     folderButton.setGravity(Gravity.START);
+                                    folderButton.setBackgroundColor(Color.TRANSPARENT);
 
                                     int folderId = Integer.parseInt(document.getId());
 
@@ -175,6 +179,16 @@ public class MainActivity extends AppCompatActivity {
                                             Button noteButton = new Button(getApplicationContext());
                                             noteButton.setBackgroundColor(Color.WHITE);
                                             noteButton.setGravity(Gravity.START);
+                                            noteButton.setBackgroundColor(Color.TRANSPARENT);
+
+                                            RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
+                                                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                                            );
+
+                                            buttonParams.setMargins(50, 0, 0, 0);
+
+                                            noteButton.setLayoutParams(buttonParams);
 
                                             currentNoteId++;
                                             int noteId = currentNoteId;
@@ -227,6 +241,16 @@ public class MainActivity extends AppCompatActivity {
                                                             Button noteButton = new Button(getApplicationContext());
                                                             noteButton.setBackgroundColor(Color.WHITE);
                                                             noteButton.setGravity(Gravity.START);
+                                                            noteButton.setBackgroundColor(Color.TRANSPARENT);
+
+                                                            RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
+                                                                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                                                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                                                            );
+
+                                                            buttonParams.setMargins(50, 0, 0, 0);
+
+                                                            noteButton.setLayoutParams(buttonParams);
 
                                                             int noteId = Integer.parseInt(document.getId());
 
@@ -348,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
                 Button noteButton = new Button(getApplicationContext());
                 noteButton.setBackgroundColor(Color.WHITE);
                 noteButton.setGravity(Gravity.START);
+                noteButton.setBackgroundColor(Color.TRANSPARENT);
 
                 currentNoteId++;
                 int noteId = currentNoteId;
@@ -406,6 +431,7 @@ public class MainActivity extends AppCompatActivity {
                 Button folderButton = new Button(getApplicationContext());
                 folderButton.setBackgroundColor(Color.WHITE);
                 folderButton.setGravity(Gravity.START);
+                folderButton.setBackgroundColor(Color.TRANSPARENT);
 
                 currentNoteId++;
                 int folderId = currentNoteId;
@@ -433,6 +459,16 @@ public class MainActivity extends AppCompatActivity {
                         Button noteButton = new Button(getApplicationContext());
                         noteButton.setBackgroundColor(Color.WHITE);
                         noteButton.setGravity(Gravity.START);
+                        noteButton.setBackgroundColor(Color.TRANSPARENT);
+
+                        RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
+                                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                RelativeLayout.LayoutParams.WRAP_CONTENT
+                        );
+
+                        buttonParams.setMargins(50, 0, 0, 0);
+
+                        noteButton.setLayoutParams(buttonParams);
 
                         currentNoteId++;
                         int noteId = currentNoteId;
