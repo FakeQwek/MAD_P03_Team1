@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -77,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
     private int currentNoteId;
 
     private int selectedNoteId = 1;
+
+    private void openBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.bottom_sheet, null);
+        bottomSheetDialog.setContentView(view);
+        bottomSheetDialog.show();
+
+        Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
+        bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -412,14 +424,6 @@ public class MainActivity extends AppCompatActivity {
                 TextView inkwellDetails = findViewById(R.id.inkwellDetails);
                 String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), currentNoteId);
                 inkwellDetails.setText(inkwellDetailsText);
-            }
-        });
-
-        addNoteButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Log.d("testing", "apple");
-                return true;
             }
         });
 
