@@ -273,7 +273,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createFileButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        currentNoteId = id;
+        if (id > currentNoteId) {
+            currentNoteId = id;
+        }
 
         Button noteButton = new Button(getApplicationContext());
         noteButton.setBackgroundColor(Color.WHITE);
@@ -326,7 +328,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createFolderButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        currentNoteId = id;
+        if (id > currentNoteId) {
+            currentNoteId = id;
+        }
 
         Button folderButton = new Button(getApplicationContext());
         folderButton.setBackgroundColor(Color.WHITE);
