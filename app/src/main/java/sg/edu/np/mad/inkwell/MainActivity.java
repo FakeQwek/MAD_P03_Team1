@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -16,15 +15,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -40,12 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import sg.edu.np.mad.inkwell.databinding.ActivityMainBinding;
@@ -89,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
     private int selectedIdentationLevel;
 
-    private void openBottomSheet() {
+    private void openFolderBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
-        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.bottom_sheet, null);
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.folder_bottom_sheet, null);
         bottomSheetDialog.setContentView(view);
         bottomSheetDialog.show();
 
@@ -124,6 +114,42 @@ public class MainActivity extends AppCompatActivity {
 
         Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
         bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
+
+        bottomSheetDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> deleteFolder = new HashMap<>();
+                deleteFolder.put("type", "deleted");
+
+                noteDocRef.update(deleteFolder);
+
+                findViewById(selectedNoteId).setVisibility(View.GONE);
+                selectedNoteLayout.setVisibility(View.GONE);
+                selectedFolderLayout.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void openNoteBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.note_bottom_sheet, null);
+        bottomSheetDialog.setContentView(view);
+        bottomSheetDialog.show();
+
+        Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
+        bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
+
+        bottomSheetDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> deleteNote = new HashMap<>();
+                deleteNote.put("type", "deleted");
+
+                noteDocRef.update(deleteNote);
+
+                findViewById(selectedNoteId).setVisibility(View.GONE);
+            }
+        });
     }
 
     private void createNewFile(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
@@ -168,6 +194,17 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        noteButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                selectedNoteId = id;
+                noteDocRef = colRef.document(String.valueOf(id));
+
+                openNoteBottomSheet();
+                return true;
+            }
+        });
         linearLayout.addView(noteButton);
     }
 
@@ -206,12 +243,13 @@ public class MainActivity extends AppCompatActivity {
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                selectedNoteId = id;
                 selectedNoteLayout = noteLayout;
                 selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
-                openBottomSheet();
+                openFolderBottomSheet();
                 return true;
             }
         });
@@ -235,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createFileButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        currentNoteId++;
+        currentNoteId = id;
 
         Button noteButton = new Button(getApplicationContext());
         noteButton.setBackgroundColor(Color.WHITE);
@@ -260,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         selectedNoteId = v.getId();
+
                         noteDocRef = docRef;
                         selectedIdentationLevel = indentationLevel;
 
@@ -272,11 +311,22 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        noteButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                selectedNoteId = id;
+                noteDocRef = colRef.document(String.valueOf(id));
+
+                openNoteBottomSheet();
+                return true;
+            }
+        });
         linearLayout.addView(noteButton);
     }
 
     private void createFolderButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        currentNoteId++;
+        currentNoteId = id;
 
         Button folderButton = new Button(getApplicationContext());
         folderButton.setBackgroundColor(Color.WHITE);
@@ -305,12 +355,13 @@ public class MainActivity extends AppCompatActivity {
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                selectedNoteId = id;
                 selectedNoteLayout = noteLayout;
                 selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
-                openBottomSheet();
+                openFolderBottomSheet();
                 return true;
             }
         });
