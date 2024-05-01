@@ -83,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
     private DocumentReference noteDocRef;
 
-    private LinearLayout selectedLayout;
+    private LinearLayout selectedNoteLayout;
+
+    private LinearLayout selectedFolderLayout;
 
     private int selectedIdentationLevel;
 
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 currentNoteId++;
 
-                createNewFile(noteDocRef.collection("files"), selectedLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIdentationLevel + 1);
+                createNewFile(noteDocRef.collection("files"), selectedNoteLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIdentationLevel + 1);
             }
         });
 
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 currentNoteId++;
 
-                createNewFolder(noteDocRef.collection("files"), selectedLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIdentationLevel + 1);
+                createNewFolder(noteDocRef.collection("files"), selectedFolderLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIdentationLevel + 1);
             }
         });
 
@@ -195,13 +197,17 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout.addView(folderButton);
 
+        LinearLayout noteLayout = new LinearLayout(getApplicationContext());
+        noteLayout.setOrientation(LinearLayout.VERTICAL);
+
         LinearLayout folderLayout = new LinearLayout(getApplicationContext());
         folderLayout.setOrientation(LinearLayout.VERTICAL);
 
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                selectedLayout = folderLayout;
+                selectedNoteLayout = noteLayout;
+                selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
@@ -210,14 +216,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        linearLayout.addView(noteLayout);
         linearLayout.addView(folderLayout);
 
         folderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (folderLayout.getVisibility() == View.VISIBLE) {
+                    noteLayout.setVisibility(View.GONE);
                     folderLayout.setVisibility(View.GONE);
                 } else {
+                    noteLayout.setVisibility(View.VISIBLE);
                     folderLayout.setVisibility(View.VISIBLE);
                 }
 
@@ -287,13 +296,17 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout.addView(folderButton);
 
+        LinearLayout noteLayout = new LinearLayout(getApplicationContext());
+        noteLayout.setOrientation(LinearLayout.VERTICAL);
+
         LinearLayout folderLayout = new LinearLayout(getApplicationContext());
         folderLayout.setOrientation(LinearLayout.VERTICAL);
 
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                selectedLayout = folderLayout;
+                selectedNoteLayout = noteLayout;
+                selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
@@ -309,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         String docNoteType = document.getData().get("type").toString();
                         if (docNoteType.equals("file")) {
-                            createFileButton(colRef.document(String.valueOf(id)).collection("files"), folderLayout, Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, indentationLevel + 1);
+                            createFileButton(colRef.document(String.valueOf(id)).collection("files"), noteLayout, Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, indentationLevel + 1);
                         } else if (docNoteType.equals("folder")) {
                             createFolderButton(colRef.document(String.valueOf(id)).collection("files"), folderLayout, Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, indentationLevel + 1);
                         }
@@ -317,14 +330,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        linearLayout.addView(noteLayout);
         linearLayout.addView(folderLayout);
 
         folderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (folderLayout.getVisibility() == View.VISIBLE) {
+                    noteLayout.setVisibility(View.GONE);
                     folderLayout.setVisibility(View.GONE);
                 } else {
+                    noteLayout.setVisibility(View.VISIBLE);
                     folderLayout.setVisibility(View.VISIBLE);
                 }
             }
