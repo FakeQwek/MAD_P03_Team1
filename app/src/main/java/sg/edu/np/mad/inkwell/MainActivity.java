@@ -89,6 +89,15 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetDialog.setContentView(view);
         bottomSheetDialog.show();
 
+        Button bottomSheetCreateFileButton = view.findViewById(R.id.bottomSheetNewNoteButton);
+        bottomSheetCreateFileButton.setText(R.string.bottom_sheet_new_note_button);
+
+        Button bottomSheetCreateFolderButton = view.findViewById(R.id.bottomSheetNewFolderButton);
+        bottomSheetCreateFolderButton.setText(R.string.bottom_sheet_new_folder_button);
+
+        Button bottomSheetRenameButton = view.findViewById(R.id.bottomSheetRenameButton);
+        bottomSheetRenameButton.setText(R.string.bottom_sheet_rename_button);
+
         Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
         bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
     }
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                // pull up bottom sheet
+                openBottomSheet();
                 return true;
             }
         });
@@ -239,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                // pull up bottom sheet
+                openBottomSheet();
                 return true;
             }
         });
