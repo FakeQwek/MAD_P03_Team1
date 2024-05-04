@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
+import android.widget.ViewAnimator;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,7 +29,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import com.google.api.Distribution;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -405,24 +404,88 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void createViewSwitcherButton(LinearLayout linearLayout) {
-        Button viewSwitcherButton = findViewById(R.id.viewSwitcherButton);
-        viewSwitcherButton.setText("switch");
+    private void createViewAnimator() {
+        Button viewAnimatorButton = findViewById(R.id.viewAnimatorButton);
+        viewAnimatorButton.setText("Switch");
 
-        ViewSwitcher viewSwitcher = findViewById(R.id.viewSwitcher);
+        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
+
         LinearLayout viewOne = findViewById(R.id.noteList);
         LinearLayout viewTwo = findViewById(R.id.menuList);
 
-        viewSwitcherButton.setOnClickListener(new View.OnClickListener() {
+        Button searchButton = new Button(getApplicationContext());
+        searchButton.setBackgroundColor(Color.TRANSPARENT);
+        searchButton.setGravity(Gravity.START);
+        searchButton.setText("Search");
+        viewTwo.addView(searchButton);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (viewSwitcher.getCurrentView() == viewOne) {
-                    viewSwitcher.showNext();
-                } else if (viewSwitcher.getCurrentView() == viewTwo) {
-                    viewSwitcher.showPrevious();
+                viewAnimator.setDisplayedChild(2);
+            }
+        });
+
+        Button tagsButton =  new Button(getApplicationContext());
+        tagsButton.setBackgroundColor(Color.TRANSPARENT);
+        tagsButton.setGravity(Gravity.START);
+        tagsButton.setText("Tags");
+        viewTwo.addView(tagsButton);
+
+        viewAnimatorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (viewAnimator.getDisplayedChild() == 0) {
+                    viewAnimator.setDisplayedChild(1);
+                } else {
+                    viewAnimator.setDisplayedChild(0);
                 }
             }
         });
+    }
+
+    private void search(CollectionReference colRef, LinearLayout linearLayout, String searchString, EditText noteTitle, EditText noteBody) {
+        linearLayout.removeAllViews();
+        colRef.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String docNoteType = document.getData().get("type").toString();
+                                if (docNoteType.equals("file")) {
+                                    String docBody = document.getData().get("body").toString();
+                                    if (docBody.contains(searchString)) {
+                                        Button noteButton = new Button(getApplicationContext());
+                                        noteButton.setBackgroundColor(Color.WHITE);
+                                        noteButton.setGravity(Gravity.START);
+                                        noteButton.setBackgroundColor(Color.TRANSPARENT);
+
+                                        String docNoteTitle = document.getData().get("title").toString();
+                                        String docNoteBody = document.getData().get("body").toString();
+
+                                        noteButton.setId(Integer.parseInt(document.getId()));
+                                        noteButton.setText(docNoteTitle);
+
+                                        noteButton.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                noteTitle.setText(docNoteTitle);
+                                                noteBody.setText(docNoteBody);
+                                            }
+                                        });
+
+                                        linearLayout.addView(noteButton);
+                                    }
+                                } else if (docNoteType.equals("folder")) {
+                                    //folder
+                                }
+                            }
+                        } else {
+                            Log.d("testing", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
     @Override
@@ -464,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            createViewSwitcherButton(findViewById(R.id.inkwellLayout));
+                            createViewAnimator();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String docNoteType = document.getData().get("type").toString();
                                 if (docNoteType.equals("file")) {

@@ -30,13 +30,13 @@
         android:textSize="16sp" />
 
     <Button
-        android:id="@+id/viewSwitcherButton"
+        android:id="@+id/viewAnimatorButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Button" />
 
-    <ViewSwitcher
-        android:id="@+id/viewSwitcher"
+    <ViewAnimator
+        android:id="@+id/viewAnimator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inAnimation="@android:anim/slide_in_left">
@@ -53,8 +53,16 @@
             android:id="@+id/menuList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/searchMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"/>
 
-    </ViewSwitcher>
+    </ViewAnimator>
 
 </LinearLayout>
