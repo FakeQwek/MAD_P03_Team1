@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/inkwellLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -12,7 +13,7 @@
 
     <TextView
         android:id="@+id/inkwellTitle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/nav_header_title"
@@ -22,24 +23,42 @@
 
     <TextView
         android:id="@+id/inkwellDetails"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/nav_header_subtitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/inkwellTitle"
+        app:layout_constraintStart_toStartOf="@id/inkwellTitle"/>
+
+    <Button
+        android:id="@+id/searchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/magnify"
+        android:layout_gravity="end"
+        app:layout_constraintTop_toTopOf="@id/viewAnimatorButton"
+        app:layout_constraintStart_toEndOf="@id/viewAnimatorButton"/>
 
     <Button
         android:id="@+id/viewAnimatorButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/swap_horizontal"
+        android:layout_gravity="end"
+        app:layout_constraintTop_toTopOf="@id/inkwellDetails"
+        app:layout_constraintStart_toEndOf="@id/inkwellDetails"/>
 
     <ViewAnimator
         android:id="@+id/viewAnimator"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:inAnimation="@android:anim/slide_in_left">
+        android:layout_height="wrap_content"
+        android:inAnimation="@android:anim/slide_in_left"
+        app:layout_constraintTop_toBottomOf="@id/viewAnimatorButton"
+        app:layout_constraintStart_toStartOf="@id/inkwellDetails">
 
         <LinearLayout
             android:id="@+id/noteList"
@@ -86,4 +105,4 @@
 
     </ViewAnimator>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

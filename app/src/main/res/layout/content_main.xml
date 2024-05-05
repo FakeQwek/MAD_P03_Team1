@@ -19,48 +19,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
 
-    <EditText
-        android:id="@+id/noteTitle"
-        android:layout_width="349dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:backgroundTint="@android:color/transparent"
-        android:ems="10"
-        android:inputType="text"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/nav_host_fragment_content_main" />
-
-    <EditText
-        android:id="@+id/noteBody"
-        android:layout_width="349dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:backgroundTint="@android:color/transparent"
-        android:ems="10"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/noteTitle" />
-
-    <Button
-        android:id="@+id/addNoteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="460dp"
-        app:layout_constraintStart_toStartOf="@+id/noteBody"
-        app:layout_constraintTop_toBottomOf="@+id/noteBody" />
-
-    <Button
-        android:id="@+id/addFolderButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="150dp"
-        android:layout_marginTop="460dp"
-        android:text="folder"
-        app:layout_constraintStart_toEndOf="@+id/addNoteButton"
-        app:layout_constraintTop_toBottomOf="@+id/noteBody" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

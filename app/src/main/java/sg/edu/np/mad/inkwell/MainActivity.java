@@ -156,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void createNewFile(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
         Button noteButton = new Button(getApplicationContext());
-        noteButton.setBackgroundColor(Color.WHITE);
         noteButton.setGravity(Gravity.START);
         noteButton.setBackgroundColor(Color.TRANSPARENT);
         noteButton.setId(id);
@@ -280,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Button noteButton = new Button(getApplicationContext());
-        noteButton.setBackgroundColor(Color.WHITE);
         noteButton.setGravity(Gravity.START);
         noteButton.setBackgroundColor(Color.TRANSPARENT);
         noteButton.setId(id);
@@ -427,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button tagsButton =  new Button(getApplicationContext());
+        Button tagsButton = new Button(getApplicationContext());
         tagsButton.setBackgroundColor(Color.TRANSPARENT);
         tagsButton.setGravity(Gravity.START);
         tagsButton.setText("Tags");
@@ -471,7 +469,6 @@ public class MainActivity extends AppCompatActivity {
                                     String docNoteTitle = document.getData().get("title").toString();
                                     if (docNoteTitle.contains(searchString)) {
                                         Button noteButton = new Button(getApplicationContext());
-                                        noteButton.setBackgroundColor(Color.WHITE);
                                         noteButton.setGravity(Gravity.START);
                                         noteButton.setBackgroundColor(Color.TRANSPARENT);
 
@@ -528,6 +525,12 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        View decorView = getWindow().getDecorView();
+
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+
+        decorView.setSystemUiVisibility(uiOptions);
 
         Button addNoteButton = findViewById(R.id.addNoteButton);
 
