@@ -29,6 +29,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -404,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void createViewAnimator() {
+    private void createViewAnimator(EditText noteTitle, EditText noteBody) {
         Button viewAnimatorButton = findViewById(R.id.viewAnimatorButton);
         viewAnimatorButton.setText("Switch");
 
@@ -442,10 +443,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        LinearLayout searchList = findViewById(R.id.searchList);
+
+        TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
+
+        searchBarEditText.addTextChangedListener(new TextChangedListener<TextInputEditText>(searchBarEditText) {
+            @Override
+            public void onTextChanged(TextInputEditText searchBarEditText, Editable s) {
+                searchList.removeAllViews();
+
+                search(db.collection("notes"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
+            }
+        });
     }
 
-    private void search(CollectionReference colRef, LinearLayout linearLayout, String searchString, EditText noteTitle, EditText noteBody) {
-        linearLayout.removeAllViews();
+    private void search(CollectionReference colRef, LinearLayout linearLayout, Editable searchString, EditText noteTitle, EditText noteBody) {
         colRef.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -453,32 +466,37 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String docNoteType = document.getData().get("type").toString();
+                                int docNoteId = Integer.parseInt(document.getId());
                                 if (docNoteType.equals("file")) {
-                                    String docBody = document.getData().get("body").toString();
-                                    if (docBody.contains(searchString)) {
+                                    String docNoteTitle = document.getData().get("title").toString();
+                                    if (docNoteTitle.contains(searchString)) {
                                         Button noteButton = new Button(getApplicationContext());
                                         noteButton.setBackgroundColor(Color.WHITE);
                                         noteButton.setGravity(Gravity.START);
                                         noteButton.setBackgroundColor(Color.TRANSPARENT);
 
-                                        String docNoteTitle = document.getData().get("title").toString();
                                         String docNoteBody = document.getData().get("body").toString();
 
-                                        noteButton.setId(Integer.parseInt(document.getId()));
+                                        noteButton.setId(docNoteId);
                                         noteButton.setText(docNoteTitle);
 
                                         noteButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
+                                                selectedNoteId = docNoteId;
+
+                                                noteDocRef = document.getReference();
+
                                                 noteTitle.setText(docNoteTitle);
                                                 noteBody.setText(docNoteBody);
                                             }
                                         });
-
                                         linearLayout.addView(noteButton);
                                     }
                                 } else if (docNoteType.equals("folder")) {
-                                    //folder
+                                    TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
+
+                                    search(colRef.document(String.valueOf(docNoteId)).collection("files"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
                                 }
                             }
                         } else {
@@ -527,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            createViewAnimator();
+                            createViewAnimator(noteTitle, noteBody);
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 String docNoteType = document.getData().get("type").toString();
                                 if (docNoteType.equals("file")) {
