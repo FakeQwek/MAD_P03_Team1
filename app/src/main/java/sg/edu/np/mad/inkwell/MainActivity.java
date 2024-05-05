@@ -6,11 +6,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int selectedIdentationLevel;
 
-    private void openFolderBottomSheet() {
+    private void openFolderBottomSheet(EditText noteTitle) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
         View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.folder_bottom_sheet, null);
         bottomSheetDialog.setContentView(view);
@@ -113,6 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
         Button bottomSheetRenameButton = view.findViewById(R.id.bottomSheetRenameButton);
         bottomSheetRenameButton.setText(R.string.bottom_sheet_rename_button);
+
+        bottomSheetRenameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rename(noteTitle);
+            }
+        });
 
         Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
         bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
@@ -211,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void createNewFolder(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
         Button folderButton = new Button(getApplicationContext());
-        folderButton.setBackgroundColor(Color.WHITE);
         folderButton.setGravity(Gravity.START);
         folderButton.setBackgroundColor(Color.TRANSPARENT);
         folderButton.setId(id);
@@ -250,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
-                openFolderBottomSheet();
+                openFolderBottomSheet(noteTitle);
                 return true;
             }
         });
@@ -333,7 +341,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Button folderButton = new Button(getApplicationContext());
-        folderButton.setBackgroundColor(Color.WHITE);
         folderButton.setGravity(Gravity.START);
         folderButton.setBackgroundColor(Color.TRANSPARENT);
         folderButton.setId(id);
@@ -365,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
                 noteDocRef = colRef.document(String.valueOf(id));
                 selectedIdentationLevel = indentationLevel;
 
-                openFolderBottomSheet();
+                openFolderBottomSheet(noteTitle);
                 return true;
             }
         });
@@ -501,6 +508,35 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void rename(EditText noteTitle) {
+        View renamePopupView = LayoutInflater.from(MainActivity.this).inflate(R.layout.rename_popup, null);
+
+        PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+
+        TextInputEditText renameEditText = renamePopupView.findViewById(R.id.renameEditText);
+
+        Button renameButton = renamePopupView.findViewById(R.id.renameButton);
+
+        renameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newTitle = renameEditText.getText().toString();
+
+                Map<String, Object> newFolder = new HashMap<>();
+                newFolder.put("title", newTitle);
+
+                noteDocRef.update(newFolder);
+
+                Button buttonTitle = findViewById(selectedNoteId);
+                buttonTitle.setText(newTitle);
+
+                renamePopupWindow.dismiss();
+            }
+        });
+
+        renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
     }
 
     @Override

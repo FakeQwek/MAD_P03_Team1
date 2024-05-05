@@ -17,5 +17,4 @@
         android:textAlignment="viewStart"
         android:textColor="@color/black"
         style="?android:attr/borderlessButtonStyle" />
-
 </LinearLayout>
