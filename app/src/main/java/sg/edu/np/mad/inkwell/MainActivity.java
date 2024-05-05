@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -412,20 +413,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void createViewAnimator(EditText noteTitle, EditText noteBody) {
         Button viewAnimatorButton = findViewById(R.id.viewAnimatorButton);
-        viewAnimatorButton.setText("Switch");
 
         ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
+
+        Button searchButton = findViewById(R.id.searchButton);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAnimator.setDisplayedChild(2);
+            }
+        });
 
         LinearLayout viewOne = findViewById(R.id.noteList);
         LinearLayout viewTwo = findViewById(R.id.menuList);
 
-        Button searchButton = new Button(getApplicationContext());
-        searchButton.setBackgroundColor(Color.TRANSPARENT);
-        searchButton.setGravity(Gravity.START);
-        searchButton.setText("Search");
-        viewTwo.addView(searchButton);
+        Button searchMenuButton = new Button(getApplicationContext());
+        searchMenuButton.setBackgroundColor(Color.TRANSPARENT);
+        searchMenuButton.setGravity(Gravity.START);
+        searchMenuButton.setText("Search");
+        viewTwo.addView(searchMenuButton);
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        searchMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 viewAnimator.setDisplayedChild(2);
