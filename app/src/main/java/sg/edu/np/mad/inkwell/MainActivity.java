@@ -88,10 +88,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        //Sets toolbar
         setSupportActionBar(binding.appBarMain.toolbar);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //Finds drawer and nav view before setting listener
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -502,13 +503,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 || super.onSupportNavigateUp();
     }
 
-    //Allows movement between activities upon clickings
+    //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.login) {
-            Intent OTPActivity = new Intent(MainActivity.this, Login.class);
-            startActivity(OTPActivity);
+        if (menuItem.getItemId() == R.id.nav_notes) {
+            /* Replace intent with other function for fragment
+            Intent Login = new Intent(MainActivity.this, Login.class);
+            startActivity(Login);
+            */
+            Log.d( "Message", "Opening notes");
         }
-        return false;
+        else if (menuItem.getItemId() == R.id.nav_home) {
+            Log.d("Message", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Log.d("Message", "Opening calendar");
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Log.d("Message", "Opening timetable");
+        }
+        else {
+           Log.d("Message", "Unknown page!");
+        }
+    return true;
     }
+
+
 }
