@@ -25,6 +25,14 @@
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
+            android:name=".Login"
+            android:exported="false" />
+        <activity
+            android:name=".navdrawer"
+            android:exported="false"
+            android:label="@string/title_activity_navdrawer"
+            android:theme="@style/Theme.Inkwell.NoActionBar" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
