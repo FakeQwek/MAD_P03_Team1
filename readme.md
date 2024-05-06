@@ -24,7 +24,7 @@ Productivity
 ## Task Allocation ##
 **Stage 1**
 
-*Features and Pages:* 
+*Tasks and Features:* 
 - Navigations bar design and implementation – Tsun Yang 
 - Logo design and Name – Tsun Yang 
 - Typing and notes page and implementation – Chin Teck 
@@ -43,7 +43,7 @@ Productivity
 
 **Stage 2** - TBD
 
-Features and Pages:
+Tasks and Features:
 
 
 Concepts:

@@ -9,19 +9,18 @@
     tools:context=".MainActivity">
 
     <Button
-        android:background="@drawable/round_btn"
-        android:id="@+id/addNewBtn"
+        android:id="@+id/addNewBtn1"
         android:layout_width="370dp"
         android:layout_height="70dp"
-        android:layout_marginTop="30dp"
         android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/round_btn"
         android:text="+ Add new"
         android:textSize="17dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
