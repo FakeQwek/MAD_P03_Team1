@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -24,13 +26,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
-
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
@@ -45,7 +50,7 @@ import java.util.Map;
 
 import sg.edu.np.mad.inkwell.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
 
@@ -618,6 +623,8 @@ public class MainActivity extends AppCompatActivity {
         renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
     }
 
+    private int selectedNoteId = 1;
+    private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -627,19 +634,23 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        //Sets toolbar
         setSupportActionBar(binding.appBarMain.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //Finds drawer and nav view before setting listener
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
+                R.string.close_nav);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
-                .setOpenableLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+
 
         View decorView = getWindow().getDecorView();
 
@@ -648,6 +659,7 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
 
         // Get addNoteButton Button
+        //Adding Notes Code
         Button addNoteButton = findViewById(R.id.addNoteButton);
 
         // Create new Note object
@@ -751,4 +763,32 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    //Allows movement between activities upon clicking
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.nav_notes) {
+            /* Replace intent with other function for fragment
+            Intent Login = new Intent(MainActivity.this, Login.class);
+            startActivity(Login);
+            */
+            Log.d( "Message", "Opening notes");
+        }
+        else if (menuItem.getItemId() == R.id.nav_home) {
+            Log.d("Message", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Log.d("Message", "Opening calendar");
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Log.d("Message", "Opening timetable");
+        }
+        else {
+           Log.d("Message", "Unknown page!");
+        }
+    return true;
+    }
+
+
 }
