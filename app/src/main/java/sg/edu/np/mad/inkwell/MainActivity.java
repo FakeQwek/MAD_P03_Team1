@@ -623,7 +623,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
     }
 
-    private int selectedNoteId = 1;
     private DrawerLayout drawerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
