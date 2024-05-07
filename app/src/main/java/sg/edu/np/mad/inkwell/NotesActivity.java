@@ -59,6 +59,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     // noteId of most recently selected note
     private int selectedNoteId = 1;
 
+    // folderId of most recently selected folder
+    private int selectedFolderId;
+
     // DocumentReference of most recently selected note
     private DocumentReference noteDocRef;
 
@@ -70,6 +73,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
     // indentationLevel of most recently selected note
     private int selectedIndentationLevel;
+
+    // int of how many files there are
+    private int noteCount;
 
     // Function to inflate folder_bottom_sheet.xml
     private void openFolderBottomSheet(EditText noteTitle) {
@@ -132,7 +138,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
                 noteDocRef.update(deleteFolder);
 
-                findViewById(selectedNoteId).setVisibility(View.GONE);
+                findViewById(selectedFolderId).setVisibility(View.GONE);
                 selectedNoteLayout.setVisibility(View.GONE);
                 selectedFolderLayout.setVisibility(View.GONE);
             }
@@ -167,6 +173,8 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
     // Function to create a new file
     private void createNewFile(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
+        noteCount++;
+
         // Create new Button and set text for noteButton
         Button noteButton = new Button(getApplicationContext());
         noteButton.setGravity(Gravity.START);
@@ -225,6 +233,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         // Add noteButton to linearLayout
         linearLayout.addView(noteButton);
+
+        TextView inkwellDetails = findViewById(R.id.inkwellDetails);
+        String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), noteCount);
+        inkwellDetails.setText(inkwellDetailsText);
     }
 
     // Function to create a new folder
@@ -267,7 +279,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                selectedNoteId = id;
+                selectedFolderId = id;
                 selectedNoteLayout = noteLayout;
                 selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
@@ -303,6 +315,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         if (id > currentNoteId) {
             currentNoteId = id;
         }
+
+        noteCount++;
+        Log.d("tester", String.valueOf(noteCount));
 
         // Create new Button and set text for noteButton
         Button noteButton = new Button(getApplicationContext());
@@ -356,6 +371,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         // Add noteButton to linearLayout
         linearLayout.addView(noteButton);
+
+        TextView inkwellDetails = findViewById(R.id.inkwellDetails);
+        String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), noteCount);
+        inkwellDetails.setText(inkwellDetailsText);
     }
 
     // Function to create folder on app load
@@ -394,7 +413,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         folderButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                selectedNoteId = id;
+                selectedFolderId = id;
                 selectedNoteLayout = noteLayout;
                 selectedFolderLayout = folderLayout;
                 noteDocRef = colRef.document(String.valueOf(id));
@@ -656,9 +675,6 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                         } else {
                             Log.d("testing", "Error getting documents: ", task.getException());
                         }
-                        TextView inkwellDetails = findViewById(R.id.inkwellDetails);
-                        String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), currentNoteId);
-                        inkwellDetails.setText(inkwellDetailsText);
                     }
                 });
 
@@ -702,10 +718,6 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 currentNoteId++;
 
                 createNewFile(db.collection("notes"), findViewById(R.id.noteList), currentNoteId, noteTitle, noteBody, 0);
-
-                TextView inkwellDetails = findViewById(R.id.inkwellDetails);
-                String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), currentNoteId);
-                inkwellDetails.setText(inkwellDetailsText);
             }
         });
 
