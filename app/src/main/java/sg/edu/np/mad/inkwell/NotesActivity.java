@@ -3,7 +3,6 @@ package sg.edu.np.mad.inkwell;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,10 +21,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -42,11 +37,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-import sg.edu.np.mad.inkwell.databinding.ActivityMainBinding;
-
 public class NotesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private AppBarConfiguration mAppBarConfiguration;
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -745,7 +736,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             */
             Log.d( "Message", "Opening notes");
         }
-        else if (menuItem.getItemId() == R.id.nav_home) {
+        else if (menuItem.getItemId() == R.id.nav_todo) {
             Log.d("Message", "Opening home");
             return true;
         }
