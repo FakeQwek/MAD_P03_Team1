@@ -35,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -47,6 +48,16 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     private int currentTodoId;
 
+    private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
+        RecyclerView todoRecyclerView = findViewById(R.id.todoRecyclerView);
+        TodoAdapter todoAdapter = new TodoAdapter(allTodos, todos, this);
+        LinearLayoutManager todoLayoutManager = new LinearLayoutManager(this);
+        todoRecyclerView.setLayoutManager(todoLayoutManager);
+        todoRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        todoRecyclerView.setAdapter(todoAdapter);
+        todoRecyclerView.getAdapter().notifyDataSetChanged();
+    }
+
     private void filter(ArrayList<Todo> todos, String status) {
         ArrayList<Todo> filterList = new ArrayList<>();
         for (Todo todo : todos){
@@ -54,17 +65,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 filterList.add(todo);
             }
         }
-        recyclerView(filterList);
-    }
-
-    private void recyclerView(ArrayList<Todo> todos) {
-        RecyclerView todoRecyclerView = findViewById(R.id.todoRecyclerView);
-        TodoAdapter todoAdapter = new TodoAdapter(todos, this);
-        LinearLayoutManager todoLayoutManager = new LinearLayoutManager(this);
-        todoRecyclerView.setLayoutManager(todoLayoutManager);
-        todoRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        todoRecyclerView.setAdapter(todoAdapter);
-        todoRecyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView(todos, filterList);
     }
 
     @Override
@@ -88,6 +89,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         ArrayList<Todo> allTodos = new ArrayList<>();
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
         db.collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -106,6 +109,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                                 Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
                                 allTodos.add(todo);
                                 filter(allTodos, "todo");
+                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                Log.d("tester", String.valueOf(allTodos.size()));
                             }
                         }
                     }
@@ -118,7 +123,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 Map<String, Object> todoData = new HashMap<>();
                 todoData.put("title", "New todo");
-                todoData.put("dateTime", Calendar.getInstance().getTime());
+                todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
                 todoData.put("status", "todo");
                 db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
             }

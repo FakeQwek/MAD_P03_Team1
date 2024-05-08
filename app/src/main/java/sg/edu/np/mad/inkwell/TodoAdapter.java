@@ -14,6 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +22,15 @@ import java.util.Map;
 public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private ArrayList<Todo> allTodos;
+
     private ArrayList<Todo> todoList;
 
     private TodoActivity todoActivity;
 
-    public TodoAdapter(ArrayList<Todo> todoList, TodoActivity todoActivity) {
+    public TodoAdapter(ArrayList<Todo> allTodos, ArrayList<Todo> todoList, TodoActivity todoActivity) {
+        this.allTodos = allTodos;
         this.todoList = todoList;
         this.todoActivity = todoActivity;
     }
@@ -70,10 +75,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                             public void onClick(View v) {
                                 String newTitle = renameEditText.getText().toString();
 
-                                Map<String, Object> newFolder = new HashMap<>();
-                                newFolder.put("title", newTitle);
+                                Map<String, Object> newTodo = new HashMap<>();
+                                newTodo.put("title", newTitle);
 
-                                db.collection("todos").document(String.valueOf(todo.getTodoId())).update(newFolder);
+                                db.collection("todos").document(String.valueOf(todo.getTodoId())).update(newTodo);
 
                                 holder.todoTitle.setText(newTitle);
 
@@ -82,6 +87,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                         });
 
                         renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
+
+                        bottomSheetDialog.dismiss();
                     }
                 });
 
@@ -98,8 +105,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                         } else {
                             todo.setTodoStatus("todo");
                         }
+                        Map<String, Object> newTodo = new HashMap<>();
+                        newTodo.put("status", todo.getTodoStatus());
+                        db.collection("todos").document(String.valueOf(todo.getTodoId())).update(newTodo);
+
                         todoList.remove(todo);
                         todoRecyclerView.getAdapter().notifyDataSetChanged();
+
+                        bottomSheetDialog.dismiss();
                     }
                 });
 
@@ -116,8 +129,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                         } else {
                             todo.setTodoStatus("inProgress");
                         }
+                        Map<String, Object> newTodo = new HashMap<>();
+                        newTodo.put("status", todo.getTodoStatus());
+                        db.collection("todos").document(String.valueOf(todo.getTodoId())).update(newTodo);
+
                         todoList.remove(todo);
                         todoRecyclerView.getAdapter().notifyDataSetChanged();
+
+                        bottomSheetDialog.dismiss();
                     }
                 });
 
@@ -127,10 +146,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                 todoDeleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        allTodos.remove(todo);
                         todoList.remove(todo);
                         todoRecyclerView.getAdapter().notifyDataSetChanged();
 
                         db.collection("todos").document(String.valueOf(todo.getTodoId())).delete();
+
+                        bottomSheetDialog.dismiss();
                     }
                 });
             }
