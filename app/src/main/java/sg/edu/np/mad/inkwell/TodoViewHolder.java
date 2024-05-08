@@ -11,11 +11,15 @@ public class TodoViewHolder extends RecyclerView.ViewHolder {
 
     TextView todoDateTime;
 
+    CardView cardView;
+
     public TodoViewHolder(View view) {
         super(view);
 
         todoTitle = view.findViewById(R.id.todoTitle);
 
         todoDateTime = view.findViewById(R.id.todoDateTime);
+
+        cardView = view.findViewById(R.id.cardView);
     }
 }

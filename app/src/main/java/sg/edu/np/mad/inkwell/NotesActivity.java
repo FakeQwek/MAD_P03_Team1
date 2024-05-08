@@ -113,7 +113,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         bottomSheetRenameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                rename(noteTitle);
+                rename();
             }
         });
 
@@ -575,7 +575,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     }
 
     // Function to rename files and folders
-    private void rename(EditText noteTitle) {
+    private void rename() {
         View renamePopupView = LayoutInflater.from(NotesActivity.this).inflate(R.layout.rename_popup, null);
 
         PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
@@ -596,7 +596,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
                 noteDocRef.update(newFolder);
 
-                Button buttonTitle = findViewById(selectedNoteId);
+                Button buttonTitle = findViewById(selectedFolderId);
                 buttonTitle.setText(newTitle);
 
                 renamePopupWindow.dismiss();

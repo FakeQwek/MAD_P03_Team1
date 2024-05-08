@@ -67,21 +67,6 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         ArrayList<Todo> todos = new ArrayList<>();
 
-        Button addTodoButton = findViewById(R.id.addTodoButton);
-
-        addTodoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                currentTodoId++;
-//                Map<String, Object> todoData = new HashMap<>();
-//                todoData.put("title", "New todo");
-//                todoData.put("dateTime", Calendar.getInstance().getTime());
-//                todoData.put("status", "todo");
-//                db.collection("todos").document(String.valueOf(currentTodoId)).set(todoData);
-                Log.d("tester", String.valueOf(todos.size()));
-            }
-        });
-
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         TodoAdapter todoAdapter = new TodoAdapter(todos, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -90,40 +75,40 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setAdapter(todoAdapter);
 
         db.collection("todos")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Todo todo = new Todo(document.getData().get("title").toString(), Integer.parseInt(document.getId()), document.getData().get("dateTime").toString(), document.getData().get("status").toString());
-                                todos.add(todo);
-                                recyclerView.getAdapter().notifyDataSetChanged();
-                            }
-                        } else {
-                            Log.d("testing", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-
-        db.collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
                                         @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
-                            Log.w("TAG", "listen:error", e);
+                            Log.w("testing", "listen:error", e);
                             return;
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
-                                Log.d("TAG", "New city: " + dc.getDocument().getData());
+                                currentTodoId++;
+                                Log.d("testing", "New city: " + dc.getDocument().getData());
+                                Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
+                                todos.add(todo);
+                                recyclerView.getAdapter().notifyDataSetChanged();
                             }
                         }
 
                     }
                 });
+
+        Button addTodoButton = findViewById(R.id.addTodoButton);
+
+        addTodoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> todoData = new HashMap<>();
+                todoData.put("title", "New todo");
+                todoData.put("dateTime", Calendar.getInstance().getTime());
+                todoData.put("status", "todo");
+                db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+            }
+        });
     }
 
     //Allows movement between activities upon clicking
