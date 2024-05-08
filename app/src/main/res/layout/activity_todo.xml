@@ -83,20 +83,21 @@
             app:layout_constraintStart_toEndOf="@+id/inProgressButton"
             app:layout_constraintTop_toTopOf="@+id/inProgressButton" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inProgressButton" />
-
         <Button
             android:id="@+id/addTodoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/doneButton"
             app:layout_constraintEnd_toEndOf="@+id/doneButton" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/todoRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inProgressButton" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

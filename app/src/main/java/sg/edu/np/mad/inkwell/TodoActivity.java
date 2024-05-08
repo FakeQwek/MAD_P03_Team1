@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -46,6 +47,26 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     private int currentTodoId;
 
+    private void filter(ArrayList<Todo> todos, String status) {
+        ArrayList<Todo> filterList = new ArrayList<>();
+        for (Todo todo : todos){
+            if(todo.getTodoStatus().equals(status)){
+                filterList.add(todo);
+            }
+        }
+        recyclerView(filterList);
+    }
+
+    private void recyclerView(ArrayList<Todo> todos) {
+        RecyclerView todoRecyclerView = findViewById(R.id.todoRecyclerView);
+        TodoAdapter todoAdapter = new TodoAdapter(todos, this);
+        LinearLayoutManager todoLayoutManager = new LinearLayoutManager(this);
+        todoRecyclerView.setLayoutManager(todoLayoutManager);
+        todoRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        todoRecyclerView.setAdapter(todoAdapter);
+        todoRecyclerView.getAdapter().notifyDataSetChanged();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,14 +86,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        ArrayList<Todo> todos = new ArrayList<>();
-
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        TodoAdapter todoAdapter = new TodoAdapter(todos, this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(todoAdapter);
+        ArrayList<Todo> allTodos = new ArrayList<>();
 
         db.collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -86,14 +100,14 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
-                                currentTodoId++;
-                                Log.d("testing", "New city: " + dc.getDocument().getData());
+                                if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
+                                    currentTodoId = Integer.parseInt(dc.getDocument().getId());
+                                }
                                 Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
-                                todos.add(todo);
-                                recyclerView.getAdapter().notifyDataSetChanged();
+                                allTodos.add(todo);
+                                filter(allTodos, "todo");
                             }
                         }
-
                     }
                 });
 
@@ -107,6 +121,35 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 todoData.put("dateTime", Calendar.getInstance().getTime());
                 todoData.put("status", "todo");
                 db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+            }
+        });
+
+        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
+
+        Button todoButton = findViewById(R.id.todoButton);
+
+        todoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filter(allTodos, "todo");
+            }
+        });
+
+        Button inProgressButton = findViewById(R.id.inProgressButton);
+
+        inProgressButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filter(allTodos, "inProgress");
+            }
+        });
+
+        Button doneButton = findViewById(R.id.doneButton);
+
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filter(allTodos, "done");
             }
         });
     }

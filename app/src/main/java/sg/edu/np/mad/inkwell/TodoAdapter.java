@@ -41,6 +41,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         holder.todoTitle.setText(todo.getTodoTitle());
         holder.todoDateTime.setText(todo.getTodoDateTime());
 
+        RecyclerView todoRecyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,11 +88,51 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                 Button todoMoveButton1 = view.findViewById(R.id.todoMoveButton1);
                 todoMoveButton1.setText("Move to In Progress");
 
+                todoMoveButton1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (todo.getTodoStatus().equals("todo")) {
+                            todo.setTodoStatus("inProgress");
+                        } else if (todo.getTodoStatus().equals("inProgress")) {
+                            todo.setTodoStatus("done");
+                        } else {
+                            todo.setTodoStatus("todo");
+                        }
+                        todoList.remove(todo);
+                        todoRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                });
+
                 Button todoMoveButton2 = view.findViewById(R.id.todoMoveButton2);
                 todoMoveButton2.setText("Move to Done");
 
+                todoMoveButton2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (todo.getTodoStatus().equals("todo")) {
+                            todo.setTodoStatus("done");
+                        } else if (todo.getTodoStatus().equals("inProgress")) {
+                            todo.setTodoStatus("todo");
+                        } else {
+                            todo.setTodoStatus("inProgress");
+                        }
+                        todoList.remove(todo);
+                        todoRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                });
+
                 Button todoDeleteButton = view.findViewById(R.id.todoDeleteButton);
                 todoDeleteButton.setText("Delete");
+
+                todoDeleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        todoList.remove(todo);
+                        todoRecyclerView.getAdapter().notifyDataSetChanged();
+
+                        db.collection("todos").document(String.valueOf(todo.getTodoId())).delete();
+                    }
+                });
             }
         });
     }
