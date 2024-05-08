@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -737,6 +738,8 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             Log.d( "Message", "Opening notes");
         }
         else if (menuItem.getItemId() == R.id.nav_todo) {
+            Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
+            startActivity(todoActivity);
             Log.d("Message", "Opening home");
             return true;
         }
