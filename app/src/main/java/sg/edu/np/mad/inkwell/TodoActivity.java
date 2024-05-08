@@ -124,8 +124,6 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
-
         Button todoButton = findViewById(R.id.todoButton);
 
         todoButton.setOnClickListener(new View.OnClickListener() {
