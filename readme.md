@@ -1,13 +1,13 @@
 # Inkwell #
+
 ## Introduction ##
 Inkwell is a productivity app that allows users to stay organised by notetaking and keeping regular schedules. 
-*Mindfulness is king* when it comes to Inkwell with its many useful features such as the calender, inkwells (notepages) and voice memos.
-
-**Stay organised today with Inkwell!**
+*Mindfulness is king* when it comes to Inkwell with its many useful features. Some of these features include the calender allows you to schedule for events and plan out your week, notepages which allow you to reflect and write down important details and
+the todo list, which allows you to keep track of tasks on a daily basis. *Stay organised today with Inkwell*
 
 ## Objective ##
-Create an app that encourages productivity through organisation. The app should allow users to schedule and plan out their days to 
-improve their quality of life.
+Create an app that encourages productivity through organisation. The app should allow users to stay organised using multiple features in the app to stay efficient and improve quality of life.
+
 
 ## Category ##
 Productivity
@@ -22,15 +22,18 @@ Productivity
 5. Jin Xuan
 
 ## Task Allocation ##
+
 **Stage 1**
 
-*Features and Pages:* 
-- Navigations bar design and implementation – Tsun Yang 
-- Logo design and Name – Tsun Yang 
-- Typing and notes page and implementation – Chin Teck 
-- Calender implementation and page – Jun Kai 
-- Timetable implementation and timetable page - Rithika 
-- Login implementation and login page – Jin Xuan 
+*Tasks and Features:* 
+- Navigations bar – Tsun Yang
+- Icon and Name - Tsun Yang
+- Notes with typing and file structure – Chin Teck 
+- Calender – Jun Kai 
+- Timetable - Rithika 
+- Login and Authentication – Jin Xuan 
+- Todo list - Chin Teck
+- Flashcards - Chin Teck
 
 *Concepts:* 
 - Database storage – Chin Teck 
@@ -41,12 +44,14 @@ Productivity
 *Other* 
 - Padlet and Readme - Tsun Yang
 
-**Stage 2** - TBD
+**Stage 2**
 
-Features and Pages:
-
-
-Concepts:
+*Tasks and Features:*
+- Multimedia upload for notes – Tsun Yang
+- Sharing to collaborators  - Chin Teck
+- Biometric Authentication -  
+- Time tracking with work statistics and achievements  -
+- Local storage and encryption – Chin Teck   
 
 *Other* 
 - Publishing App - Tsun Yang
