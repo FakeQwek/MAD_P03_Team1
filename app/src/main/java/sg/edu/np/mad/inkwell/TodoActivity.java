@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SearchView;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -48,6 +49,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     private int currentTodoId;
 
+    private String currentStatus;
+
     private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
         RecyclerView todoRecyclerView = findViewById(R.id.todoRecyclerView);
         TodoAdapter todoAdapter = new TodoAdapter(allTodos, todos, this);
@@ -58,10 +61,10 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         todoRecyclerView.getAdapter().notifyDataSetChanged();
     }
 
-    private void filter(ArrayList<Todo> todos, String status) {
+    private void filter(ArrayList<Todo> todos, String status, String query) {
         ArrayList<Todo> filterList = new ArrayList<>();
         for (Todo todo : todos){
-            if(todo.getTodoStatus().equals(status)){
+            if(todo.getTodoStatus().equals(status) && todo.getTodoTitle().toLowerCase().contains(query)) {
                 filterList.add(todo);
             }
         }
@@ -108,7 +111,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                                 }
                                 Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
                                 allTodos.add(todo);
-                                filter(allTodos, "todo");
+                                filter(allTodos, "todo", "");
                             } else if (dc.getType() == DocumentChange.Type.REMOVED) {
                                 Log.d("tester", String.valueOf(allTodos.size()));
                             }
@@ -134,7 +137,9 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         todoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                filter(allTodos, "todo");
+                currentStatus = "todo";
+
+                filter(allTodos, "todo", "");
             }
         });
 
@@ -143,7 +148,9 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         inProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                filter(allTodos, "inProgress");
+                currentStatus = "inProgress";
+
+                filter(allTodos, "inProgress", "");
             }
         });
 
@@ -152,7 +159,25 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                filter(allTodos, "done");
+                currentStatus = "done";
+
+                filter(allTodos, "done", "");
+            }
+        });
+
+        SearchView searchView = findViewById(R.id.searchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filter(allTodos, currentStatus, query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(allTodos, currentStatus, newText);
+                return false;
             }
         });
     }

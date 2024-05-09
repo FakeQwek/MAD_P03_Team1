@@ -52,12 +52,13 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
             android:layout_marginTop="30dp"
             android:backgroundTint="@color/white"
             android:text="Todo"
             android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@+id/textView2"
-            tools:layout_editor_absoluteX="26dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         <Button
             android:id="@+id/inProgressButton"
@@ -83,6 +84,13 @@
             app:layout_constraintStart_toEndOf="@+id/inProgressButton"
             app:layout_constraintTop_toTopOf="@+id/inProgressButton" />
 
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inProgressButton" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/todoRecyclerView"
             android:layout_width="match_parent"
@@ -91,7 +99,7 @@
             android:layout_marginBottom="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inProgressButton"
+            app:layout_constraintTop_toBottomOf="@+id/searchView"
             app:layout_constraintVertical_bias="0.0" />
 
         <Button
