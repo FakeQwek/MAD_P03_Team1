@@ -52,13 +52,13 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     private String currentStatus;
 
     private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
-        RecyclerView todoRecyclerView = findViewById(R.id.todoRecyclerView);
-        TodoAdapter todoAdapter = new TodoAdapter(allTodos, todos, this);
-        LinearLayoutManager todoLayoutManager = new LinearLayoutManager(this);
-        todoRecyclerView.setLayoutManager(todoLayoutManager);
-        todoRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        todoRecyclerView.setAdapter(todoAdapter);
-        todoRecyclerView.getAdapter().notifyDataSetChanged();
+        RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
+        TodoAdapter adapter = new TodoAdapter(allTodos, todos, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     private void filter(ArrayList<Todo> todos, String status, String query) {
