@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -16,9 +18,20 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class QuizFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private int currentFlashcardPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +61,57 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 
         decorView.setSystemUiVisibility(uiOptions);
+
+        ArrayList<String> questionList = new ArrayList<>();
+
+        ArrayList<String> answerList = new ArrayList<>();
+
+        TextView question = findViewById(R.id.question);
+
+        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                questionList.add(document.getData().get("question").toString());
+                                answerList.add(document.getData().get("answer").toString());
+                            }
+                        } else {
+                            Log.d("testing", "Error getting documents: ", task.getException());
+                        }
+                        question.setText(questionList.get(currentFlashcardPosition));
+                    }
+                });
+
+        Button wrongButton = findViewById(R.id.wrongButton);
+
+        wrongButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentFlashcardPosition++;
+                if (currentFlashcardPosition >= questionList.size()) {
+
+                } else {
+                    question.setText(questionList.get(currentFlashcardPosition));
+                }
+            }
+        });
+
+        Button correctButton = findViewById(R.id.correctButton);
+
+        correctButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentFlashcardPosition++;
+                if (currentFlashcardPosition >= questionList.size()) {
+
+                } else {
+                    question.setText(questionList.get(currentFlashcardPosition));
+                }
+            }
+        });
     }
 
     @Override
