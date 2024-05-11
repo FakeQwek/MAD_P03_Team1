@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -124,7 +125,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                     }
                 });
 
-        Button addFlashcardButton = findViewById(R.id.addFlashcardButton);
+        ImageButton addFlashcardButton = findViewById(R.id.addFlashcardButton);
 
         addFlashcardButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,6 +134,16 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 flashcardData.put("question", "New flashcard");
                 flashcardData.put("answer", "answer");
                 db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
+            }
+        });
+
+        Button quizButton = findViewById(R.id.quizButton);
+
+        quizButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent quiz = new Intent(ViewFlashcardActivity.this, QuizFlashcardActivity.class);
+                startActivity(quiz);
             }
         });
 

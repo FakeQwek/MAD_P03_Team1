@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +50,7 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
 
         RecyclerView recyclerView = viewFlashcardActivity.findViewById(R.id.recyclerView);
 
-        Button deleteFlashcardButton = viewFlashcardActivity.findViewById(R.id.deleteFlashcardButton);
+        ImageButton deleteFlashcardButton = viewFlashcardActivity.findViewById(R.id.deleteFlashcardButton);
 
         deleteFlashcardButton.setOnClickListener(new View.OnClickListener() {
             @Override
