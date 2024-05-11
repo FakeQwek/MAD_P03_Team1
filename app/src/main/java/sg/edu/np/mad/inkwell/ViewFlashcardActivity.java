@@ -35,6 +35,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -134,6 +135,8 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 flashcardData.put("question", "New flashcard");
                 flashcardData.put("answer", "answer");
                 db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
+
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
             }
         });
 
@@ -163,7 +166,9 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
             Log.d("Message", "Opening home");
             return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(ViewFlashcardActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             Log.d("Message", "Opening calendar");
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {

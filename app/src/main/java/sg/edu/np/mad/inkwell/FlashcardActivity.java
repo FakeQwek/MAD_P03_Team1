@@ -101,7 +101,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentFlashcardCollectionId) {
                                     currentFlashcardCollectionId = Integer.parseInt(dc.getDocument().getId());
                                 }
-                                FlashcardCollection flashcardCollection = new FlashcardCollection(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), Integer.parseInt(dc.getDocument().getData().get("flashcardCount").toString()));
+                                FlashcardCollection flashcardCollection = new FlashcardCollection(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), Integer.parseInt(dc.getDocument().getData().get("flashcardCount").toString()), Integer.parseInt(dc.getDocument().getData().get("correct").toString()));
                                 allFlashcardCollections.add(flashcardCollection);
                                 filter(allFlashcardCollections, "");
                             } else if (dc.getType() == DocumentChange.Type.REMOVED) {
@@ -140,7 +140,9 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
             Log.d("Message", "Opening home");
             return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(FlashcardActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             Log.d("Message", "Opening calendar");
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {

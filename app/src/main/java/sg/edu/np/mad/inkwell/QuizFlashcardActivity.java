@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -62,11 +63,15 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         decorView.setSystemUiVisibility(uiOptions);
 
+        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
+
         ArrayList<String> questionList = new ArrayList<>();
 
         ArrayList<String> answerList = new ArrayList<>();
 
-        TextView question = findViewById(R.id.question);
+        TextView question1 = findViewById(R.id.question1);
+
+        TextView question2 = findViewById(R.id.question2);
 
         db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards")
                 .get()
@@ -81,7 +86,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                         } else {
                             Log.d("testing", "Error getting documents: ", task.getException());
                         }
-                        question.setText(questionList.get(currentFlashcardPosition));
+                        question1.setText(questionList.get(currentFlashcardPosition));
                     }
                 });
 
@@ -94,7 +99,13 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                 if (currentFlashcardPosition >= questionList.size()) {
 
                 } else {
-                    question.setText(questionList.get(currentFlashcardPosition));
+                    if (viewAnimator.getDisplayedChild() == 0) {
+                        question2.setText(questionList.get(currentFlashcardPosition));
+                        viewAnimator.setDisplayedChild(1);
+                    } else {
+                        question1.setText(questionList.get(currentFlashcardPosition));
+                        viewAnimator.setDisplayedChild(0);
+                    }
                 }
             }
         });
@@ -108,7 +119,13 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                 if (currentFlashcardPosition >= questionList.size()) {
 
                 } else {
-                    question.setText(questionList.get(currentFlashcardPosition));
+                    if (viewAnimator.getDisplayedChild() == 0) {
+                        question2.setText(questionList.get(currentFlashcardPosition));
+                        viewAnimator.setDisplayedChild(1);
+                    } else {
+                        question1.setText(questionList.get(currentFlashcardPosition));
+                        viewAnimator.setDisplayedChild(0);
+                    }
                 }
             }
         });

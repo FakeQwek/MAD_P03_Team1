@@ -1,6 +1,7 @@
 package sg.edu.np.mad.inkwell;
 
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -13,6 +14,8 @@ public class FlashcardCollectionViewHolder extends RecyclerView.ViewHolder {
 
     CardView cardView;
 
+    ProgressBar progressBar;
+
     public FlashcardCollectionViewHolder(View view) {
         super(view);
 
@@ -21,5 +24,7 @@ public class FlashcardCollectionViewHolder extends RecyclerView.ViewHolder {
         flashcardCount = view.findViewById(R.id.flashcardCount);
 
         cardView = view.findViewById(R.id.cardView);
+
+        progressBar = view.findViewById(R.id.progressBar);
     }
 }

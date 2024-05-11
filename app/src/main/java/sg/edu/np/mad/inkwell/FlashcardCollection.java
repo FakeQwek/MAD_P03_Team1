@@ -7,15 +7,20 @@ public class FlashcardCollection {
 
     public int flashcardCount;
 
+    public int correct;
+
     public String getTitle() { return this.title; }
 
     public int getId() { return this.id; }
 
     public int getFlashcardCount() {return this.flashcardCount; }
 
-    public FlashcardCollection(String title, int id, int flashcardCount) {
+    public int getCorrect() { return this.correct; }
+
+    public FlashcardCollection(String title, int id, int flashcardCount, int correct) {
         this.title = title;
         this.id = id;
         this.flashcardCount = flashcardCount;
+        this.correct = correct;
     }
 }

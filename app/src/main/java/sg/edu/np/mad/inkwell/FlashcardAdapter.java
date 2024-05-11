@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -72,6 +73,8 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
                 recyclerView.getAdapter().notifyDataSetChanged();
 
                 db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
+
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
             }
         });
     }

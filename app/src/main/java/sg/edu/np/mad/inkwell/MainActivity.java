@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(MainActivity.this, ViewFlashcardActivity.class);
+            Intent todoActivity = new Intent(MainActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
             Log.d("Message", "Opening home");
             return true;

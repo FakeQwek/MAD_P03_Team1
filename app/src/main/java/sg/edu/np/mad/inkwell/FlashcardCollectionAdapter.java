@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,19 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
         holder.flashcardCount.setText(String.valueOf(flashcardCollection.getFlashcardCount()));
 
         RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
+
+        holder.progressBar.setMax(flashcardCollection.getFlashcardCount());
+
+        holder.progressBar.setProgress(flashcardCollection.getCorrect());
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewFlashcardActivity = new Intent(flashcardActivity, ViewFlashcardActivity.class);
+                flashcardActivity.startActivity(viewFlashcardActivity);
+            }
+        });
+
     }
 
     public int getItemCount() { return flashcardCollectionList.size(); }
