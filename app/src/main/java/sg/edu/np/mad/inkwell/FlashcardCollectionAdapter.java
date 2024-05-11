@@ -37,7 +37,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
         holder.title.setText(flashcardCollection.getTitle());
         holder.flashcardCount.setText(String.valueOf(flashcardCollection.getFlashcardCount()));
 
-        RecyclerView todoRecyclerView = flashcardActivity.findViewById(R.id.todoRecyclerView);
+        RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
     }
 
     public int getItemCount() { return flashcardCollectionList.size(); }

@@ -1,24 +1,33 @@
 package sg.edu.np.mad.inkwell;
 
 public class Flashcard {
-    public String flashcardQuestion;
+    public String question;
 
-    public String flashcardAnswer;
+    public String answer;
 
-    public String getFlashcardQuestion() { return this.flashcardQuestion; }
+    public int id;
 
-    public String getFlashcardAnswer() { return this.flashcardAnswer; }
+    public String getQuestion() { return this.question; }
+
+    public String getAnswer() { return this.answer; }
+
+    public int getId() { return this.id; }
 
     public void setFlashcardQuestion(String flashcardQuestion) {
-        this.flashcardQuestion = flashcardQuestion;
+        this.question = flashcardQuestion;
     }
 
     public void setFlashcardAnswer(String flashcardAnswer) {
-        this.flashcardAnswer = flashcardAnswer;
+        this.answer = flashcardAnswer;
     }
 
-    public Flashcard(String flashcardQuestion, String flashcardAnswer) {
-        this.flashcardQuestion = flashcardQuestion;
-        this.flashcardAnswer = flashcardAnswer;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Flashcard(String flashcardQuestion, String flashcardAnswer, int id) {
+        this.question = flashcardQuestion;
+        this.answer = flashcardAnswer;
+        this.id = id;
     }
 }

@@ -9,6 +9,8 @@ public class FlashcardCollection {
 
     public String getTitle() { return this.title; }
 
+    public int getId() { return this.id; }
+
     public int getFlashcardCount() {return this.flashcardCount; }
 
     public FlashcardCollection(String title, int id, int flashcardCount) {
