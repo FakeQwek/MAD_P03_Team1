@@ -17,6 +17,14 @@
     <string name="new_folder_title">Folder</string>
 
     <string name="inkwell_details_text">%1$d files</string>
+  
+    <string name="bottom_sheet_new_note_button">New note</string>
+    <string name="bottom_sheet_new_folder_button">New folder</string>
+    <string name="bottom_sheet_rename_button">Rename</string>
+    <string name="bottom_sheet_delete_button">Delete</string>
+    <string name="title_activity_navdrawer">navdrawer</string>
+
+    <string name="flashcard_collection_correct_count">%1$d files/%1$d files</string>
 
     <string name="add_new">+ Add new</string>
 </resources>
