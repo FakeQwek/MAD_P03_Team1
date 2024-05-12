@@ -12,6 +12,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Inkwell"
         tools:targetApi="31">
+      <activity
+            android:name=".mainscreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Intro1"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".QuizFlashcardActivity"
             android:exported="true"
