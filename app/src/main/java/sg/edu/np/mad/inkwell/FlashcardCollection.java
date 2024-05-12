@@ -17,6 +17,10 @@ public class FlashcardCollection {
 
     public int getCorrect() { return this.correct; }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public FlashcardCollection(String title, int id, int flashcardCount, int correct) {
         this.title = title;
         this.id = id;

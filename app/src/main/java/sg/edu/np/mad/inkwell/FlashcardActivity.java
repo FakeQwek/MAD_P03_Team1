@@ -33,7 +33,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public static int currentFlashcardCollectionId = 1;
+    public static int currentFlashcardCollectionId;
 
     private void recyclerView(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollections) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -119,11 +119,10 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 Map<String, Object> flashcardCollectionData = new HashMap<>();
                 flashcardCollectionData.put("title", "New collection");
                 flashcardCollectionData.put("flashcardCount", 0);
+                flashcardCollectionData.put("correct", 0);
                 db.collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId + 1)).set(flashcardCollectionData);
             }
         });
-
-
     }
 
     //Allows movement between activities upon clicking
