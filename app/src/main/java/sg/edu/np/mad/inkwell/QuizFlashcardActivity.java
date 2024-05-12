@@ -75,7 +75,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         TextView question2 = findViewById(R.id.question2);
 
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards")
+        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -102,7 +102,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("correct", correct);
+                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
@@ -126,7 +126,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("correct", correct);
+                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));

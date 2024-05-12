@@ -61,6 +61,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FlashcardActivity.selectedFlashcardCollectionId = flashcardCollection.getId();
                 Intent viewFlashcardActivity = new Intent(flashcardActivity, ViewFlashcardActivity.class);
                 flashcardActivity.startActivity(viewFlashcardActivity);
             }

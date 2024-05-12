@@ -35,6 +35,8 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
 
     public static int currentFlashcardCollectionId;
 
+    public static int selectedFlashcardCollectionId;
+
     private void recyclerView(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollections) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FlashcardCollectionAdapter adapter = new FlashcardCollectionAdapter(allFlashcardCollections, flashcardCollections, this);

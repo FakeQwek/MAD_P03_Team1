@@ -92,6 +92,8 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
+        Log.d("tester1", String.valueOf(FlashcardActivity.selectedFlashcardCollectionId));
+
 
         View decorView = getWindow().getDecorView();
 
@@ -101,7 +103,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         ArrayList<Flashcard> allFlashcards = new ArrayList<>();
 
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards")
+        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -134,9 +136,9 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 Map<String, Object> flashcardData = new HashMap<>();
                 flashcardData.put("question", "New flashcard");
                 flashcardData.put("answer", "answer");
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
             }
         });
 
