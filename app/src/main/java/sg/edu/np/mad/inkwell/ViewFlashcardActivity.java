@@ -145,8 +145,12 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         quizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent quiz = new Intent(ViewFlashcardActivity.this, QuizFlashcardActivity.class);
-                startActivity(quiz);
+                if (!allFlashcards.isEmpty()) {
+                    Intent quiz = new Intent(ViewFlashcardActivity.this, QuizFlashcardActivity.class);
+                    startActivity(quiz);
+                } else {
+
+                }
             }
         });
 

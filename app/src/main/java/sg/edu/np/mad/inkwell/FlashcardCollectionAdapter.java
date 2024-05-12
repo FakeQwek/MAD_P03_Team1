@@ -50,7 +50,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
     public void onBindViewHolder(FlashcardCollectionViewHolder holder, int position) {
         FlashcardCollection flashcardCollection = flashcardCollectionList.get(position);
         holder.title.setText(flashcardCollection.getTitle());
-        holder.flashcardCount.setText(String.valueOf(flashcardCollection.getFlashcardCount()));
+        holder.flashcardCount.setText(flashcardCollection.getCorrect() + "/" + flashcardCollection.getFlashcardCount());
 
         RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
 

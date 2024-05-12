@@ -23,4 +23,6 @@
     <string name="bottom_sheet_rename_button">Rename</string>
     <string name="bottom_sheet_delete_button">Delete</string>
     <string name="title_activity_navdrawer">navdrawer</string>
+
+    <string name="flashcard_collection_correct_count">%1$d files/%1$d files</string>
 </resources>
