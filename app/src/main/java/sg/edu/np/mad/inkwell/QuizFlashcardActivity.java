@@ -34,6 +34,8 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
     private int currentFlashcardPosition = 0;
 
+    private int correct;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +99,10 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 currentFlashcardPosition++;
                 if (currentFlashcardPosition >= questionList.size()) {
+                    Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
+                    startActivity(flashcardActivity);
 
+                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("correct", correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
@@ -116,8 +121,12 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
+                correct++;
                 if (currentFlashcardPosition >= questionList.size()) {
+                    Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
+                    startActivity(flashcardActivity);
 
+                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("correct", correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
