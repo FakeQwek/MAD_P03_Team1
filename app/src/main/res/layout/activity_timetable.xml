@@ -47,7 +47,6 @@
         android:layout_margin="40dp"
         app:cardBackgroundColor="#00000000"
         app:cardCornerRadius="200dp"
-        app:cardStrokeColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintTop_toBottomOf="@+id/textView8"
         app:layout_constraintVertical_bias="0.0"

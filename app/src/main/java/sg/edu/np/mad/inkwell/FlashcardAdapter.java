@@ -72,9 +72,9 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
                 flashcardList.remove(flashcard);
                 recyclerView.getAdapter().notifyDataSetChanged();
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.currentFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
             }
         });
     }
