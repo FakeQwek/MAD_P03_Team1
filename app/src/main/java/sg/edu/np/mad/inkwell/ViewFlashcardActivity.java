@@ -92,9 +92,6 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
 
-        Log.d("tester1", String.valueOf(FlashcardActivity.selectedFlashcardCollectionId));
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
