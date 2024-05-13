@@ -1,9 +1,12 @@
 package sg.edu.np.mad.inkwell;
 
+import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> {
 
@@ -75,6 +80,20 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
                 db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
 
                 db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
+            }
+        });
+
+        holder.question.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.question) {
+            @Override
+            public void onTextChanged(EditText question, Editable s) {
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("question", question.getText().toString());
+            }
+        });
+
+        holder.answer.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.answer) {
+            @Override
+            public void onTextChanged(EditText answer, Editable s) {
+                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("answer", answer.getText().toString());
             }
         });
     }
