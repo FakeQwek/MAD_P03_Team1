@@ -21,5 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Inkwell"
 include(":app")
-include(":app")
- 
