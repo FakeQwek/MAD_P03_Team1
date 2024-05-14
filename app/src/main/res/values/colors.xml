@@ -8,6 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="purple">#8692f7</color>
+    <color name="lavender">#8692f7</color>
 
     //onboarding colors
     <color name="background">#F0F4F3</color>
