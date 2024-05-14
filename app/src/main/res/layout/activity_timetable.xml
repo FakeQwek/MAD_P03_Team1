@@ -16,6 +16,13 @@
         app:layout_constraintGuide_percent="0.075" />
 
     <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_rHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.925" />
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,7 +81,8 @@
         app:cardCornerRadius="20dp"
         app:cardElevation="10dp"
         app:layout_constraintBottom_toTopOf="@+id/addNewBtn1"
-        app:layout_constraintStart_toStartOf="@id/guideline_horizontal">
+        app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
+        app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -170,13 +178,12 @@
         android:id="@+id/addNewBtn1"
         android:layout_width="340dp"
         android:layout_height="70dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="20dp"
         android:text="@string/add_new"
         android:textSize="17sp"
         app:cornerRadius="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.111"
         app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
+        app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
 
 
