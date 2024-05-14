@@ -4,6 +4,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -14,7 +16,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
         RecyclerView todoRecyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
 
+        Animation slideInLeft = AnimationUtils.loadAnimation(todoActivity, R.anim.slide_in_left);
+
+        holder.cardView.startAnimation(slideInLeft);
+
+        Animation popup = AnimationUtils.loadAnimation(todoActivity, R.anim.popup);
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +70,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                     @Override
                     public void onClick(View v) {
                         View renamePopupView = LayoutInflater.from(todoActivity).inflate(R.layout.rename_popup, null);
+
+                        renamePopupView.startAnimation(popup);
 
                         PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
 

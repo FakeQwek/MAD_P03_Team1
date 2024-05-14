@@ -53,6 +53,13 @@
         app:layout_constraintTop_toTopOf="@id/inkwellDetails"
         app:layout_constraintStart_toEndOf="@id/inkwellDetails"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/viewAnimator"
+        tools:layout_editor_absoluteX="16dp" />
+
     <ViewAnimator
         android:id="@+id/viewAnimator"
         android:layout_width="match_parent"

@@ -6,6 +6,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -52,6 +54,8 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
         holder.title.setText(flashcardCollection.getTitle());
         holder.flashcardCount.setText(flashcardCollection.getCorrect() + "/" + flashcardCollection.getFlashcardCount());
 
+        Animation popup = AnimationUtils.loadAnimation(flashcardActivity, R.anim.popup);
+
         RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
 
         holder.progressBar.setMax(flashcardCollection.getFlashcardCount());
@@ -82,6 +86,8 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                     @Override
                     public void onClick(View v) {
                         View renamePopupView = LayoutInflater.from(flashcardActivity).inflate(R.layout.rename_popup, null);
+
+                        renamePopupView.startAnimation(popup);
 
                         PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
 
