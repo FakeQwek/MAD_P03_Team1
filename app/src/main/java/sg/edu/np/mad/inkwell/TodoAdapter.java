@@ -80,7 +80,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                                 db.collection("todos").document(String.valueOf(todo.getTodoId())).update(newTodo);
 
-                                holder.todoTitle.setText(newTitle);
+                                todo.setTodoTitle(newTitle);
+
+                                todoRecyclerView.getAdapter().notifyDataSetChanged();
 
                                 renamePopupWindow.dismiss();
                             }
