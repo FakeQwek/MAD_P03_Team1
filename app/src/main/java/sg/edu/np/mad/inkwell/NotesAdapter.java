@@ -72,6 +72,11 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             File file = (File) allNotes.get(position);
             fileViewHolder.fileButton.setText(file.getTitle());
 
+            if (!NotesActivity.fileIds.contains(file.id)) {
+                NotesActivity.fileIds.add(file.id);
+                NotesActivity.files.add(file);
+            }
+
             EditText noteTitle = notesActivity.findViewById(R.id.noteTitle);
 
             EditText noteBody = notesActivity.findViewById(R.id.noteBody);
@@ -214,6 +219,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)).set(fileData);
 
                             File file = new File("Title", "Enter your text", NotesActivity.currentNoteId, "file", folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)));
+                            NotesActivity.fileIds.add(file.id);
+                            NotesActivity.files.add(file);
                             folderAllNotes.add(file);
                             recyclerView(folderAllNotes, folderViewHolder.recyclerView);
 

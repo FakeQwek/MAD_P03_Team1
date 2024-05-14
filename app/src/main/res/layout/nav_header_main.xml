@@ -53,11 +53,18 @@
         app:layout_constraintTop_toTopOf="@id/inkwellDetails"
         app:layout_constraintStart_toEndOf="@id/inkwellDetails"/>
 
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/viewAnimatorButton"
+        tools:layout_editor_absoluteX="16dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/viewAnimator"
+        app:layout_constraintTop_toBottomOf="@+id/searchView"
         tools:layout_editor_absoluteX="16dp" />
 
     <ViewAnimator
@@ -66,7 +73,8 @@
         android:layout_height="wrap_content"
         android:inAnimation="@android:anim/slide_in_left"
         app:layout_constraintTop_toBottomOf="@id/viewAnimatorButton"
-        app:layout_constraintStart_toStartOf="@id/inkwellDetails">
+        app:layout_constraintStart_toStartOf="@id/inkwellDetails"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/noteList"

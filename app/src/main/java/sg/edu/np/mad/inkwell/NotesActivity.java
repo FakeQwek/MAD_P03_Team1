@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -21,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -55,136 +57,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     // noteId of most recently selected note
     public static int selectedNoteId = 1;
 
-    // DocumentReference of most recently selected note
-    private DocumentReference noteDocRef;
+    public static ArrayList<File> files = new ArrayList<>();
 
-    // noteLayout of most recently selected note
-    private LinearLayout selectedNoteLayout;
-
-    // folderLayout of most recently selected note
-    private LinearLayout selectedFolderLayout;
-
-    // Function to add elements to viewAnimator on app load
-    private void createViewAnimator(EditText noteTitle, EditText noteBody) {
-        // Get viewAnimatorButton Button
-        Button viewAnimatorButton = findViewById(R.id.viewAnimatorButton);
-
-        // Get viewAnimator ViewAnimator
-        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
-
-        // Get searchButton Button
-        Button searchButton = findViewById(R.id.searchButton);
-
-        // Set on click listener to searchButton to open searchMenu
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewAnimator.setDisplayedChild(2);
-            }
-        });
-
-        LinearLayout viewOne = findViewById(R.id.noteList);
-        LinearLayout viewTwo = findViewById(R.id.menuList);
-
-        // Create new Button and set text for searchMenuButton
-        Button searchMenuButton = new Button(getApplicationContext());
-        searchMenuButton.setBackgroundColor(Color.TRANSPARENT);
-        searchMenuButton.setGravity(Gravity.START);
-        searchMenuButton.setText("Search");
-        viewTwo.addView(searchMenuButton);
-
-        // Set on click listener to searchMenuButton to open searchMenu
-        searchMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewAnimator.setDisplayedChild(2);
-            }
-        });
-
-        // Create new Button and set text for tagsButton
-        Button tagsButton = new Button(getApplicationContext());
-        tagsButton.setBackgroundColor(Color.TRANSPARENT);
-        tagsButton.setGravity(Gravity.START);
-        tagsButton.setText("Tags");
-        viewTwo.addView(tagsButton);
-
-        // Set on click listener to viewAnimatorButton to change displayed child
-        viewAnimatorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (viewAnimator.getDisplayedChild() == 0) {
-                    viewAnimator.setDisplayedChild(1);
-                } else {
-                    viewAnimator.setDisplayedChild(0);
-                }
-            }
-        });
-
-        // Get searchList LinearLayout
-        LinearLayout searchList = findViewById(R.id.searchList);
-
-        // Get searchBarEditText TextInputEditText
-        TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
-
-        // Set text change listener to searchBarEditText
-        searchBarEditText.addTextChangedListener(new MainActivity.TextChangedListener<TextInputEditText>(searchBarEditText) {
-            @Override
-            public void onTextChanged(TextInputEditText searchBarEditText, Editable s) {
-                searchList.removeAllViews();
-
-                search(db.collection("notes"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
-            }
-        });
-    }
-
-    // Function to search for existing files
-    private void search(CollectionReference colRef, LinearLayout linearLayout, Editable searchString, EditText noteTitle, EditText noteBody) {
-        // Read from firebase and create files on search
-        colRef.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String docNoteType = document.getData().get("type").toString();
-                                int docNoteId = Integer.parseInt(document.getId());
-                                if (docNoteType.equals("file")) {
-                                    String docNoteTitle = document.getData().get("title").toString();
-                                    if (docNoteTitle.contains(searchString)) {
-                                        Button noteButton = new Button(getApplicationContext());
-                                        noteButton.setGravity(Gravity.START);
-                                        noteButton.setBackgroundColor(Color.TRANSPARENT);
-
-                                        String docNoteBody = document.getData().get("body").toString();
-
-                                        noteButton.setId(docNoteId);
-                                        noteButton.setText(docNoteTitle);
-
-                                        noteButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                selectedNoteId = docNoteId;
-
-                                                noteDocRef = document.getReference();
-
-                                                noteTitle.setText(docNoteTitle);
-                                                noteBody.setText(docNoteBody);
-                                            }
-                                        });
-                                        linearLayout.addView(noteButton);
-                                    }
-                                } else if (docNoteType.equals("folder")) {
-                                    TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
-
-                                    search(colRef.document(String.valueOf(docNoteId)).collection("files"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
-                                }
-                            }
-                        } else {
-                            Log.d("testing", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-    }
+    public static ArrayList<Integer> fileIds = new ArrayList<>();
 
     private void recyclerView(ArrayList<Object> allNotes) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -194,6 +69,38 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
         recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    private void filter(ArrayList<File> files, ArrayList<Object> notes, String query) {
+        ArrayList<Object> filterList = new ArrayList<>();
+        if (query.isEmpty()) {
+            recyclerView(notes);
+        } else {
+            for (File file : files){
+                if (file.title.toLowerCase().contains(query)) {
+                    filterList.add(file);
+                }
+            }
+            recyclerView(filterList);
+        }
+    }
+
+    private void search(ArrayList<File> files, ArrayList<Object> notes) {
+        SearchView searchView = findViewById(R.id.searchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filter(files, notes, query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(files, notes, newText);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -229,7 +136,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         EditText noteTitle = findViewById(R.id.noteTitle);
         EditText noteBody = findViewById(R.id.noteBody);
 
-        ArrayList<Object> allNotes = new ArrayList<>();
+        ArrayList<Object> notes = new ArrayList<>();
 
         // Read from firebase and create files and folders on app load
         db.collection("notes")
@@ -238,8 +145,8 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            createViewAnimator(noteTitle, noteBody);
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                search(files, notes);
                                 String docNoteType = document.getData().get("type").toString();
                                 if (docNoteType.equals("file")) {
                                     if (Integer.parseInt(document.getId()) > currentNoteId) {
@@ -247,16 +154,16 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                     }
 
                                     File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
-                                    allNotes.add(file);
-                                    recyclerView(allNotes);
+                                    notes.add(file);
+                                    filter(files, notes, "");
                                 } else if (docNoteType.equals("folder")) {
                                     if (Integer.parseInt(document.getId()) > currentNoteId) {
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
 
                                     Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("notes"));
-                                    allNotes.add(folder);
-                                    recyclerView(allNotes);
+                                    notes.add(folder);
+                                    filter(files, notes, "");
                                 }
                             }
                         } else {
@@ -264,6 +171,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                         }
                     }
                 });
+
     }
 
     //Allows movement between activities upon clicking
