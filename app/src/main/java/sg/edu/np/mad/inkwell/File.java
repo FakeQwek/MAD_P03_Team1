@@ -23,6 +23,14 @@ public class File {
 
     public DocumentReference getDocRef() { return this.docRef; }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public File(String title, String body, int id, String type, DocumentReference docRef) {
         this.title = title;
         this.body = body;

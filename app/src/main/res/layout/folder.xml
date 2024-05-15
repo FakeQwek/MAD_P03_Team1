@@ -8,7 +8,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
 
         <Button
             android:id="@+id/folderButton"
@@ -34,9 +35,10 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="10dp"
             app:layout_constraintStart_toStartOf="@+id/folderButton"
-            app:layout_constraintTop_toBottomOf="@+id/folderButton" />
+            app:layout_constraintTop_toBottomOf="@+id/folderButton"
+            android:background="@drawable/border_left"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

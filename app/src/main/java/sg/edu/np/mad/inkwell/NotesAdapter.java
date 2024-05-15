@@ -126,7 +126,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     // Update note title data in firebase
                     if (file.id == NotesActivity.selectedNoteId) {
                         file.docRef.update("title", noteTitle.getText().toString());
-
+                        file.setTitle(noteTitle.getText().toString());
                         fileViewHolder.fileButton.setText(noteTitle.getText().toString());
                     }
                 }
@@ -139,6 +139,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     // Update note body data in firebase
                     if (file.id == NotesActivity.selectedNoteId) {
                         file.docRef.update("body", noteBody.getText().toString());
+                        file.setBody(noteBody.getText().toString());
                     }
                 }
             });
@@ -148,6 +149,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Folder folder = (Folder) allNotes.get(position);
             folderViewHolder.folderButton.setText(folder.getTitle());
             ArrayList<Object> folderAllNotes = new ArrayList<>();
+
+            recyclerView(folderAllNotes, folderViewHolder.recyclerView);
 
             folder.colRef.document(String.valueOf(folder.id)).collection("files")
                     .get()
@@ -164,7 +167,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                                         File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
                                         folderAllNotes.add(file);
-                                        recyclerView(folderAllNotes, folderViewHolder.recyclerView);
+                                        folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
                                     } else if (docNoteType.equals("folder")) {
                                         if (Integer.parseInt(document.getId()) > NotesActivity.currentNoteId) {
                                             NotesActivity.currentNoteId = Integer.parseInt(document.getId());
@@ -172,7 +175,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                                         Folder folder2 = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, folder.colRef.document(String.valueOf(folder.id)).collection("files"));
                                         folderAllNotes.add(folder2);
-                                        recyclerView(folderAllNotes, folderViewHolder.recyclerView);
+                                        folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
                                     }
                                 }
                             } else {
@@ -221,8 +224,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             File file = new File("Title", "Enter your text", NotesActivity.currentNoteId, "file", folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)));
                             NotesActivity.fileIds.add(file.id);
                             NotesActivity.files.add(file);
-                            folderAllNotes.add(file);
-                            recyclerView(folderAllNotes, folderViewHolder.recyclerView);
+                            folderAllNotes.add(0, file);
+                            folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
 
                             bottomSheetDialog.dismiss();
                         }
@@ -246,8 +249,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)).set(folderData);
 
                             Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", folder.colRef.document(String.valueOf(folder.id)).collection("files"));
-                            folderAllNotes.add(folder2);
-                            recyclerView(folderAllNotes, folderViewHolder.recyclerView);
+                            folderAllNotes.add(0, folder2);
+                            folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
 
                             bottomSheetDialog.dismiss();
                         }

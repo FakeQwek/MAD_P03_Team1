@@ -9,7 +9,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:animateLayoutChanges="true">
 
     <TextView
         android:id="@+id/inkwellTitle"
@@ -33,92 +34,18 @@
         app:layout_constraintTop_toBottomOf="@id/inkwellTitle"
         app:layout_constraintStart_toStartOf="@id/inkwellTitle"/>
 
-    <Button
-        android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:drawableLeft="@drawable/magnify"
-        android:layout_gravity="end"
-        app:layout_constraintTop_toTopOf="@id/viewAnimatorButton"
-        app:layout_constraintStart_toEndOf="@id/viewAnimatorButton"/>
-
-    <Button
-        android:id="@+id/viewAnimatorButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:drawableLeft="@drawable/swap_horizontal"
-        android:layout_gravity="end"
-        app:layout_constraintTop_toTopOf="@id/inkwellDetails"
-        app:layout_constraintStart_toEndOf="@id/inkwellDetails"/>
-
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/viewAnimatorButton"
+        app:layout_constraintTop_toBottomOf="@+id/inkwellDetails"
         tools:layout_editor_absoluteX="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/searchView"
-        tools:layout_editor_absoluteX="16dp" />
-
-    <ViewAnimator
-        android:id="@+id/viewAnimator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inAnimation="@android:anim/slide_in_left"
-        app:layout_constraintTop_toBottomOf="@id/viewAnimatorButton"
-        app:layout_constraintStart_toStartOf="@id/inkwellDetails"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:id="@+id/noteList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/menuList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/searchMenu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/searchBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/searchBarEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:hint="Search" />
-
-                <LinearLayout
-                    android:id="@+id/searchList"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </LinearLayout>
-
-    </ViewAnimator>
+        app:layout_constraintStart_toStartOf="@+id/searchView"
+        app:layout_constraintTop_toBottomOf="@+id/searchView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
