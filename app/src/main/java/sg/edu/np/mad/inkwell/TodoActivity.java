@@ -1,12 +1,14 @@
 package sg.edu.np.mad.inkwell;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.ViewAnimator;
 
@@ -130,7 +132,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-        Button addTodoButton = findViewById(R.id.addTodoButton);
+        ImageButton addTodoButton = findViewById(R.id.addTodoButton);
 
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override

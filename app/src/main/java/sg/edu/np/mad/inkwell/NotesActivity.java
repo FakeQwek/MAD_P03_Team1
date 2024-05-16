@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class NotesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Get firebase
@@ -82,6 +86,11 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 return false;
             }
         });
+    }
+
+    private void notifyInsert() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.getAdapter().notifyItemInserted(0);
     }
 
     @Override
@@ -145,6 +154,48 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                         }
                     }
                 });
+
+        ImageButton addFileButton = findViewById(R.id.addFileButton);
+
+        addFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentNoteId++;
+
+                Map<String, Object> fileData = new HashMap<>();
+                fileData.put("title", "Title");
+                fileData.put("body", "Enter your text");
+                fileData.put("type", "file");
+
+                db.collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
+
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("notes").document(String.valueOf(currentNoteId)));
+                fileIds.add(file.id);
+                files.add(file);
+                notes.add(0, file);
+                notifyInsert();
+            }
+        });
+
+        ImageButton addFolderButton = findViewById(R.id.addFolderButton);
+
+        addFolderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentNoteId++;
+
+                Map<String, Object> folderData = new HashMap<>();
+                folderData.put("title", "Folder");
+                folderData.put("body", "");
+                folderData.put("type", "folder");
+
+                db.collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
+
+                Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
+                notes.add(0, folder2);
+                notifyInsert();
+            }
+        });
 
     }
 
