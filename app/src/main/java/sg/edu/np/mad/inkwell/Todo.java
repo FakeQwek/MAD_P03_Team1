@@ -7,6 +7,8 @@ public class Todo {
 
     public int todoId;
 
+    public String description;
+
     public String todoDateTime;
 
     public String todoStatus;
@@ -14,6 +16,8 @@ public class Todo {
     public String getTodoTitle() { return this.todoTitle; }
 
     public int getTodoId() { return this.todoId; }
+
+    public String getDescription() { return this.description; }
 
     public String getTodoDateTime() { return this.todoDateTime; }
 
@@ -35,9 +39,10 @@ public class Todo {
         this.todoStatus = todoStatus;
     }
 
-    public Todo(String todoTitle, int todoId, String todoDateTime, String todoStatus) {
+    public Todo(String todoTitle, int todoId, String description, String todoDateTime, String todoStatus) {
         this.todoTitle = todoTitle;
         this.todoId = todoId;
+        this.description = description;
         this.todoDateTime = todoDateTime;
         this.todoStatus = todoStatus;
     }

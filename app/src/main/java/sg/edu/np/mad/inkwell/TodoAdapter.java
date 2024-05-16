@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,17 +46,30 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
     public void onBindViewHolder(TodoViewHolder holder, int position) {
         Todo todo = todoList.get(position);
         holder.todoTitle.setText(todo.getTodoTitle());
+        holder.description.setText(todo.getDescription());
         holder.todoDateTime.setText(todo.getTodoDateTime());
+
+        if (todo.todoStatus.equals("inProgress")) {
+            holder.cardView2.setCardBackgroundColor(Color.parseColor("#ADD2E8"));
+            holder.status.setText("IN PROGRESS");
+            holder.status.setTextColor(Color.parseColor("#0029BA"));
+            holder.cardView3.setCardBackgroundColor(Color.parseColor("#0029BA"));
+        } else if (todo.todoStatus.equals("done")) {
+            holder.cardView2.setCardBackgroundColor(Color.parseColor("#ADE8C1"));
+            holder.status.setText("DONE");
+            holder.status.setTextColor(Color.parseColor("#009C2C"));
+            holder.cardView3.setCardBackgroundColor(Color.parseColor("#009C2C"));
+        }
 
         RecyclerView todoRecyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
 
         Animation slideInLeft = AnimationUtils.loadAnimation(todoActivity, R.anim.slide_in_left);
 
-        holder.cardView.startAnimation(slideInLeft);
+        holder.cardView1.startAnimation(slideInLeft);
 
         Animation popup = AnimationUtils.loadAnimation(todoActivity, R.anim.popup);
 
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.cardView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(todoActivity);
