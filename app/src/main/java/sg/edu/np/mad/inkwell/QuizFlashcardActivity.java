@@ -138,6 +138,32 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
                 }
             }
         });
+
+        Button answerButton1 = findViewById(R.id.answerButton1);
+
+        answerButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (question1.getText() == answerList.get(currentFlashcardPosition)) {
+                    question1.setText(questionList.get(currentFlashcardPosition));
+                } else {
+                    question1.setText(answerList.get(currentFlashcardPosition));
+                }
+            }
+        });
+
+        Button answerButton2 = findViewById(R.id.answerButton2);
+
+        answerButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (question2.getText() == answerList.get(currentFlashcardPosition)) {
+                    question2.setText(questionList.get(currentFlashcardPosition));
+                } else {
+                    question2.setText(answerList.get(currentFlashcardPosition));
+                }
+            }
+        });
     }
 
     @Override

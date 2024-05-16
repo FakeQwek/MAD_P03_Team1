@@ -18,12 +18,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#F0F0F0">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -33,8 +36,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginTop="30dp"
-            android:text="Hello Table!"
+            android:fontFamily="@font/inter_regular"
+            android:text="Todos"
             android:textSize="32sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
@@ -43,44 +48,48 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="You have 3 todos today"
+            android:text="You have x todos left"
             app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            android:fontFamily="@font/inter_regular" />
 
         <Button
             android:id="@+id/todoButton"
-            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginTop="30dp"
             android:backgroundTint="@color/white"
-            android:text="Todo"
+            android:fontFamily="@font/inter_regular"
+            android:text="To do"
             android:textColor="#000000"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         <Button
             android:id="@+id/inProgressButton"
-            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
+            android:fontFamily="@font/inter_regular"
             android:text="In progress"
             android:textColor="#000000"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/doneButton"
             app:layout_constraintStart_toEndOf="@+id/todoButton"
             app:layout_constraintTop_toTopOf="@+id/todoButton" />
 
         <Button
             android:id="@+id/doneButton"
-            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:backgroundTint="@color/white"
+            android:fontFamily="@font/inter_regular"
             android:text="Done"
             android:textColor="#000000"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/inProgressButton" />
 
@@ -106,17 +115,16 @@
             app:layout_constraintTop_toBottomOf="@+id/searchView"
             app:layout_constraintVertical_bias="0.0" />
 
-        <Button
+        <ImageButton
             android:id="@+id/addTodoButton"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
-            android:layout_marginBottom="10dp"
-            android:text="Add todo"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/textView"
+            app:srcCompat="@drawable/plus"
+            android:backgroundTint="#00000000" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

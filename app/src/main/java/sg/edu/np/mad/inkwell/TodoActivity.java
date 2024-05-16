@@ -1,11 +1,14 @@
 package sg.edu.np.mad.inkwell;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.ViewAnimator;
 
@@ -25,7 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -35,6 +40,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +56,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     private int currentTodoId;
 
-    private String currentStatus;
+    public static String currentStatus = "todo";
 
     private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
         RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
@@ -115,7 +122,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
                                     currentTodoId = Integer.parseInt(dc.getDocument().getId());
                                 }
-                                Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
+                                Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("description").toString(), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
                                 allTodos.add(todo);
                                 filter(allTodos, "todo", "");
                             } else if (dc.getType() == DocumentChange.Type.REMOVED) {
@@ -125,16 +132,42 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-        Button addTodoButton = findViewById(R.id.addTodoButton);
+        ImageButton addTodoButton = findViewById(R.id.addTodoButton);
 
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> todoData = new HashMap<>();
-                todoData.put("title", "New todo");
-                todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
-                todoData.put("status", "todo");
-                db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(TodoActivity.this);
+                View view = LayoutInflater.from(TodoActivity.this).inflate(R.layout.add_todo_bottom_sheet, null);
+                bottomSheetDialog.setContentView(view);
+                bottomSheetDialog.show();
+
+                TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
+                TextInputEditText descriptionEditText = view.findViewById(R.id.descriptionEditText);
+
+                Button createTodoButton = view.findViewById(R.id.createTodoButton);
+
+                createTodoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> todoData = new HashMap<>();
+                        todoData.put("title", titleEditText.getText().toString());
+                        todoData.put("description", descriptionEditText.getText().toString());
+                        todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
+                        todoData.put("status", "todo");
+                        db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button cancelButton = view.findViewById(R.id.cancelButton);
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
             }
         });
 

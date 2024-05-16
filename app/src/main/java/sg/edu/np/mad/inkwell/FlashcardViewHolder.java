@@ -1,6 +1,7 @@
 package sg.edu.np.mad.inkwell;
 
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -8,9 +9,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FlashcardViewHolder extends RecyclerView.ViewHolder {
-    TextView question;
+    EditText question;
 
-    TextView answer;
+    EditText answer;
 
     CardView cardView;
 
