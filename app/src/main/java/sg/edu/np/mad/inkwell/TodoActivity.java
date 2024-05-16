@@ -54,7 +54,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     private int currentTodoId;
 
-    private String currentStatus = "todo";
+    public static String currentStatus = "todo";
 
     private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
         RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);

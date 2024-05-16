@@ -31,6 +31,10 @@ public class Todo {
         this.todoId = todoId;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void setTodoDateTime(String todoDateTime) {
         this.todoDateTime = todoDateTime;
     }
