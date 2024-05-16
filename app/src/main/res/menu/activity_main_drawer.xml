@@ -5,13 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_todo"
             android:icon="@drawable/baseline_home_24"
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_notes"
             android:icon="@drawable/notes"
             android:title="Notes" />
+        <item
+            android:id="@+id/nav_flashcards"
+            android:icon="@drawable/notes"
+            android:title="Flashcards" />
         <item
             android:id="@+id/nav_calendar"
             android:icon="@android:drawable/ic_menu_month"
