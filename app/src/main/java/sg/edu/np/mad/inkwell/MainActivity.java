@@ -97,24 +97,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (menuItem.getItemId() == R.id.nav_notes) {
             Intent notesActivity = new Intent(MainActivity.this, NotesActivity.class);
             startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
+            Log.d( "Alert", "Opening notes");
         }
         else if (menuItem.getItemId() == R.id.nav_todo) {
             Intent todoActivity = new Intent(MainActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
             Intent todoActivity = new Intent(MainActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
             Log.d("Message", "Opening calendar");
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
             Log.d("Message", "Opening timetable");
         }
         else {
