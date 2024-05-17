@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +35,8 @@ import java.util.Map;
 public class FlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     public static int currentFlashcardCollectionId;
 
@@ -101,7 +104,8 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                            String docFlashcardCollectionUid = String.valueOf(dc.getDocument().getData().get("uid"));
+                            if (dc.getType() == DocumentChange.Type.ADDED && docFlashcardCollectionUid.equals(currentFirebaseUserUid)) {
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentFlashcardCollectionId) {
                                     currentFlashcardCollectionId = Integer.parseInt(dc.getDocument().getId());
                                 }
@@ -120,11 +124,14 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         addFlashcardCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                currentFlashcardCollectionId++;
+
                 Map<String, Object> flashcardCollectionData = new HashMap<>();
                 flashcardCollectionData.put("title", "New collection");
                 flashcardCollectionData.put("flashcardCount", 0);
                 flashcardCollectionData.put("correct", 0);
-                db.collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId + 1)).set(flashcardCollectionData);
+                flashcardCollectionData.put("uid", currentFirebaseUserUid);
+                db.collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
             }
         });
     }

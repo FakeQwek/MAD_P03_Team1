@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -48,11 +49,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TodoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     private int currentTodoId;
 
@@ -118,7 +122,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                            String docTodoUid = String.valueOf(dc.getDocument().getData().get("uid"));
+                            if (dc.getType() == DocumentChange.Type.ADDED && docTodoUid.equals(currentFirebaseUserUid)) {
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
                                     currentTodoId = Integer.parseInt(dc.getDocument().getId());
                                 }
@@ -155,6 +160,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         todoData.put("description", descriptionEditText.getText().toString());
                         todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
                         todoData.put("status", "todo");
+                        todoData.put("uid", currentFirebaseUserUid);
                         db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
                         bottomSheetDialog.dismiss();
                     }

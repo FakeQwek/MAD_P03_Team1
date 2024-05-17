@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -28,11 +30,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class NotesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
 
@@ -90,7 +95,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
     private void notifyInsert() {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.getAdapter().notifyItemInserted(0);
+        Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(0);
     }
 
     @Override
@@ -131,7 +136,8 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 search(files, notes);
                                 String docNoteType = document.getData().get("type").toString();
-                                if (docNoteType.equals("file")) {
+                                String docNoteUid = document.getData().get("uid").toString();
+                                if (docNoteType.equals("file") && docNoteUid.equals(currentFirebaseUserUid)) {
                                     if (Integer.parseInt(document.getId()) > currentNoteId) {
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
@@ -139,7 +145,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                     File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
                                     notes.add(file);
                                     filter(files, notes, "");
-                                } else if (docNoteType.equals("folder")) {
+                                } else if (docNoteType.equals("folder") && docNoteUid.equals(currentFirebaseUserUid)) {
                                     if (Integer.parseInt(document.getId()) > currentNoteId) {
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
@@ -166,6 +172,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 fileData.put("title", "Title");
                 fileData.put("body", "Enter your text");
                 fileData.put("type", "file");
+                fileData.put("uid", currentFirebaseUserUid);
 
                 db.collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
 
@@ -173,7 +180,12 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 fileIds.add(file.id);
                 files.add(file);
                 notes.add(0, file);
-                notifyInsert();
+
+                if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else {
+                    notifyInsert();
+                }
             }
         });
 
@@ -188,12 +200,18 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 folderData.put("title", "Folder");
                 folderData.put("body", "");
                 folderData.put("type", "folder");
+                folderData.put("uid", currentFirebaseUserUid);
 
                 db.collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
-                notes.add(0, folder2);
-                notifyInsert();
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
+                notes.add(0, folder);
+
+                if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else {
+                    notifyInsert();
+                }
             }
         });
 
