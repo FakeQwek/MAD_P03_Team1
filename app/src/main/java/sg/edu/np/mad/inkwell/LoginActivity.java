@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        Log.d("Alert", "LoginActivity class created");
         auth = FirebaseAuth.getInstance();
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
@@ -46,7 +46,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
-
+                //For some reason none of the if statements work, even the workarounds i created dont trigger
+                //Likely some database thing
+                Log.d("Error", "This shows its working");
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                if (pass == "admin") {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    Log.d("Error", "This should load the main page");
+                }
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
                         auth.signInWithEmailAndPassword(email, pass)
@@ -54,13 +61,15 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity2.class));
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        Log.d("Error", "This should load the main page");
                                         finish();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Toast.makeText(LoginActivity.this, "Login Failure", Toast.LENGTH_SHORT).show();
+                                        Log.d("Error", "This should not load the main page");
                                     }
                                 });
                     } else {

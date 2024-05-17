@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d("Alert", "MainActivity class created");
         //Sets toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 
         decorView.setSystemUiVisibility(uiOptions);
+
 
     }
 
