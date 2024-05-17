@@ -1,6 +1,11 @@
 package sg.edu.np.mad.inkwell.ui.timetable;
 
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,11 +25,15 @@ public class TimetableActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TimetableAdapter adapter;
     private List<TimetableData> dataList;
+    private Button slideUpButton;
+    private LinearLayout slidingPanel;
+    private boolean isPanelShown = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
 
+        // testing recyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -37,6 +46,29 @@ public class TimetableActivity extends AppCompatActivity {
 
         adapter = new TimetableAdapter(dataList);
         recyclerView.setAdapter(adapter);
+
+        // sliding panel to add new tasks for the day
+        slideUpButton = findViewById(R.id.addNewBtn1);
+        slidingPanel = findViewById(R.id.slidingPanel);
+
+        slideUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isPanelShown) {
+                    // Slide up animation
+                    Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                    slidingPanel.startAnimation(slideUp);
+                    slidingPanel.setVisibility(View.VISIBLE);
+                    isPanelShown = true;
+                } else {
+                    // Slide down animation
+                    Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+                    slidingPanel.startAnimation(slideDown);
+                    slidingPanel.setVisibility(View.GONE);
+                    isPanelShown = false;
+                }
+            }
+        });
 
     }
 }
