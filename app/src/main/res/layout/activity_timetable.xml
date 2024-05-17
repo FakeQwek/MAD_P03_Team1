@@ -91,6 +91,13 @@
         app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
         app:layout_constraintTop_toBottomOf="@id/recyclerView" />
 
+    <FrameLayout
+        android:id="@+id/backgroundOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/slidingPanel"
         android:layout_width="0dp"

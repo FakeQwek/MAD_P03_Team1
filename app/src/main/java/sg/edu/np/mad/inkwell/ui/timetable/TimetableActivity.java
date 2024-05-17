@@ -28,6 +28,8 @@ public class TimetableActivity extends AppCompatActivity {
     private Button slideUpButton;
     private LinearLayout slidingPanel;
     private boolean isPanelShown = false;
+    private View backgroundOverlay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +52,7 @@ public class TimetableActivity extends AppCompatActivity {
         // sliding panel to add new tasks for the day
         slideUpButton = findViewById(R.id.addNewBtn1);
         slidingPanel = findViewById(R.id.slidingPanel);
+        backgroundOverlay = findViewById(R.id.backgroundOverlay);
 
         slideUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,14 +62,28 @@ public class TimetableActivity extends AppCompatActivity {
                     Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
                     slidingPanel.startAnimation(slideUp);
                     slidingPanel.setVisibility(View.VISIBLE);
+                    backgroundOverlay.setVisibility(View.VISIBLE);
                     isPanelShown = true;
                 } else {
                     // Slide down animation
                     Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
                     slidingPanel.startAnimation(slideDown);
                     slidingPanel.setVisibility(View.GONE);
+                    backgroundOverlay.setVisibility(View.GONE);
                     isPanelShown = false;
                 }
+            }
+        });
+
+        backgroundOverlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Slide down animation
+                Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+                slidingPanel.startAnimation(slideDown);
+                slidingPanel.setVisibility(View.GONE);
+                backgroundOverlay.setVisibility(View.GONE);
+                isPanelShown = false;
             }
         });
 
