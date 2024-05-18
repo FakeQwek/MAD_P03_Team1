@@ -121,6 +121,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     int day;
 
+    Date date;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -261,8 +263,6 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-                        Date date;
 
                         try {
                             date = simpleDateFormat.parse(datePickerButton.getText().toString());

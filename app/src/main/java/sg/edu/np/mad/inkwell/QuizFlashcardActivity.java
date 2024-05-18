@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -26,6 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class QuizFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -35,6 +38,8 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
     private int currentFlashcardPosition = 0;
 
     private int correct;
+
+    private int stillLearning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,12 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         TextView question2 = findViewById(R.id.question2);
 
+        TextView knownCount = findViewById(R.id.knownCount);
+
+        TextView stillLearningCount = findViewById(R.id.stillLearningCount);
+
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+
         db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -98,11 +109,18 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
-                if (currentFlashcardPosition >= questionList.size()) {
+                stillLearning++;
+                if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
                     db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                } else if (currentFlashcardPosition == questionList.size()) {
+                    viewAnimator.setDisplayedChild(2);
+                    knownCount.setText(String.valueOf(correct));
+                    stillLearningCount.setText(String.valueOf(stillLearning));
+                    progressBar.setMax(correct + stillLearning);
+                    progressBar.setProgress(correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
@@ -122,11 +140,17 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 currentFlashcardPosition++;
                 correct++;
-                if (currentFlashcardPosition >= questionList.size()) {
+                if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
                     db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                } else if (currentFlashcardPosition == questionList.size()) {
+                    viewAnimator.setDisplayedChild(2);
+                    knownCount.setText(String.valueOf(correct));
+                    stillLearningCount.setText(String.valueOf(stillLearning));
+                    progressBar.setMax(correct + stillLearning);
+                    progressBar.setProgress(correct);
                 } else {
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
