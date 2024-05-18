@@ -1,15 +1,26 @@
 package sg.edu.np.mad.inkwell;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.RemoteAction;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.TimePicker;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +29,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -44,10 +57,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Text;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -82,6 +98,29 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         recyclerView(todos, filterList);
     }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Todo";
+            String description = "todo";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("Todo", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    int hour = 0;
+
+    int minute = 0;
+
+    int year;
+
+    int month;
+
+    int day;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +146,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         decorView.setSystemUiVisibility(uiOptions);
 
+        createNotificationChannel();
+
         ArrayList<Todo> allTodos = new ArrayList<>();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -122,11 +163,11 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
+                                currentTodoId = Integer.parseInt(dc.getDocument().getId());
+                            }
                             String docTodoUid = String.valueOf(dc.getDocument().getData().get("uid"));
                             if (dc.getType() == DocumentChange.Type.ADDED && docTodoUid.equals(currentFirebaseUserUid)) {
-                                if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
-                                    currentTodoId = Integer.parseInt(dc.getDocument().getId());
-                                }
                                 Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("description").toString(), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
                                 allTodos.add(todo);
                                 filter(allTodos, "todo", "");
@@ -150,6 +191,59 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
                 TextInputEditText descriptionEditText = view.findViewById(R.id.descriptionEditText);
 
+                Button timePickerButton = view.findViewById(R.id.timePickerButton);
+
+                timePickerButton.setText("00:00");
+
+                timePickerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener()
+                        {
+                            @Override
+                            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute)
+                            {
+                                hour = selectedHour;
+                                minute = selectedMinute;
+                                timePickerButton.setText(String.format(Locale.getDefault(), "%02d:%02d",hour, minute));
+                            }
+                        };
+
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(TodoActivity.this, onTimeSetListener, hour, minute, true);
+
+                        timePickerDialog.show();
+                    }
+                });
+
+                Button datePickerButton = view.findViewById(R.id.datePickerButton);
+
+                Calendar calendar = Calendar.getInstance();
+
+                datePickerButton.setText(String.format(Locale.getDefault(), "%02d/%02d/%02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR)));
+
+                datePickerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
+                                year = selectedYear;
+                                month = selectedMonth + 1;
+                                day = selectedDay;
+
+                                datePickerButton.setText(String.format(Locale.getDefault(), "%02d/%02d/%02d", day, month, year));
+                            }
+                        };
+
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(TodoActivity.this, onDateSetListener, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+                        datePickerDialog.show();
+                    }
+                });
+
                 Button createTodoButton = view.findViewById(R.id.createTodoButton);
 
                 createTodoButton.setOnClickListener(new View.OnClickListener() {
@@ -163,6 +257,22 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         todoData.put("uid", currentFirebaseUserUid);
                         db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
                         bottomSheetDialog.dismiss();
+
+                        Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                        Date date;
+
+                        try {
+                            date = simpleDateFormat.parse(datePickerButton.getText().toString());
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        long time = hour * 3600000 + minute * 60000;
+
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
                     }
                 });
 
