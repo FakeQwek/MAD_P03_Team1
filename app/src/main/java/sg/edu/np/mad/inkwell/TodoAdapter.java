@@ -74,13 +74,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
             holder.cardView3.setCardBackgroundColor(Color.parseColor("#009C2C"));
         }
 
-        RecyclerView todoRecyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
+        RecyclerView recyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
 
         Animation slideInLeft = AnimationUtils.loadAnimation(todoActivity, R.anim.slide_in_left);
 
         holder.cardView1.startAnimation(slideInLeft);
-
-        Animation popup = AnimationUtils.loadAnimation(todoActivity, R.anim.popup);
 
         // On clicking bring up a menu
         holder.cardView1.setOnClickListener(new View.OnClickListener() {
@@ -168,8 +166,21 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                             todoList.remove(todo);
                         }
 
-                        todoRecyclerView.getAdapter().notifyDataSetChanged();
+                        recyclerView.getAdapter().notifyDataSetChanged();
 
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button deleteButton = view.findViewById(R.id.deleteButton);
+
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).delete();
+                        allTodos.remove(todo);
+                        todoList.remove(todo);
+                        recyclerView.getAdapter().notifyItemRemoved(holder.getAdapterPosition());
                         bottomSheetDialog.dismiss();
                     }
                 });
