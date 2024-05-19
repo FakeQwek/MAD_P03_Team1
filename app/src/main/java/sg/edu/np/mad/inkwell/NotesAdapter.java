@@ -34,20 +34,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+    // Declaration of variables
     private ArrayList<Object> allNotes;
 
     private NotesActivity notesActivity;
 
+    // NotesAdapter constructor
     public NotesAdapter(ArrayList<Object> allNotes, NotesActivity notesActivity) {
         this.allNotes = allNotes;
         this.notesActivity = notesActivity;
     }
 
+    // Returns an int based on whether the item is a file or not
     @Override
     public int getItemViewType(int position) {
         if (allNotes.get(position).getClass().getName().equals("sg.edu.np.mad.inkwell.File")) {
@@ -57,6 +55,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    // NotesAdapter onCreateViewHolder
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if (viewType == 0) {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.file, viewGroup, false);
@@ -69,7 +68,9 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    // NotesAdapter onBindViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        // If item is a file
         if (holder.getItemViewType() == 0) {
             FileViewHolder fileViewHolder = (FileViewHolder) holder;
             File file = (File) allNotes.get(position);
@@ -146,7 +147,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     }
                 }
             });
-
+            // If item is a folder
         } else {
             FolderViewHolder folderViewHolder = (FolderViewHolder) holder;
             Folder folder = (Folder) allNotes.get(position);
@@ -187,6 +188,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         }
                     });
 
+            // Toggles visibility of the children elements of a folder
             folderViewHolder.folderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -198,6 +200,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             });
 
+            // On long clicking a folder bring up a menu
             folderViewHolder.folderButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -316,6 +319,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes, RecyclerView recyclerView) {
         NotesAdapter adapter = new NotesAdapter(allNotes, notesActivity);
         LinearLayoutManager layoutManager = new LinearLayoutManager(notesActivity);
@@ -325,5 +329,6 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    // Returns the size of allNotes
     public int getItemCount() { return allNotes.size(); }
 }

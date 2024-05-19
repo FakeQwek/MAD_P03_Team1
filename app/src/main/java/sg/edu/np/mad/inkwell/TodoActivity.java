@@ -72,44 +72,15 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Get id of current user
     String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+    // Declaration of variables
+
+    // currentTodoId keeps track of the ids that have already been assigned
     private int currentTodoId;
 
     public static String currentStatus = "todo";
-
-    private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
-        RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
-        TodoAdapter adapter = new TodoAdapter(allTodos, todos, this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-        recyclerView.getAdapter().notifyDataSetChanged();
-    }
-
-    private void filter(ArrayList<Todo> todos, String status, String query) {
-        ArrayList<Todo> filterList = new ArrayList<>();
-        for (Todo todo : todos){
-            if(todo.getTodoStatus().equals(status) && todo.getTodoTitle().toLowerCase().contains(query)) {
-                filterList.add(todo);
-            }
-        }
-        recyclerView(todos, filterList);
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Todo";
-            String description = "todo";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel("Todo", name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
 
     int hour = 0;
 
@@ -122,6 +93,42 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     int day;
 
     Date date;
+
+    // Method to set items in the recycler view
+    private void recyclerView(ArrayList<Todo> allTodos, ArrayList<Todo> todos) {
+        RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
+        TodoAdapter adapter = new TodoAdapter(allTodos, todos, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    // Method to filter items already in the recycler view
+    private void filter(ArrayList<Todo> todos, String status, String query) {
+        ArrayList<Todo> filterList = new ArrayList<>();
+        for (Todo todo : todos){
+            if(todo.getTodoStatus().equals(status) && todo.getTodoTitle().toLowerCase().contains(query)) {
+                filterList.add(todo);
+            }
+        }
+        recyclerView(todos, filterList);
+    }
+
+    // Create notification channel for sending notifications
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Todo";
+            String description = "todo";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("Todo", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +161,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
+        // Read from firebase and create todos on create
         db.collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -164,6 +172,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                             return;
                         }
 
+                        // Adds items to recycler view on create and everytime new data is added to firebase
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (Integer.parseInt(dc.getDocument().getId()) > currentTodoId) {
                                 currentTodoId = Integer.parseInt(dc.getDocument().getId());
@@ -173,8 +182,6 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                                 Todo todo = new Todo(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), dc.getDocument().getData().get("description").toString(), dc.getDocument().getData().get("dateTime").toString(), dc.getDocument().getData().get("status").toString());
                                 allTodos.add(todo);
                                 filter(allTodos, "todo", "");
-                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                Log.d("tester", String.valueOf(allTodos.size()));
                             }
                         }
                     }
@@ -182,6 +189,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         ImageButton addTodoButton = findViewById(R.id.addTodoButton);
 
+        // Brings up a menu to create a todo
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,6 +205,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                 timePickerButton.setText("00:00");
 
+                // Brings up a time picker
                 timePickerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -223,6 +232,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                 datePickerButton.setText(String.format(Locale.getDefault(), "%02d/%02d/%02d", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR)));
 
+                // Brings up a date picker
                 datePickerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -248,6 +258,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                 Button createTodoButton = view.findViewById(R.id.createTodoButton);
 
+                // Adds a todo to firebase
                 createTodoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -278,6 +289,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                 Button cancelButton = view.findViewById(R.id.cancelButton);
 
+                // Cancels the process
                 cancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -289,6 +301,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         Button todoButton = findViewById(R.id.todoButton);
 
+        // Set recycler view to only show todos with status todo
         todoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -300,6 +313,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         Button inProgressButton = findViewById(R.id.inProgressButton);
 
+        // Set recycler view to only show todos with status inProgress
         inProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -311,6 +325,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         Button doneButton = findViewById(R.id.doneButton);
 
+        // Set recycler view to only show todos with status done
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -322,6 +337,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         SearchView searchView = findViewById(R.id.searchView);
 
+        // Search the items in recycler view
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

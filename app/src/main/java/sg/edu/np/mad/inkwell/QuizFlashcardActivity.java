@@ -32,9 +32,12 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 
 public class QuizFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Declaration of variables
+
+    // currentFlashcardPosition keeps track of the number of flashcards that have been shown
     private int currentFlashcardPosition = 0;
 
     private int correct;
@@ -60,10 +63,6 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -86,6 +85,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         ProgressBar progressBar = findViewById(R.id.progressBar);
 
+        // Read from firebase and create flashcards on create
         db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -105,6 +105,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         Button wrongButton = findViewById(R.id.wrongButton);
 
+        // Increments stillLearning and goes to the next flashcard
         wrongButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +136,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         Button correctButton = findViewById(R.id.correctButton);
 
+        // Increments correct and goes to the next flashcard
         correctButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,6 +167,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         Button answerButton1 = findViewById(R.id.answerButton1);
 
+        // Toggles between the question and answer
         answerButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,6 +181,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
         Button answerButton2 = findViewById(R.id.answerButton2);
 
+        // Toggles between the question and answer
         answerButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

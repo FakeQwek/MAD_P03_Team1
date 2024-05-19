@@ -33,15 +33,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Get id of current user
     String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+    // Declaration of variables
+
+    // currentFlashcardCollectionId keeps track of the ids that have already been assigned
     public static int currentFlashcardCollectionId;
 
+    // selectedFlashcardCollectionId keeps track of the flashcard collection that has been selected
     public static int selectedFlashcardCollectionId;
 
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollections) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FlashcardCollectionAdapter adapter = new FlashcardCollectionAdapter(allFlashcardCollections, flashcardCollections, this);
@@ -52,6 +58,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    // Method to filter items already in the recycler view
     private void filter(ArrayList<FlashcardCollection> flashcardCollections, String query) {
         ArrayList<FlashcardCollection> filterList = new ArrayList<>();
         for (FlashcardCollection flashcardCollection : flashcardCollections){
@@ -81,10 +88,6 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -93,6 +96,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
 
         ArrayList<FlashcardCollection> allFlashcardCollections = new ArrayList<>();
 
+        // Read from firebase and create flashcard collections on create
         db.collection("flashcardCollections")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -103,6 +107,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                             return;
                         }
 
+                        // Adds items to recycler view on create and everytime new data is added to firebase
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             String docFlashcardCollectionUid = String.valueOf(dc.getDocument().getData().get("uid"));
                             if (dc.getType() == DocumentChange.Type.ADDED && docFlashcardCollectionUid.equals(currentFirebaseUserUid)) {
@@ -112,8 +117,6 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                                 FlashcardCollection flashcardCollection = new FlashcardCollection(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), Integer.parseInt(dc.getDocument().getData().get("flashcardCount").toString()), Integer.parseInt(dc.getDocument().getData().get("correct").toString()));
                                 allFlashcardCollections.add(flashcardCollection);
                                 filter(allFlashcardCollections, "");
-                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                Log.d("tester", String.valueOf(allFlashcardCollections.size()));
                             }
                         }
                     }
@@ -121,6 +124,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
 
         Button addFlashcardCollectionButton = findViewById(R.id.addFlashcardCollectionButton);
 
+        // Adds a flashcard collection to firebase
         addFlashcardCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

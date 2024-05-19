@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FolderViewHolder extends RecyclerView.ViewHolder {
+    // FolderViewHolder for recycler view
     Button folderButton;
 
     RecyclerView recyclerView;

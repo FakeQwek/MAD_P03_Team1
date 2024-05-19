@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Class to add text change listener
+    // Interface to add TextChangedListener
     public abstract static class TextChangedListener<T> implements TextWatcher {
         private T target;
 
@@ -72,10 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -84,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Button button = findViewById(R.id.button);
 
+        // Set night mode
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

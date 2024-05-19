@@ -41,16 +41,17 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
     // Declaration of variables
 
-    // Latest noteId of most recently created note
+    // currentNoteId keeps track of the ids that have already been assigned
     public static int currentNoteId;
 
-    // noteId of most recently selected note
+    // selectedNoteId keeps track of the note that has been selected
     public static int selectedNoteId = 1;
 
     public static ArrayList<File> files = new ArrayList<>();
 
     public static ArrayList<Integer> fileIds = new ArrayList<>();
 
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         NotesAdapter adapter = new NotesAdapter(allNotes, this);
@@ -61,6 +62,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    // Method to filter items already in the recycler view
     private void filter(ArrayList<File> files, ArrayList<Object> notes, String query) {
         ArrayList<Object> filterList = new ArrayList<>();
         if (query.isEmpty()) {
@@ -75,6 +77,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         }
     }
 
+    // Method to search the items in recycler view
     private void search(ArrayList<File> files, ArrayList<Object> notes) {
         SearchView searchView = findViewById(R.id.searchView);
 
@@ -93,6 +96,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         });
     }
 
+    // Method to notify recycler view a new item has been inserted
     private void notifyInsert() {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(0);
@@ -126,7 +130,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         ArrayList<Object> notes = new ArrayList<>();
 
-        // Read from firebase and create files and folders on app load
+        // Read from firebase and create files and folders on create
         db.collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -163,6 +167,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         ImageButton addFileButton = findViewById(R.id.addFileButton);
 
+        // Adds a file to firebase and updates the recycler view
         addFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,6 +196,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         ImageButton addFolderButton = findViewById(R.id.addFolderButton);
 
+        // Adds a folder to firebase and updates the recycler view
         addFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
