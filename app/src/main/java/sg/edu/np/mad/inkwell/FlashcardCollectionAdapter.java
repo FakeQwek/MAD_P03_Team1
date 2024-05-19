@@ -28,32 +28,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCollectionViewHolder> {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Declaration of variables
     private ArrayList<FlashcardCollection> allFlashcardCollections;
 
     private ArrayList<FlashcardCollection> flashcardCollectionList;
 
     private FlashcardActivity flashcardActivity;
 
+    // FlashcardCollectionAdapter constructor
     public FlashcardCollectionAdapter(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollectionList, FlashcardActivity flashcardActivity) {
         this.allFlashcardCollections = allFlashcardCollections;
         this.flashcardCollectionList = flashcardCollectionList;
         this.flashcardActivity = flashcardActivity;
     }
 
+    // FlashcardCollectionAdapter onCreateViewHolder
     public FlashcardCollectionViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.flashcard_collection, viewGroup, false);
         FlashcardCollectionViewHolder holder = new FlashcardCollectionViewHolder(view);
         return holder;
     }
 
+    // FlashcardCollectionAdapter onBindViewHolder
     public void onBindViewHolder(FlashcardCollectionViewHolder holder, int position) {
+        // Get position and set text to view holder
         FlashcardCollection flashcardCollection = flashcardCollectionList.get(position);
         holder.title.setText(flashcardCollection.getTitle());
         holder.flashcardCount.setText(flashcardCollection.getCorrect() + "/" + flashcardCollection.getFlashcardCount());
 
+        // Create animation popup
         Animation popup = AnimationUtils.loadAnimation(flashcardActivity, R.anim.popup);
 
         RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
@@ -62,6 +68,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
 
         holder.progressBar.setProgress(flashcardCollection.getCorrect());
 
+        // On clicking a flashcard collection go to ViewFlashcardActivity
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,6 +78,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
             }
         });
 
+        // On long clicking a flashcard collection bring up a menu
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -82,6 +90,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                 Button flashcardCollectionRenameButton = view.findViewById(R.id.flashcardCollectionRenameButton);
                 flashcardCollectionRenameButton.setText("Rename");
 
+                // Rename flashcard collection
                 flashcardCollectionRenameButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -122,6 +131,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                 Button flashcardCollectionDeleteButton = view.findViewById(R.id.flashcardCollectionDeleteButton);
                 flashcardCollectionDeleteButton.setText("Delete");
 
+                // Delete flashcard collection
                 flashcardCollectionDeleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -158,5 +168,6 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
 
     }
 
+    // Return the size of flashcardCollectionList
     public int getItemCount() { return flashcardCollectionList.size(); }
 }

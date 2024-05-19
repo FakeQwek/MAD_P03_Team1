@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F0F0F0"
+    android:background="@color/secondary_white"
     android:padding="30dp">
 
     <TextView
@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:contentPadding="10dp"
-            app:cardBackgroundColor="#ADD2E8">
+            app:cardBackgroundColor="@color/secondary_blue">
 
             <TextView
                 android:id="@+id/textView7"
@@ -89,14 +89,14 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/inter_regular"
                 android:textStyle="bold"
-                android:textColor="#0029BA" />
+                android:textColor="@color/primary_blue" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:contentPadding="10dp"
-            app:cardBackgroundColor="#ADE8C1"
+            app:cardBackgroundColor="@color/secondary_green"
             android:layout_gravity="center">
 
             <TextView
@@ -107,7 +107,7 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/inter_regular"
                 android:textStyle="bold"
-                android:textColor="#009C2C" />
+                android:textColor="@color/primary_green" />
         </androidx.cardview.widget.CardView>
     </ViewAnimator>
 

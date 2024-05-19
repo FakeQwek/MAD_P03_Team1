@@ -7,12 +7,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Class to add text change listener
+    // Interface to add TextChangedListener
     public abstract static class TextChangedListener<T> implements TextWatcher {
         private T target;
 
@@ -71,16 +73,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 
         decorView.setSystemUiVisibility(uiOptions);
 
+        Button button = findViewById(R.id.button);
+
+        // Set night mode
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+        });
 
     }
 

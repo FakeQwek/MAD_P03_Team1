@@ -45,11 +45,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ViewFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Declaration of variables
+
+    // currentFlashcardId keeps track of the ids that have already been assigned
     private int currentFlashcardId;
 
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<Flashcard> allFlashcards, ArrayList<Flashcard> flashcards) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FlashcardAdapter adapter = new FlashcardAdapter(allFlashcards, flashcards, this);
@@ -60,6 +64,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    // Method to filter items already in the recycler view
     private void filter(ArrayList<Flashcard> flashcards, String query) {
         ArrayList<Flashcard> filterList = new ArrayList<>();
         for (Flashcard flashcard : flashcards){
@@ -89,9 +94,6 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -100,6 +102,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         ArrayList<Flashcard> allFlashcards = new ArrayList<>();
 
+        // Read from firebase and create flashcards on create
         db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -110,6 +113,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                             return;
                         }
 
+                        // Adds items to recycler view on create and everytime new data is added to firebase
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentFlashcardId) {
@@ -118,8 +122,6 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                                 Flashcard flashcard = new Flashcard(dc.getDocument().getData().get("question").toString(), dc.getDocument().getData().get("answer").toString(), Integer.parseInt(dc.getDocument().getId()));
                                 allFlashcards.add(flashcard);
                                 filter(allFlashcards, "");
-                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                Log.d("tester", String.valueOf(allFlashcards.size()));
                             }
                         }
                     }
@@ -127,6 +129,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         ImageButton addFlashcardButton = findViewById(R.id.addFlashcardButton);
 
+        // Adds a flashcard to firebase
         addFlashcardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,6 +144,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         Button quizButton = findViewById(R.id.quizButton);
 
+        // Go to QuizFlashcardActivity
         quizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -5,6 +5,7 @@ import com.google.firebase.firestore.CollectionReference;
 import java.util.ArrayList;
 
 public class Folder {
+    // Folder class attributes
     public String title;
 
     public String body;
@@ -15,6 +16,7 @@ public class Folder {
 
     public CollectionReference colRef;
 
+    // Folder class get methods
     public String getTitle() { return this.title; }
 
     public String getBody() { return this.body; }
@@ -25,6 +27,7 @@ public class Folder {
 
     public CollectionReference getColRef() { return this.colRef; }
 
+    // Folder class constructor
     public Folder(String title, String body, int id, String type, CollectionReference colRef) {
         this.title = title;
         this.body = body;

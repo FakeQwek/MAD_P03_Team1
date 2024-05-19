@@ -5,10 +5,10 @@
       <entry key="LoginActivity">
         <State />
       </entry>
-      <entry key="SignUpActivity">
+      <entry key="MainActivity">
         <State />
       </entry>
-      <entry key="app">
+      <entry key="NotesActivity">
         <State />
       </entry>
     </value>

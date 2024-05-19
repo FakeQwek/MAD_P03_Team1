@@ -35,12 +35,15 @@
                 android:id="@+id/todoDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/inter_regular"
+                android:maxLines="1"
+                android:paddingRight="40dp"
                 android:text="description"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/todoDateTime"
                 app:layout_constraintStart_toStartOf="@+id/todoTitle"
-                app:layout_constraintTop_toBottomOf="@+id/todoTitle"
-                android:fontFamily="@font/inter_regular" />
+                app:layout_constraintTop_toBottomOf="@+id/todoTitle" />
 
             <TextView
                 android:id="@+id/todoDateTime"
@@ -78,14 +81,15 @@
                         android:textSize="12sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:textColor="#000000"/>
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardView3"
                         android:layout_width="5dp"
                         android:layout_height="5dp"
                         android:layout_marginStart="5dp"
-                        app:cardBackgroundColor="#B0B0B0"
+                        app:cardBackgroundColor="#000000"
                         app:cardCornerRadius="99dp"
                         app:cardElevation="0dp"
                         app:layout_constraintBottom_toBottomOf="@+id/status"

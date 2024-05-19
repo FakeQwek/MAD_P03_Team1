@@ -9,6 +9,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FlashcardViewHolder extends RecyclerView.ViewHolder {
+    // FlashcardViewHolder for recycler view
     EditText question;
 
     EditText answer;

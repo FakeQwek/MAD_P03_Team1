@@ -25,33 +25,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Declaration of variables
     private ArrayList<Todo> allTodos;
 
     private ArrayList<Todo> todoList;
 
     private TodoActivity todoActivity;
 
+    // TodoAdapter constructor
     public TodoAdapter(ArrayList<Todo> allTodos, ArrayList<Todo> todoList, TodoActivity todoActivity) {
         this.allTodos = allTodos;
         this.todoList = todoList;
         this.todoActivity = todoActivity;
     }
 
+    // TodoAdpater onCreateViewHolder
     public TodoViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.todo, viewGroup, false);
         TodoViewHolder holder = new TodoViewHolder(view);
         return holder;
     }
 
+    // TodoAdpater onBindViewHolder
     public void onBindViewHolder(TodoViewHolder holder, int position) {
+        // Get position and set text to view holder
         Todo todo = todoList.get(position);
         holder.todoTitle.setText(todo.getTodoTitle());
         holder.description.setText(todo.getDescription());
         holder.todoDateTime.setText(todo.getTodoDateTime());
 
+        // Changes the colour of the status based on the todo's status
         if (todo.todoStatus.equals("inProgress")) {
             holder.cardView2.setCardBackgroundColor(Color.parseColor("#ADD2E8"));
             holder.status.setText("IN PROGRESS");
@@ -72,6 +78,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
         Animation popup = AnimationUtils.loadAnimation(todoActivity, R.anim.popup);
 
+        // On clicking bring up a menu
         holder.cardView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +104,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 ImageButton statusLeftButton = view.findViewById(R.id.statusLeftButton);
 
+                // Change the status
                 statusLeftButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -115,6 +123,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 Button cancelButton = view.findViewById(R.id.cancelButton);
 
+                // Cancels the process
                 cancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -125,6 +134,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 Button doneButton = view.findViewById(R.id.doneButton);
 
+                // Changes the data in firebase
                 doneButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -163,5 +173,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         });
     }
 
+    // Returns the size of todoList
     public int getItemCount() { return todoList.size(); }
 }
