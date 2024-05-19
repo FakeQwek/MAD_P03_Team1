@@ -5,8 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
@@ -24,7 +23,9 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.appcompat.widget.Toolbar>
 
@@ -39,38 +40,43 @@
             android:textSize="48sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/toolbar"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            android:fontFamily="@font/inter_regular" />
 
         <EditText
             android:id="@+id/noteBody"
             android:layout_width="349dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
             android:backgroundTint="@android:color/transparent"
             android:ems="10"
             android:gravity="start|top"
             android:inputType="textMultiLine"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/noteTitle"
-            app:layout_constraintTop_toBottomOf="@+id/noteTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/noteTitle"
+            android:fontFamily="@font/inter_regular" />
 
-        <Button
-            android:id="@+id/addNoteButton"
+        <ImageButton
+            android:id="@+id/addFileButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="460dp"
-            app:layout_constraintStart_toStartOf="@+id/noteBody"
-            app:layout_constraintTop_toBottomOf="@+id/noteBody" />
+            android:layout_marginStart="100dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="#00000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/note_plus_outline" />
 
-        <Button
+        <ImageButton
             android:id="@+id/addFolderButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="150dp"
-            android:layout_marginTop="460dp"
-            android:text="folder"
-            app:layout_constraintStart_toEndOf="@+id/addNoteButton"
-            app:layout_constraintTop_toBottomOf="@+id/noteBody" />
+            android:layout_marginEnd="100dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="#00000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/folder_plus_outline" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

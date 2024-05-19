@@ -7,11 +7,14 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -29,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Class to add text change listener
+    // Interface to add TextChangedListener
     public abstract static class TextChangedListener<T> implements TextWatcher {
         private T target;
 
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d("Alert", "MainActivity class created");
         //Sets toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,15 +73,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 
         decorView.setSystemUiVisibility(uiOptions);
+
+        Button button = findViewById(R.id.button);
+
+        // Set night mode
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+        });
 
     }
 
@@ -95,18 +104,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (menuItem.getItemId() == R.id.nav_notes) {
             Intent notesActivity = new Intent(MainActivity.this, NotesActivity.class);
             startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
+            Log.d( "Alert", "Opening notes");
         }
         else if (menuItem.getItemId() == R.id.nav_todo) {
             Intent todoActivity = new Intent(MainActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            Log.d("Alert", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(MainActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
+            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
             Log.d("Message", "Opening calendar");
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
             Log.d("Message", "Opening timetable");
         }
         else {
