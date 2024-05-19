@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -47,6 +48,9 @@ import java.util.Map;
 public class ViewFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
 
@@ -103,7 +107,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         ArrayList<Flashcard> allFlashcards = new ArrayList<>();
 
         // Read from firebase and create flashcards on create
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -136,9 +140,9 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 Map<String, Object> flashcardData = new HashMap<>();
                 flashcardData.put("question", "New flashcard");
                 flashcardData.put("answer", "answer");
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
             }
         });
 

@@ -97,7 +97,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         ArrayList<FlashcardCollection> allFlashcardCollections = new ArrayList<>();
 
         // Read from firebase and create flashcard collections on create
-        db.collection("flashcardCollections")
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -135,7 +135,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 flashcardCollectionData.put("flashcardCount", 0);
                 flashcardCollectionData.put("correct", 0);
                 flashcardCollectionData.put("uid", currentFirebaseUserUid);
-                db.collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
             }
         });
     }

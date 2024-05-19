@@ -131,7 +131,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         ArrayList<Object> notes = new ArrayList<>();
 
         // Read from firebase and create files and folders on create
-        db.collection("notes")
+        db.collection("users").document(currentFirebaseUserUid).collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -154,7 +154,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
 
-                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("notes"));
+                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                                     notes.add(folder);
                                     filter(files, notes, "");
                                 }
@@ -179,9 +179,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 fileData.put("type", "file");
                 fileData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
 
-                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("notes").document(String.valueOf(currentNoteId)));
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)));
                 fileIds.add(file.id);
                 files.add(file);
                 notes.add(0, file);
@@ -208,9 +208,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 folderData.put("type", "folder");
                 folderData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                 notes.add(0, folder);
 
                 if (currentNoteId == 1) {

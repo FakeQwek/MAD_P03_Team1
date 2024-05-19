@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -30,6 +31,9 @@ import java.util.Map;
 public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCollectionViewHolder> {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
     private ArrayList<FlashcardCollection> allFlashcardCollections;
@@ -112,7 +116,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                                 Map<String, Object> newFlashcardCollection = new HashMap<>();
                                 newFlashcardCollection.put("title", newTitle);
 
-                                db.collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).update(newFlashcardCollection);
+                                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).update(newFlashcardCollection);
 
                                 flashcardCollection.setTitle(newTitle);
 
@@ -139,7 +143,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                         flashcardCollectionList.remove(flashcardCollection);
                         recyclerView.getAdapter().notifyDataSetChanged();
 
-                        db.collection("flashcardCollections")
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections")
                                 .document(String.valueOf(flashcardCollection.getId()))
                                 .collection("flashcards")
                                 .get()
@@ -156,7 +160,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                                     }
                                 });
 
-                        db.collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).delete();
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).delete();
 
                         bottomSheetDialog.dismiss();
                     }

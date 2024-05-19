@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -22,6 +23,9 @@ import java.util.Map;
 public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
     private ArrayList<Flashcard> allFlashcards;
@@ -85,9 +89,9 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
                 flashcardList.remove(flashcard);
                 recyclerView.getAdapter().notifyDataSetChanged();
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
             }
         });
 
@@ -95,14 +99,14 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
         holder.question.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.question) {
             @Override
             public void onTextChanged(EditText question, Editable s) {
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("question", question.getText().toString());
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("question", question.getText().toString());
             }
         });
 
         holder.answer.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.answer) {
             @Override
             public void onTextChanged(EditText answer, Editable s) {
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("answer", answer.getText().toString());
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("answer", answer.getText().toString());
             }
         });
     }

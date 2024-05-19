@@ -23,6 +23,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -34,6 +35,9 @@ import java.util.ArrayList;
 public class QuizFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
 
@@ -86,7 +90,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
         ProgressBar progressBar = findViewById(R.id.progressBar);
 
         // Read from firebase and create flashcards on create
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -110,19 +114,20 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
-                stillLearning++;
                 if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                    db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else if (currentFlashcardPosition == questionList.size()) {
+                    stillLearning++;
                     viewAnimator.setDisplayedChild(2);
                     knownCount.setText(String.valueOf(correct));
                     stillLearningCount.setText(String.valueOf(stillLearning));
                     progressBar.setMax(correct + stillLearning);
                     progressBar.setProgress(correct);
                 } else {
+                    stillLearning++;
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
                         viewAnimator.setDisplayedChild(1);
@@ -141,19 +146,20 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
-                correct++;
                 if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                    db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else if (currentFlashcardPosition == questionList.size()) {
+                    correct++;
                     viewAnimator.setDisplayedChild(2);
                     knownCount.setText(String.valueOf(correct));
                     stillLearningCount.setText(String.valueOf(stillLearning));
                     progressBar.setMax(correct + stillLearning);
                     progressBar.setProgress(correct);
                 } else {
+                    correct++;
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
                         viewAnimator.setDisplayedChild(1);

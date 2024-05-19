@@ -162,7 +162,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         // Read from firebase and create todos on create
-        db.collection("todos")
+        db.collection("users").document(currentFirebaseUserUid).collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -268,7 +268,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
                         todoData.put("status", "todo");
                         todoData.put("uid", currentFirebaseUserUid);
-                        db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
                         bottomSheetDialog.dismiss();
 
                         Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);

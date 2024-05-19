@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -27,6 +28,9 @@ import java.util.Map;
 public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
     private ArrayList<Todo> allTodos;
@@ -155,7 +159,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                             todo.setTodoStatus("done");
                         }
 
-                        db.collection("todos").document(String.valueOf(todo.todoId)).update(newTodo);
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).update(newTodo);
 
                         todo.setTodoTitle(titleEditText.getText().toString());
                         todo.setDescription(descriptionEditText.getText().toString());
