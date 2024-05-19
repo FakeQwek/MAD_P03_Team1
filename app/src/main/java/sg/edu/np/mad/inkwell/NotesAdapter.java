@@ -89,9 +89,26 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     NotesActivity.selectedNoteId = file.getId();
+                    NotesActivity.fileOrderIndex++;
 
                     noteTitle.setText(file.getTitle());
                     noteBody.setText(file.getBody());
+
+                    if (NotesActivity.fileOrder.isEmpty()) {
+                        NotesActivity.fileOrder.add(file);
+                    } else if (NotesActivity.fileOrder.get(NotesActivity.fileOrderIndex - 1) != file) {
+                        Log.d("tester", String.valueOf(NotesActivity.fileOrderIndex));
+                        Log.d("tester", String.valueOf(NotesActivity.fileOrder.size()));
+                        if (NotesActivity.fileOrderIndex != NotesActivity.fileOrder.size()) {
+                            int count = NotesActivity.fileOrder.size() - NotesActivity.fileOrderIndex;
+                            Log.d("tester1", String.valueOf(count));
+                            for (int i = 0; i < count; i++) {
+                                Log.d("tester", "for LOOP");
+                                NotesActivity.fileOrder.remove(NotesActivity.fileOrder.size() - 1);
+                            }
+                        }
+                        NotesActivity.fileOrder.add(file);
+                    }
                 }
             });
 

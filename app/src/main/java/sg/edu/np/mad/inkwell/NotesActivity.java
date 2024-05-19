@@ -22,7 +22,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,6 +49,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     public static ArrayList<File> files = new ArrayList<>();
 
     public static ArrayList<Integer> fileIds = new ArrayList<>();
+
+    public static ArrayList<File> fileOrder = new ArrayList<>();
+
+    public static int fileOrderIndex;
 
     // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes) {
@@ -129,6 +132,13 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         decorView.setSystemUiVisibility(uiOptions);
 
         ArrayList<Object> notes = new ArrayList<>();
+
+        EditText noteTitle = findViewById(R.id.noteTitle);
+        EditText noteBody = findViewById(R.id.noteBody);
+
+        fileOrder = new ArrayList<>();
+
+        fileOrderIndex = -1;
 
         // Read from firebase and create files and folders on create
         db.collection("users").document(currentFirebaseUserUid).collection("notes")
@@ -221,6 +231,35 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             }
         });
 
+        ImageButton leftButton = findViewById(R.id.leftButton);
+
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex > 0) {
+                    fileOrderIndex--;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton rightButton = findViewById(R.id.rightButton);
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex < fileOrder.size() - 1) {
+                    fileOrderIndex++;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
     }
 
     //Allows movement between activities upon clicking
