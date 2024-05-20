@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- guidelines for layout -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_horizontal"
         android:layout_width="wrap_content"
@@ -29,6 +30,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.05" />
 
+    <!-- title -->
     <TextView
         android:id="@+id/tvTimetable"
         android:layout_width="wrap_content"
@@ -40,6 +42,7 @@
         app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
         app:layout_constraintTop_toBottomOf="@id/guideline_vertical" />
 
+    <!-- date cardView -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDate"
         android:layout_width="100dp"
@@ -70,6 +73,18 @@
 
     </androidx.cardview.widget.CardView>
 
+    <!-- recyclerView to show events -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/addNewBtn1"
+        app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
+        app:layout_constraintTop_toBottomOf="@id/cardDate" />
+
+    <!-- add new button -->
     <Button
         android:id="@+id/addNewBtn1"
         android:layout_width="340dp"
@@ -82,16 +97,7 @@
         app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
         app:layout_constraintTop_toBottomOf="@id/recyclerView" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/addNewBtn1"
-        app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
-        app:layout_constraintTop_toBottomOf="@id/cardDate" />
-
+    <!-- darken background when panel is up -->
     <FrameLayout
         android:id="@+id/backgroundOverlay"
         android:layout_width="match_parent"
@@ -99,6 +105,7 @@
         android:background="#80000000"
         android:visibility="gone"/>
 
+    <!-- sliding panel -->
     <LinearLayout
         android:id="@+id/slidingPanel"
         android:layout_width="0dp"
@@ -112,6 +119,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- panel title layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,6 +128,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="16dp">
 
+            <!-- panel title -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,12 +144,12 @@
 
             </LinearLayout>
 
-
+            <!-- editText card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/orange"
+                app:cardBackgroundColor="@color/purple_200"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -148,6 +157,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- task text -->
                     <EditText
                         android:id="@+id/etToDo"
                         android:layout_width="match_parent"
@@ -161,11 +171,13 @@
                         android:textSize="18sp"
                         android:textStyle="bold"/>
 
+                    <!-- divider -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:background="@android:color/darker_gray"/>
 
+                    <!-- location text -->
                     <EditText
                         android:id="@+id/etLocation"
                         android:layout_width="match_parent"
@@ -178,22 +190,26 @@
                         android:text="Location"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
+
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
-
+            <!-- timepicker card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/orange"
+                app:cardBackgroundColor="@color/purple_200"
                 app:cardCornerRadius="8dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- startTimePicker layout -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -205,6 +221,7 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
+                            <!-- tvStart -->
                             <TextView
                                 android:id="@+id/tvStart"
                                 android:layout_width="match_parent"
@@ -217,6 +234,7 @@
 
                         </LinearLayout>
 
+                        <!-- startTime button -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -253,6 +271,7 @@
 
                     </LinearLayout>
 
+                    <!-- startTimePicker -->
                     <TimePicker
                         android:id="@+id/selectStartTime"
                         android:layout_width="match_parent"
@@ -261,11 +280,13 @@
                         android:timePickerMode="spinner"
                         android:visibility="gone"/>
 
+                    <!-- divider -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:background="@android:color/darker_gray"/>
 
+                    <!-- endTimePicker layout -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -297,6 +318,7 @@
                             android:gravity="end|center_vertical"
                             android:orientation="horizontal">
 
+                            <!-- endTimePicker button -->
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/endTime"
                                 android:layout_marginEnd="20dp"
@@ -338,11 +360,13 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- setNoti card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/setNoti"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/orange"
+                app:cardBackgroundColor="@color/purple_200"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -388,11 +412,13 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- tagging card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/markAs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/orange"
+                app:cardBackgroundColor="@color/purple_200"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -437,7 +463,6 @@
 
 
             </androidx.cardview.widget.CardView>
-
 
         </LinearLayout>
 
