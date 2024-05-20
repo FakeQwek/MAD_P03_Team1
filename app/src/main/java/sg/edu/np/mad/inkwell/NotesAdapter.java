@@ -211,8 +211,10 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 public void onClick(View v) {
                     if (folderViewHolder.recyclerView.getVisibility() == View.VISIBLE) {
                         folderViewHolder.recyclerView.setVisibility(View.GONE);
+                        folderViewHolder.chevron.setImageResource(R.drawable.chevron_up);
                     } else {
                         folderViewHolder.recyclerView.setVisibility(View.VISIBLE);
+                        folderViewHolder.chevron.setImageResource(R.drawable.chevron_down);
                     }
                 }
             });

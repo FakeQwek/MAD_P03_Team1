@@ -3,11 +3,13 @@ package sg.edu.np.mad.inkwell;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +21,17 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -122,20 +129,47 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                     }
                 });
 
-        Button addFlashcardCollectionButton = findViewById(R.id.addFlashcardCollectionButton);
+        ImageButton addFlashcardCollectionButton = findViewById(R.id.addFlashcardCollectionButton);
 
         // Adds a flashcard collection to firebase
         addFlashcardCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentFlashcardCollectionId++;
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(FlashcardActivity.this);
+                View view = LayoutInflater.from(FlashcardActivity.this).inflate(R.layout.add_flashcard_collection_bottom_sheet, null);
+                bottomSheetDialog.setContentView(view);
+                bottomSheetDialog.show();
 
-                Map<String, Object> flashcardCollectionData = new HashMap<>();
-                flashcardCollectionData.put("title", "New collection");
-                flashcardCollectionData.put("flashcardCount", 0);
-                flashcardCollectionData.put("correct", 0);
-                flashcardCollectionData.put("uid", currentFirebaseUserUid);
-                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
+                TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
+
+                Button cancelButton = view.findViewById(R.id.cancelButton);
+
+                // Cancels the process
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button doneButton = view.findViewById(R.id.doneButton);
+
+                // Changes the data in firebase
+                doneButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        currentFlashcardCollectionId++;
+
+                        Map<String, Object> flashcardCollectionData = new HashMap<>();
+                        flashcardCollectionData.put("title", titleEditText.getText().toString());
+                        flashcardCollectionData.put("flashcardCount", 0);
+                        flashcardCollectionData.put("correct", 0);
+                        flashcardCollectionData.put("uid", currentFirebaseUserUid);
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
+
+                        bottomSheetDialog.dismiss();
+                    }
+                });
             }
         });
     }
