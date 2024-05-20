@@ -6,9 +6,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TimePicker;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,10 +27,14 @@ public class TimetableActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TimetableAdapter adapter;
     private List<TimetableData> dataList;
-    private Button slideUpButton;
     private LinearLayout slidingPanel;
     private boolean isPanelShown = false;
     private View backgroundOverlay;
+    private View addNewBtn1;
+    private CardView startTime;
+    private CardView endTime;
+    private TimePicker selectEndTime;
+    private TimePicker selectStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,43 +55,77 @@ public class TimetableActivity extends AppCompatActivity {
         adapter = new TimetableAdapter(dataList);
         recyclerView.setAdapter(adapter);
 
-        // sliding panel to add new tasks for the day
-        slideUpButton = findViewById(R.id.addNewBtn1);
+        addNewBtn1 = findViewById(R.id.addNewBtn1);
         slidingPanel = findViewById(R.id.slidingPanel);
         backgroundOverlay = findViewById(R.id.backgroundOverlay);
+        selectStartTime = findViewById(R.id.selectStartTime);
+        startTime = findViewById(R.id.startTime);
+        endTime = findViewById(R.id.endTime);
+        selectStartTime = findViewById(R.id.selectStartTime);
+        selectEndTime = findViewById(R.id.selectEndTime);
 
-        slideUpButton.setOnClickListener(new View.OnClickListener() {
+        // add sliding up panel when addNew clicked
+        addNewBtn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isPanelShown) {
-                    // Slide up animation
-                    Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-                    slidingPanel.startAnimation(slideUp);
-                    slidingPanel.setVisibility(View.VISIBLE);
-                    backgroundOverlay.setVisibility(View.VISIBLE);
-                    isPanelShown = true;
-                } else {
-                    // Slide down animation
-                    Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
-                    slidingPanel.startAnimation(slideDown);
-                    slidingPanel.setVisibility(View.GONE);
-                    backgroundOverlay.setVisibility(View.GONE);
-                    isPanelShown = false;
+                toggleSlidingPanel();
+            }
+        });
+
+        // show timePicker on click
+        startTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectStartTime.setVisibility(View.VISIBLE);
+            }
+        });
+
+        endTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectEndTime.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // close timePicker if user clicks panel
+        slidingPanel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectStartTime.getVisibility() == View.VISIBLE) {
+                    hideStartTimePicker();
+                } else if (selectEndTime.getVisibility() == View.VISIBLE) {
+                    hideEndTimePicker();
                 }
             }
         });
-
-        backgroundOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Slide down animation
-                Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
-                slidingPanel.startAnimation(slideDown);
-                slidingPanel.setVisibility(View.GONE);
-                backgroundOverlay.setVisibility(View.GONE);
-                isPanelShown = false;
-            }
-        });
-
     }
+
+
+    private void toggleSlidingPanel() {
+        if (!isPanelShown) {
+            // Slide up animation
+            Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+            slidingPanel.startAnimation(slideUp);
+            slidingPanel.setVisibility(View.VISIBLE);
+            backgroundOverlay.setVisibility(View.VISIBLE);
+            isPanelShown = true;
+        }
+    }
+
+    private void hideSlidingPanel() {
+        // Slide down animation
+        Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+        slidingPanel.startAnimation(slideDown);
+        slidingPanel.setVisibility(View.GONE);
+        backgroundOverlay.setVisibility(View.GONE);
+        isPanelShown = false;
+    }
+
+    private void hideStartTimePicker() {
+        selectStartTime.setVisibility(View.GONE);
+    }
+    private void hideEndTimePicker() {
+        selectEndTime.setVisibility(View.GONE);
+    }
+
 }
