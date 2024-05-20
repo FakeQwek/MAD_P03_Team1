@@ -260,6 +260,23 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 }
             }
         });
+
+        ImageButton readOnlyButton = findViewById(R.id.readOnlyButton);
+
+        readOnlyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (noteTitle.isEnabled()) {
+                    noteTitle.setEnabled(false);
+                    noteBody.setEnabled(false);
+                    readOnlyButton.setImageResource(R.drawable.pencil_outline);
+                } else {
+                    noteTitle.setEnabled(true);
+                    noteBody.setEnabled(true);
+                    readOnlyButton.setImageResource(R.drawable.book_open_blank_variant_outline);
+                }
+            }
+        });
     }
 
     //Allows movement between activities upon clicking
