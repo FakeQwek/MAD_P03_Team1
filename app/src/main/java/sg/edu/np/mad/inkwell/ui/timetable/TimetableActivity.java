@@ -1,11 +1,14 @@
 package sg.edu.np.mad.inkwell.ui.timetable;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.activity.EdgeToEdge;
@@ -17,24 +20,30 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import sg.edu.np.mad.inkwell.R;
 
 public class TimetableActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private TimetableAdapter adapter;
-    private List<TimetableData> dataList;
     private LinearLayout slidingPanel;
     private boolean isPanelShown = false;
     private View backgroundOverlay;
-    private View addNewBtn1;
-    private CardView startTime;
-    private CardView endTime;
-    private TimePicker selectEndTime;
-    private TimePicker selectStartTime;
+    private RecyclerView recyclerView;
+    private TimetableAdapter adapter;
+    private List<TimetableData> dataList;
+    private Button addNewBtn1;
+    private TextView tvDate;
+    private CardView startTime, endTime;
+    private TextView tvStartTime,tvEndTime;
+    private TimePicker selectEndTime, selectStartTime;
+    private int startHour, startMinute, endHour, endMinute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +67,13 @@ public class TimetableActivity extends AppCompatActivity {
         addNewBtn1 = findViewById(R.id.addNewBtn1);
         slidingPanel = findViewById(R.id.slidingPanel);
         backgroundOverlay = findViewById(R.id.backgroundOverlay);
-        selectStartTime = findViewById(R.id.selectStartTime);
+        tvStartTime = findViewById(R.id.tvStartTime);
+        tvEndTime = findViewById(R.id.tvEndTime);
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
         selectStartTime = findViewById(R.id.selectStartTime);
         selectEndTime = findViewById(R.id.selectEndTime);
+        tvDate = findViewById(R.id.tvDate);
 
         // add sliding up panel when addNew clicked
         addNewBtn1.setOnClickListener(new View.OnClickListener() {
@@ -72,34 +83,71 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
+        // lowers sliding panel when overlay clicked
+        backgroundOverlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSlidingPanel();
+            }
+        });
+
+        // close timePicker if slidingPanel touched
+        slidingPanel.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                selectStartTime.setVisibility(View.GONE);
+                selectEndTime.setVisibility(View.GONE);
+                return true;
+            }
+        });
+
         // show timePicker on click
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectStartTime.setVisibility(View.VISIBLE);
+                showTimePickerDialog(true);
             }
         });
 
         endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectEndTime.setVisibility(View.VISIBLE);
+                showTimePickerDialog(false);
             }
         });
 
-        // close timePicker if user clicks panel
-        slidingPanel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectStartTime.getVisibility() == View.VISIBLE) {
-                    hideStartTimePicker();
-                } else if (selectEndTime.getVisibility() == View.VISIBLE) {
-                    hideEndTimePicker();
-                }
-            }
-        });
+        // get current date
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(date);
+
+        // set current date
+        tvDate.setText(currentDate);
     }
 
+    // timePicker
+    private void showTimePickerDialog(final boolean isStartTime) {
+        int hour = isStartTime ? startHour : endHour;
+        int minute = isStartTime ? startMinute : endMinute;
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
+                if (isStartTime) {
+                    startHour = selectedHour;
+                    startMinute = selectedMinute;
+                    tvStartTime.setText(String.format("%02d:%02d", startHour, startMinute));
+                } else {
+                    endHour = selectedHour;
+                    endMinute = selectedMinute;
+                    tvEndTime.setText(String.format("%02d:%02d", endHour, endMinute));
+                }
+            }
+        }, hour, minute, true);
+        timePickerDialog.show();
+    }
 
     private void toggleSlidingPanel() {
         if (!isPanelShown) {
@@ -119,13 +167,4 @@ public class TimetableActivity extends AppCompatActivity {
         slidingPanel.setVisibility(View.GONE);
         backgroundOverlay.setVisibility(View.GONE);
         isPanelShown = false;
-    }
-
-    private void hideStartTimePicker() {
-        selectStartTime.setVisibility(View.GONE);
-    }
-    private void hideEndTimePicker() {
-        selectEndTime.setVisibility(View.GONE);
-    }
-
-}
+    }}
