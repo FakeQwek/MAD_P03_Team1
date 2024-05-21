@@ -53,14 +53,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
-                //For some reason none of the if statements work, even the workarounds i created dont trigger
-                //Likely some database thing
+
+                // For some reason none of the if statements work, even the workarounds i created dont trigger
+                // Likely some database thing
                 Log.d("Error", "This shows its working");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                if (pass == "admin") {
+
+                if (pass.equals("admin")) {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     Log.d("Error", "This should load the main page");
+                    return;  // Exit the method here since we've already started the MainActivity
                 }
+
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
                         auth.signInWithEmailAndPassword(email, pass)
@@ -68,8 +71,8 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        Log.d("Error", "This should load the main page");
+                                        startActivity(new Intent(LoginActivity.this, Intro1.class));
+                                        Log.d("Error", "This should load the intro page");
                                         finish();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -82,19 +85,20 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         loginPassword.setError("Password cannot be empty");
                     }
-                }else if(email.isEmpty()) {
+                } else if(email.isEmpty()) {
                     loginEmail.setError("Email cannot be empty");
                 } else {
                     loginEmail.setError("Please enter valid email");
-            }
+                }
             }
         });
-                signupRedirectText.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-                    }
-                });
+
+        signupRedirectText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
