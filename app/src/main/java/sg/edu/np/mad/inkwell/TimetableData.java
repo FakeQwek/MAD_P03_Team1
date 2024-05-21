@@ -1,4 +1,4 @@
-package sg.edu.np.mad.inkwell.ui.timetable;
+package sg.edu.np.mad.inkwell;
 
 public class TimetableData {
     private String title;

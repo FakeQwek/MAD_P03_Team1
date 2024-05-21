@@ -1,4 +1,4 @@
-package sg.edu.np.mad.inkwell.ui.timetable;
+package sg.edu.np.mad.inkwell;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,10 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.sql.Time;
 import java.util.List;
-
-import sg.edu.np.mad.inkwell.R;
 
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
     private List<TimetableData> dataList;
