@@ -280,7 +280,9 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         bottomSheetDialog.dismiss();
 
                         Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                        Date date = new Date();
+                        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(date));
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
                         try {
