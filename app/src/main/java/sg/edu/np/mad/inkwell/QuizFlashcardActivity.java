@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -171,7 +172,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             }
         });
 
-        Button answerButton1 = findViewById(R.id.answerButton1);
+        ImageButton answerButton1 = findViewById(R.id.answerButton1);
 
         // Toggles between the question and answer
         answerButton1.setOnClickListener(new View.OnClickListener() {
@@ -179,13 +180,15 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 if (question1.getText() == answerList.get(currentFlashcardPosition)) {
                     question1.setText(questionList.get(currentFlashcardPosition));
+                    answerButton1.setImageResource(R.drawable.eye_off_outline);
                 } else {
                     question1.setText(answerList.get(currentFlashcardPosition));
+                    answerButton1.setImageResource(R.drawable.eye_outline);
                 }
             }
         });
 
-        Button answerButton2 = findViewById(R.id.answerButton2);
+        ImageButton answerButton2 = findViewById(R.id.answerButton2);
 
         // Toggles between the question and answer
         answerButton2.setOnClickListener(new View.OnClickListener() {
@@ -193,8 +196,10 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 if (question2.getText() == answerList.get(currentFlashcardPosition)) {
                     question2.setText(questionList.get(currentFlashcardPosition));
+                    answerButton2.setImageResource(R.drawable.eye_off_outline);
                 } else {
                     question2.setText(answerList.get(currentFlashcardPosition));
+                    answerButton2.setImageResource(R.drawable.eye_outline);
                 }
             }
         });

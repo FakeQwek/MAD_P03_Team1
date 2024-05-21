@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,6 +55,8 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
     // selectedFlashcardCollectionId keeps track of the flashcard collection that has been selected
     public static int selectedFlashcardCollectionId;
 
+    private ArrayList<FlashcardCollection> flashcardCollections;
+
     // Method to set items in the recycler view
     private void recyclerView(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollections) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -66,14 +69,15 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
     }
 
     // Method to filter items already in the recycler view
-    private void filter(ArrayList<FlashcardCollection> flashcardCollections, String query) {
+    private void filter(ArrayList<FlashcardCollection> allFlashcardCollections, String query) {
         ArrayList<FlashcardCollection> filterList = new ArrayList<>();
-        for (FlashcardCollection flashcardCollection : flashcardCollections){
+        for (FlashcardCollection flashcardCollection : allFlashcardCollections){
             if(flashcardCollection.getTitle().toLowerCase().contains(query)) {
                 filterList.add(flashcardCollection);
             }
         }
-        recyclerView(flashcardCollections, filterList);
+        flashcardCollections = filterList;
+        recyclerView(allFlashcardCollections, filterList);
     }
 
     @Override
@@ -102,6 +106,8 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         decorView.setSystemUiVisibility(uiOptions);
 
         ArrayList<FlashcardCollection> allFlashcardCollections = new ArrayList<>();
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
 
         // Read from firebase and create flashcard collections on create
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections")
@@ -172,6 +178,31 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 });
             }
         });
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getAdapterPosition();
+                FlashcardCollection flashcardCollection = allFlashcardCollections.get(position);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.id)).delete();
+                allFlashcardCollections.remove(flashcardCollection);
+                flashcardCollections.remove(flashcardCollection);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.80f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //Allows movement between activities upon clicking

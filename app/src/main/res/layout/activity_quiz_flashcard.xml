@@ -61,19 +61,18 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:fontFamily="@font/inter_regular" />
 
-                    <Button
+                    <ImageButton
                         android:id="@+id/answerButton1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:text="Button"
+                        android:layout_marginBottom="30dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/question1"
-                        app:layout_constraintVertical_bias="1.0" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:srcCompat="@drawable/eye_off_outline"
+                        android:backgroundTint="#00000000"/>
 
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -99,17 +98,16 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:fontFamily="@font/inter_regular" />
 
-                    <Button
+                    <ImageButton
                         android:id="@+id/answerButton2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:text="Button"
+                        android:layout_marginBottom="30dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/question2"
-                        app:layout_constraintVertical_bias="1.0" />
+                        app:srcCompat="@drawable/eye_outline"
+                        android:backgroundTint="#00000000"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.cardview.widget.CardView>

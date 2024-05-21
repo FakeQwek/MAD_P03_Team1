@@ -9,6 +9,7 @@ import android.app.RemoteAction;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +38,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +85,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     public static String currentStatus = "todo";
 
+    private ArrayList<Todo> todos;
+
     int hour = 0;
 
     int minute = 0;
@@ -106,14 +111,15 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     }
 
     // Method to filter items already in the recycler view
-    private void filter(ArrayList<Todo> todos, String status, String query) {
+    private void filter(ArrayList<Todo> allTodos, String status, String query) {
         ArrayList<Todo> filterList = new ArrayList<>();
-        for (Todo todo : todos){
+        for (Todo todo : allTodos){
             if(todo.getTodoStatus().equals(status) && todo.getTodoTitle().toLowerCase().contains(query)) {
                 filterList.add(todo);
             }
         }
-        recyclerView(todos, filterList);
+        todos = filterList;
+        recyclerView(allTodos, filterList);
     }
 
     // Create notification channel for sending notifications
@@ -158,6 +164,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
         createNotificationChannel();
 
         ArrayList<Todo> allTodos = new ArrayList<>();
+
+        RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -351,6 +359,31 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 return false;
             }
         });
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getAdapterPosition();
+                Todo todo = todos.get(position);
+                db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).delete();
+                allTodos.remove(todo);
+                todos.remove(todo);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.80f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //Allows movement between activities upon clicking

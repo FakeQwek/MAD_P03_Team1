@@ -56,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
                 //For some reason none of the if statements work, even the workarounds i created dont trigger
                 //Likely some database thing
                 Log.d("Error", "This shows its working");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 if (pass == "admin") {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     Log.d("Error", "This should load the main page");
