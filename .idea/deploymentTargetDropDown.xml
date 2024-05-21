@@ -11,6 +11,9 @@
       <entry key="NotesActivity">
         <State />
       </entry>
+      <entry key="SettingsActivity">
+        <State />
+      </entry>
     </value>
   </component>
 </project>

@@ -86,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         decorView.setSystemUiVisibility(uiOptions);
 
-        Button button = findViewById(R.id.button);
-
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
@@ -95,15 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-
-        // Set night mode
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
-        });
-
     }
 
     @Override
