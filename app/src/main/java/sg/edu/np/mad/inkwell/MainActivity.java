@@ -23,7 +23,11 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Interface to add TextChangedListener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -80,6 +87,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         decorView.setSystemUiVisibility(uiOptions);
 
         Button button = findViewById(R.id.button);
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("uid", "");
+        userData.put("type", "");
+        db.collection("users").document(currentFirebaseUserUid).set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
 
         // Set night mode
         button.setOnClickListener(new View.OnClickListener() {

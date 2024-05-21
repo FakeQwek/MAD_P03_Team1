@@ -22,7 +22,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,6 +49,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     public static ArrayList<File> files = new ArrayList<>();
 
     public static ArrayList<Integer> fileIds = new ArrayList<>();
+
+    public static ArrayList<File> fileOrder = new ArrayList<>();
+
+    public static int fileOrderIndex;
 
     // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes) {
@@ -130,8 +133,15 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         ArrayList<Object> notes = new ArrayList<>();
 
+        EditText noteTitle = findViewById(R.id.noteTitle);
+        EditText noteBody = findViewById(R.id.noteBody);
+
+        fileOrder = new ArrayList<>();
+
+        fileOrderIndex = -1;
+
         // Read from firebase and create files and folders on create
-        db.collection("notes")
+        db.collection("users").document(currentFirebaseUserUid).collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -154,7 +164,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
 
-                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("notes"));
+                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                                     notes.add(folder);
                                     filter(files, notes, "");
                                 }
@@ -179,9 +189,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 fileData.put("type", "file");
                 fileData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
 
-                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("notes").document(String.valueOf(currentNoteId)));
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)));
                 fileIds.add(file.id);
                 files.add(file);
                 notes.add(0, file);
@@ -208,9 +218,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 folderData.put("type", "folder");
                 folderData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                 notes.add(0, folder);
 
                 if (currentNoteId == 1) {
@@ -221,6 +231,52 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             }
         });
 
+        ImageButton leftButton = findViewById(R.id.leftButton);
+
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex > 0) {
+                    fileOrderIndex--;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton rightButton = findViewById(R.id.rightButton);
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex < fileOrder.size() - 1) {
+                    fileOrderIndex++;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton readOnlyButton = findViewById(R.id.readOnlyButton);
+
+        readOnlyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (noteTitle.isEnabled()) {
+                    noteTitle.setEnabled(false);
+                    noteBody.setEnabled(false);
+                    readOnlyButton.setImageResource(R.drawable.pencil_outline);
+                } else {
+                    noteTitle.setEnabled(true);
+                    noteBody.setEnabled(true);
+                    readOnlyButton.setImageResource(R.drawable.book_open_blank_variant_outline);
+                }
+            }
+        });
     }
 
     //Allows movement between activities upon clicking
