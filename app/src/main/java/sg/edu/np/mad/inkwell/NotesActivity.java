@@ -282,28 +282,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            /* Replace intent with other function for fragment
-            Intent Login = new Intent(MainActivity.this, Login.class);
-            startActivity(Login);
-            */
-            Log.d( "Message", "Opening notes");
-        }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
-            Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            Log.d("Message", "Opening home");
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
         return true;
     }
 }

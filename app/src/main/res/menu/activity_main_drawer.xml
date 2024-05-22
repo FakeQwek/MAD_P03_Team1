@@ -5,7 +5,7 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_todo"
+            android:id="@+id/nav_home"
             android:icon="@drawable/home_nav_icon"
             android:title="@string/menu_home" />
         <item
@@ -14,7 +14,7 @@
             android:title="Notes" />
         <item
             android:id="@+id/nav_flashcards"
-            android:icon="@drawable/flashcards_nav_icon"
+            android:icon="@drawable/nav_flashcard_icon"
             android:title="Flashcards" />
         <item
             android:id="@+id/nav_calendar"
@@ -24,5 +24,13 @@
             android:id="@+id/nav_timetable"
             android:icon="@drawable/timetable_nav_icon"
             android:title="Timetable" />
+        <item
+            android:id="@+id/nav_todo"
+            android:icon="@drawable/flashcards_nav_icon"
+            android:title="Todo List" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/nav_unlock_icon"
+            android:title="Logout" />
     </group>
 </menu>
