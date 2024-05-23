@@ -7,14 +7,20 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import java.util.HashMap;
+import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class TimetableActivity extends AppCompatActivity {
 
@@ -37,23 +44,26 @@ public class TimetableActivity extends AppCompatActivity {
     private TextView tvStartTime,tvEndTime;
     private TimePicker selectEndTime, selectStartTime;
     private int startHour, startMinute, endHour, endMinute;
+    private HashMap<String, Integer> categoryColors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
 
-        // testing recyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        categoryColors = new HashMap<>();
+        categoryColors.put("class", Color.RED);
+        categoryColors.put("meeting", Color.BLUE);
+
         dataList = new ArrayList<>();
-
-        dataList.add(new TimetableData("Title 1", "Description 1", "1300","1400"));
-        dataList.add(new TimetableData("Title 2", "Description 2", "1300","1400"));
-        dataList.add(new TimetableData("Title 3", "Description 3", "1300","1400"));
-        dataList.add(new TimetableData("Title 4", "Description 4", "1300","1400"));
-
+        // Add sample data to dataList
+        dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400"));
+        dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400"));
+        dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400"));
+        dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400"));
         adapter = new TimetableAdapter(dataList);
         recyclerView.setAdapter(adapter);
 
@@ -67,8 +77,24 @@ public class TimetableActivity extends AppCompatActivity {
         selectStartTime = findViewById(R.id.selectStartTime);
         selectEndTime = findViewById(R.id.selectEndTime);
         tvDate = findViewById(R.id.tvDate);
+        Button btnClear = findViewById(R.id.btnClear);
 
-        // add sliding up panel when addNew clicked
+        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
+
+        Calendar calendar = Calendar.getInstance(singaporeTimeZone);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+
+        tvStartTime.setText(currentTime);
+        tvEndTime.setText(currentTime);
+        Date date = calendar.getTime();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(date);
+
+        tvDate.setText(currentDate);
+
         addNewBtn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +102,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        // lowers sliding panel when overlay clicked
         backgroundOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +109,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        // close timePicker if slidingPanel touched
         slidingPanel.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -94,7 +118,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        // show timePicker on click
         startTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,18 +132,14 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        // get current date
-        Calendar calendar = Calendar.getInstance();
-        Date date = calendar.getTime();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
-        String currentDate = dateFormat.format(date);
-
-        // set current date
-        tvDate.setText(currentDate);
+        btnClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearInputData();
+            }
+        });
     }
 
-    // timePicker
     private void showTimePickerDialog(final boolean isStartTime) {
         int hour = isStartTime ? startHour : endHour;
         int minute = isStartTime ? startMinute : endMinute;
@@ -160,4 +179,23 @@ public class TimetableActivity extends AppCompatActivity {
         slidingPanel.setVisibility(View.GONE);
         backgroundOverlay.setVisibility(View.GONE);
         isPanelShown = false;
-    }}
+    }
+
+    private void clearInputData() {
+        EditText etToDo = findViewById(R.id.etToDo);
+        EditText etLocation = findViewById(R.id.etLocation);
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+// Optionally, you can format the time as a string
+        String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+
+        etToDo.setText("");
+        etLocation.setText("");
+        tvStartTime.setText(currentTime);
+        tvEndTime.setText(currentTime);
+    }
+
+
+}

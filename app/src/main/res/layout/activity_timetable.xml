@@ -68,7 +68,7 @@
                     android:layout_width="150dp"
                     android:layout_height="50dp"
                     android:layout_margin="20dp"
-                    app:cardBackgroundColor="@color/purple_200"
+                    app:cardBackgroundColor="@color/purple"
                     app:cardElevation="4dp"
                     app:cardCornerRadius="200dp">
 
@@ -169,7 +169,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple_200"
+                app:cardBackgroundColor="@color/purple"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -218,7 +218,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple_200"
+                app:cardBackgroundColor="@color/purple"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -382,7 +382,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple_200"
+                app:cardBackgroundColor="@color/purple"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -433,7 +433,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple_200"
+                app:cardBackgroundColor="@color/purple"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -477,6 +477,37 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnClear"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="10dp"
+                        android:text="Clear" />
+
+                    <Button
+                        android:id="@+id/btnSave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="10dp"
+                        android:text="Save" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
