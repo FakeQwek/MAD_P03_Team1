@@ -11,18 +11,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import java.util.HashMap;
-import android.graphics.Color;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -51,17 +49,18 @@ public class TimetableActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        categoryColors = new HashMap<>();
-        categoryColors.put("class", Color.RED);
-        categoryColors.put("meeting", Color.BLUE);
-
         dataList = new ArrayList<>();
+        categoryColors = new HashMap<>();
 
         dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400", "class"));
         dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400","meeting"));
         dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400","class"));
         dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400","meeting"));
-        adapter = new TimetableAdapter(dataList,categoryColors);
+
+        categoryColors.put("class", ContextCompat.getColor(this, R.color.pastelCoral));
+        categoryColors.put("meeting", ContextCompat.getColor(this, R.color.pastelBlue));
+
+        adapter = new TimetableAdapter(this, dataList, categoryColors);
         recyclerView.setAdapter(adapter);
 
         addNewBtn1 = findViewById(R.id.addNewBtn1);
@@ -185,7 +184,6 @@ public class TimetableActivity extends AppCompatActivity {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-// Optionally, you can format the time as a string
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
 
         etToDo.setText("");
@@ -193,6 +191,4 @@ public class TimetableActivity extends AppCompatActivity {
         tvStartTime.setText(currentTime);
         tvEndTime.setText(currentTime);
     }
-
-
 }
