@@ -1,13 +1,19 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.TimePickerDialog;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -18,12 +24,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 public class TimetableActivity extends AppCompatActivity {
 
@@ -40,6 +51,10 @@ public class TimetableActivity extends AppCompatActivity {
     private TimePicker selectEndTime, selectStartTime;
     private int startHour, startMinute, endHour, endMinute;
     private HashMap<String, Integer> categoryColors;
+    private Spinner categorySpinner;
+    private ArrayAdapter<String> spinnerAdapter;
+    private List<String> categoryList = new ArrayList<>();
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +89,7 @@ public class TimetableActivity extends AppCompatActivity {
         selectEndTime = findViewById(R.id.selectEndTime);
         tvDate = findViewById(R.id.tvDate);
         Button btnClear = findViewById(R.id.btnClear);
+
 
         TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
 
@@ -134,6 +150,35 @@ public class TimetableActivity extends AppCompatActivity {
                 clearInputData();
             }
         });
+
+        categoryColors = new HashMap<>();
+        categoryColors.put("Class", ContextCompat.getColor(this, R.color.pastelCoral));
+        categoryColors.put("Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
+
+        categoryList.add("class");
+        categoryList.add("meeting");
+
+        Spinner spinner = findViewById(R.id.categorySpinner);
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedCategory = parent.getItemAtPosition(position).toString();
+                if (selectedCategory.equals("Add New Option")) {
+                    showAddOptionPopup();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        categoryList.add("Add New Option");
+        spinnerAdapter.notifyDataSetChanged();
     }
 
     private void showTimePickerDialog(final boolean isStartTime) {
@@ -178,9 +223,10 @@ public class TimetableActivity extends AppCompatActivity {
     }
 
     private void clearInputData() {
+        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
         EditText etToDo = findViewById(R.id.etToDo);
         EditText etLocation = findViewById(R.id.etLocation);
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(singaporeTimeZone);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
@@ -191,4 +237,119 @@ public class TimetableActivity extends AppCompatActivity {
         tvStartTime.setText(currentTime);
         tvEndTime.setText(currentTime);
     }
+
+    private void showAddOptionPopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.add_new_task_popup, null);
+        builder.setView(dialogView);
+
+        final EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
+        final LinearLayout colorLayout = dialogView.findViewById(R.id.colorLayout);
+        Button btnAddCategory = dialogView.findViewById(R.id.btnAddCategory);
+
+        final AlertDialog dialog = builder.create();
+
+        // Add color buttons dynamically
+        int[] colors = {R.color.pastelCoral, R.color.pastelBlue, R.color.pastelGreen, R.color.pastelPurple, R.color.pastelYellow};
+        for (final int color : colors) {
+            Button colorButton = new Button(this);
+            colorButton.setBackgroundColor(ContextCompat.getColor(this, color));
+            colorButton.setTag(color);
+            colorButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setSelected(true);
+                    for (int i = 0; i < colorLayout.getChildCount(); i++) {
+                        View child = colorLayout.getChildAt(i);
+                        if (child != v) {
+                            child.setSelected(false);
+                        }
+                    }
+                }
+            });
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    getResources().getDimensionPixelSize(R.dimen.color_button_size),
+                    getResources().getDimensionPixelSize(R.dimen.color_button_size)
+            );
+            params.setMargins(10, 10, 10, 10); // Adjust margins as needed
+            colorButton.setLayoutParams(params);
+
+            // Add a circular background programmatically
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.OVAL);
+            shape.setColor(ContextCompat.getColor(this, color));
+            colorButton.setBackground(shape);
+
+            colorLayout.addView(colorButton);
+
+            colorButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isSelected = v.isSelected();
+                    v.setSelected(!isSelected);
+
+                    if (isSelected) {
+                        // Restore original size
+                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
+                        params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
+                        params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
+                        v.setLayoutParams(params);
+                    } else {
+                        // Enlarge button when selected
+                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
+                        params.width = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
+                        params.height = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
+                        v.setLayoutParams(params);
+                    }
+
+                    for (int i = 0; i < colorLayout.getChildCount(); i++) {
+                        View child = colorLayout.getChildAt(i);
+                        if (child != v) {
+                            child.setSelected(false);
+                            // Restore original size for unselected buttons
+                            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) child.getLayoutParams();
+                            params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
+                            params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
+                            child.setLayoutParams(params);
+                        }
+                    }
+                }
+            });
+        }
+
+        btnAddCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String categoryName = etCategoryName.getText().toString().trim();
+                int selectedColor = -1;
+                for (int i = 0; i < colorLayout.getChildCount(); i++) {
+                    View child = colorLayout.getChildAt(i);
+                    if (child.isSelected()) {
+                        selectedColor = (int) child.getTag();
+                        break;
+                    }
+                }
+                if (!categoryName.isEmpty() && selectedColor != -1) {
+                    categoryList.add(categoryList.size() - 1, categoryName); // Add before "Add New Option"
+                    categoryColors.put(categoryName, ContextCompat.getColor(TimetableActivity.this, selectedColor));
+                    spinnerAdapter.notifyDataSetChanged();
+                    dialog.dismiss();
+                } else {
+                    // Show error message
+                    if (categoryName.isEmpty()) {
+                        etCategoryName.setError("Category name required");
+                    }
+                    if (selectedColor == -1) {
+                        TextView selectColorTextView = dialogView.findViewById(R.id.tvSelectColor);
+                        selectColorTextView.setError("Select a color");
+                    }
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
 }

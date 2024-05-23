@@ -123,7 +123,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#80000000"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <!-- sliding panel -->
     <LinearLayout
@@ -133,7 +133,7 @@
         android:layout_weight="1"
         android:background="@drawable/top_rounded_corners"
         android:padding="16dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintHeight_percent="0.75"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -469,6 +469,11 @@
                             android:layout_height="match_parent"
                             android:gravity="end|center_vertical"
                             android:orientation="horizontal">
+
+                            <Spinner
+                                android:id="@+id/categorySpinner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
