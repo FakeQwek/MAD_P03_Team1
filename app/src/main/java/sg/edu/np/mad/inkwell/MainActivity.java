@@ -77,16 +77,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-        /*
+
         // Sets help button functionality to bring you to introduction
         ImageView helpButton = findViewById(R.id.helpButton);
-        helpButton.setOnClickListener(new helpButton.OnClickListener(){
-          @Override
-            public void onClick(view)
-
+        helpButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View V) {
+                startActivity(new Intent(MainActivity.this, Intro1.class));
+            }
         });
-        */
-         
+
+
 
 
     }
