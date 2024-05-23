@@ -19,9 +19,6 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,12 +56,12 @@ public class TimetableActivity extends AppCompatActivity {
         categoryColors.put("meeting", Color.BLUE);
 
         dataList = new ArrayList<>();
-        // Add sample data to dataList
-        dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400"));
-        dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400"));
-        dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400"));
-        dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400"));
-        adapter = new TimetableAdapter(dataList);
+
+        dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400", "class"));
+        dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400","meeting"));
+        dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400","class"));
+        dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400","meeting"));
+        adapter = new TimetableAdapter(dataList,categoryColors);
         recyclerView.setAdapter(adapter);
 
         addNewBtn1 = findViewById(R.id.addNewBtn1);

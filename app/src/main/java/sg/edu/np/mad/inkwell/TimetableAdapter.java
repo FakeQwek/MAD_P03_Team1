@@ -6,20 +6,26 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
+import java.util.HashMap;
+import android.graphics.Color;
 
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
-    private List<TimetableData> dataList;
 
-    public TimetableAdapter(List<TimetableData> dataList) {
+    private List<TimetableData> dataList;
+    private HashMap<String, Integer> categoryColors;
+
+    // Constructor
+    public TimetableAdapter(List<TimetableData> dataList, HashMap<String, Integer> categoryColors) {
         this.dataList = dataList;
+        this.categoryColors = categoryColors;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.timetable_card, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.timetable_card, parent, false);
         return new ViewHolder(view);
     }
 
@@ -30,6 +36,19 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         holder.tvDescription.setText(data.getDescription());
         holder.tvStartTime.setText(data.getStartTime());
         holder.tvEndTime.setText(data.getEndTime());
+
+        if (categoryColors.containsKey(data.getCategory())) {
+            holder.colorIndicator.setBackgroundColor(categoryColors.get(data.getCategory()));
+        } else {
+            holder.colorIndicator.setBackgroundColor(Color.WHITE); // Default color
+        }
+    }
+
+    public void updateCategoryColor(String category, int color) {
+        if (categoryColors.containsKey(category)) {
+            categoryColors.put(category, color);
+            notifyDataSetChanged(); // Notify RecyclerView of data change
+        }
     }
 
     @Override
@@ -39,6 +58,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle, tvDescription, tvStartTime, tvEndTime;
+        public View colorIndicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -46,6 +66,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvStartTime = itemView.findViewById(R.id.tvStartTime);
             tvEndTime = itemView.findViewById(R.id.tvEndTime);
+            colorIndicator = itemView.findViewById(R.id.colorIndicator);
         }
     }
 }
