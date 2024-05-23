@@ -18,19 +18,19 @@
             android:layout_height="wrap_content"
             android:background="#00000000"
             android:backgroundTint="#00000000"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center_vertical"
             android:text="Folder"
             android:textAllCaps="false"
             android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="parent"
-            android:gravity="center_vertical"
-            android:fontFamily="@font/inter_regular" />
+            app:layout_constraintStart_toEndOf="@+id/chevron"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/chevron"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="9dp"
             app:layout_constraintBottom_toBottomOf="@+id/folderButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/folderButton"

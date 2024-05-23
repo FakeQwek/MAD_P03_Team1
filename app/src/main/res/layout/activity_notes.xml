@@ -60,7 +60,7 @@
             android:id="@+id/addFileButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
+            android:layout_marginStart="130dp"
             android:layout_marginBottom="30dp"
             android:backgroundTint="#00000000"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,12 +71,45 @@
             android:id="@+id/addFolderButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="100dp"
+            android:layout_marginEnd="130dp"
             android:layout_marginBottom="30dp"
             android:backgroundTint="#00000000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/folder_plus_outline" />
+
+        <ImageButton
+            android:id="@+id/leftButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/addFileButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/arrow_left_thin"
+            android:backgroundTint="#00000000" />
+
+        <ImageButton
+            android:id="@+id/rightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/addFolderButton"
+            app:srcCompat="@drawable/arrow_right_thin"
+            android:backgroundTint="#00000000" />
+
+        <ImageButton
+            android:id="@+id/readOnlyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/book_open_blank_variant_outline"
+            android:backgroundTint="#00000000" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

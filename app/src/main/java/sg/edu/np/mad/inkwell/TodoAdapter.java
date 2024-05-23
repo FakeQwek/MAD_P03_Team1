@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -25,33 +26,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    // Declaration of variables
     private ArrayList<Todo> allTodos;
 
     private ArrayList<Todo> todoList;
 
     private TodoActivity todoActivity;
 
+    // TodoAdapter constructor
     public TodoAdapter(ArrayList<Todo> allTodos, ArrayList<Todo> todoList, TodoActivity todoActivity) {
         this.allTodos = allTodos;
         this.todoList = todoList;
         this.todoActivity = todoActivity;
     }
 
+    // TodoAdpater onCreateViewHolder
     public TodoViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.todo, viewGroup, false);
         TodoViewHolder holder = new TodoViewHolder(view);
         return holder;
     }
 
+    // TodoAdpater onBindViewHolder
     public void onBindViewHolder(TodoViewHolder holder, int position) {
+        // Get position and set text to view holder
         Todo todo = todoList.get(position);
         holder.todoTitle.setText(todo.getTodoTitle());
         holder.description.setText(todo.getDescription());
         holder.todoDateTime.setText(todo.getTodoDateTime());
 
+        // Changes the colour of the status based on the todo's status
         if (todo.todoStatus.equals("inProgress")) {
             holder.cardView2.setCardBackgroundColor(Color.parseColor("#ADD2E8"));
             holder.status.setText("IN PROGRESS");
@@ -64,14 +74,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
             holder.cardView3.setCardBackgroundColor(Color.parseColor("#009C2C"));
         }
 
-        RecyclerView todoRecyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
+        RecyclerView recyclerView = todoActivity.findViewById(R.id.todoRecyclerView);
 
         Animation slideInLeft = AnimationUtils.loadAnimation(todoActivity, R.anim.slide_in_left);
 
         holder.cardView1.startAnimation(slideInLeft);
 
-        Animation popup = AnimationUtils.loadAnimation(todoActivity, R.anim.popup);
-
+        // On clicking bring up a menu
         holder.cardView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +106,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 ImageButton statusLeftButton = view.findViewById(R.id.statusLeftButton);
 
+                // Change the status
                 statusLeftButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -115,6 +125,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 Button cancelButton = view.findViewById(R.id.cancelButton);
 
+                // Cancels the process
                 cancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -125,6 +136,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
 
                 Button doneButton = view.findViewById(R.id.doneButton);
 
+                // Changes the data in firebase
                 doneButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -145,7 +157,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                             todo.setTodoStatus("done");
                         }
 
-                        db.collection("todos").document(String.valueOf(todo.todoId)).update(newTodo);
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).update(newTodo);
 
                         todo.setTodoTitle(titleEditText.getText().toString());
                         todo.setDescription(descriptionEditText.getText().toString());
@@ -154,8 +166,21 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
                             todoList.remove(todo);
                         }
 
-                        todoRecyclerView.getAdapter().notifyDataSetChanged();
+                        recyclerView.getAdapter().notifyDataSetChanged();
 
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button deleteButton = view.findViewById(R.id.deleteButton);
+
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).delete();
+                        allTodos.remove(todo);
+                        todoList.remove(todo);
+                        recyclerView.getAdapter().notifyItemRemoved(holder.getAdapterPosition());
                         bottomSheetDialog.dismiss();
                     }
                 });
@@ -163,5 +188,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoViewHolder> {
         });
     }
 
+    // Returns the size of todoList
     public int getItemCount() { return todoList.size(); }
 }

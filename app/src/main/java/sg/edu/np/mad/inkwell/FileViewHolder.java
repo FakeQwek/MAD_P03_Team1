@@ -6,6 +6,7 @@ import android.widget.Button;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FileViewHolder extends RecyclerView.ViewHolder {
+    // FileViewHolder for recycler view
     Button fileButton;
 
     public FileViewHolder(View view) {
