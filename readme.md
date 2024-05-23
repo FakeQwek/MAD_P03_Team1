@@ -31,7 +31,9 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication – Jin Xuan 
+- Login and Authentication – Jin Xuan
+- Sign Up and Reset Password - Jin Xuan
+- Walkthrough Intro - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 

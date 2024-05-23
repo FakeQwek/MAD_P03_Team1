@@ -7,6 +7,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class TodoViewHolder extends RecyclerView.ViewHolder {
+    // TodoViewHolder for recycler view
     TextView todoTitle;
 
     TextView description;

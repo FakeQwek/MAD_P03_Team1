@@ -3,11 +3,13 @@ package sg.edu.np.mad.inkwell;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,14 +18,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -32,13 +41,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    // Declaration of variables
+
+    // currentFlashcardCollectionId keeps track of the ids that have already been assigned
     public static int currentFlashcardCollectionId;
 
+    // selectedFlashcardCollectionId keeps track of the flashcard collection that has been selected
     public static int selectedFlashcardCollectionId;
 
+    private ArrayList<FlashcardCollection> flashcardCollections;
+
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<FlashcardCollection> allFlashcardCollections, ArrayList<FlashcardCollection> flashcardCollections) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FlashcardCollectionAdapter adapter = new FlashcardCollectionAdapter(allFlashcardCollections, flashcardCollections, this);
@@ -49,14 +68,16 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
-    private void filter(ArrayList<FlashcardCollection> flashcardCollections, String query) {
+    // Method to filter items already in the recycler view
+    private void filter(ArrayList<FlashcardCollection> allFlashcardCollections, String query) {
         ArrayList<FlashcardCollection> filterList = new ArrayList<>();
-        for (FlashcardCollection flashcardCollection : flashcardCollections){
+        for (FlashcardCollection flashcardCollection : allFlashcardCollections){
             if(flashcardCollection.getTitle().toLowerCase().contains(query)) {
                 filterList.add(flashcardCollection);
             }
         }
-        recyclerView(flashcardCollections, filterList);
+        flashcardCollections = filterList;
+        recyclerView(allFlashcardCollections, filterList);
     }
 
     @Override
@@ -78,10 +99,6 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -90,7 +107,10 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
 
         ArrayList<FlashcardCollection> allFlashcardCollections = new ArrayList<>();
 
-        db.collection("flashcardCollections")
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+
+        // Read from firebase and create flashcard collections on create
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -100,33 +120,89 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                             return;
                         }
 
+                        // Adds items to recycler view on create and everytime new data is added to firebase
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                            String docFlashcardCollectionUid = String.valueOf(dc.getDocument().getData().get("uid"));
+                            if (dc.getType() == DocumentChange.Type.ADDED && docFlashcardCollectionUid.equals(currentFirebaseUserUid)) {
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentFlashcardCollectionId) {
                                     currentFlashcardCollectionId = Integer.parseInt(dc.getDocument().getId());
                                 }
                                 FlashcardCollection flashcardCollection = new FlashcardCollection(dc.getDocument().getData().get("title").toString(), Integer.parseInt(dc.getDocument().getId()), Integer.parseInt(dc.getDocument().getData().get("flashcardCount").toString()), Integer.parseInt(dc.getDocument().getData().get("correct").toString()));
                                 allFlashcardCollections.add(flashcardCollection);
                                 filter(allFlashcardCollections, "");
-                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                Log.d("tester", String.valueOf(allFlashcardCollections.size()));
                             }
                         }
                     }
                 });
 
-        Button addFlashcardCollectionButton = findViewById(R.id.addFlashcardCollectionButton);
+        ImageButton addFlashcardCollectionButton = findViewById(R.id.addFlashcardCollectionButton);
 
+        // Adds a flashcard collection to firebase
         addFlashcardCollectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> flashcardCollectionData = new HashMap<>();
-                flashcardCollectionData.put("title", "New collection");
-                flashcardCollectionData.put("flashcardCount", 0);
-                flashcardCollectionData.put("correct", 0);
-                db.collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId + 1)).set(flashcardCollectionData);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(FlashcardActivity.this);
+                View view = LayoutInflater.from(FlashcardActivity.this).inflate(R.layout.add_flashcard_collection_bottom_sheet, null);
+                bottomSheetDialog.setContentView(view);
+                bottomSheetDialog.show();
+
+                TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
+
+                Button cancelButton = view.findViewById(R.id.cancelButton);
+
+                // Cancels the process
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button doneButton = view.findViewById(R.id.doneButton);
+
+                // Changes the data in firebase
+                doneButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        currentFlashcardCollectionId++;
+
+                        Map<String, Object> flashcardCollectionData = new HashMap<>();
+                        flashcardCollectionData.put("title", titleEditText.getText().toString());
+                        flashcardCollectionData.put("flashcardCount", 0);
+                        flashcardCollectionData.put("correct", 0);
+                        flashcardCollectionData.put("uid", currentFirebaseUserUid);
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
+
+                        bottomSheetDialog.dismiss();
+                    }
+                });
             }
         });
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getAdapterPosition();
+                FlashcardCollection flashcardCollection = allFlashcardCollections.get(position);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.id)).delete();
+                allFlashcardCollections.remove(flashcardCollection);
+                flashcardCollections.remove(flashcardCollection);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.80f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //Allows movement between activities upon clicking

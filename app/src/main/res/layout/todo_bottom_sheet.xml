@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F0F0F0"
+    android:background="@color/secondary_white"
     android:padding="30dp">
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create todo"
+        android:text="Edit todo"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00000000"
-        android:backgroundTint="#00000000"
         android:fontFamily="@font/inter_regular"
         android:text="Cancel"
         android:textAllCaps="false"
@@ -42,7 +41,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/textView5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView5"
-        android:backgroundTint="#00000000"
         android:textColor="@color/black"
         android:background="#00000000"
         android:fontFamily="@font/inter_regular"
@@ -79,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:contentPadding="10dp"
-            app:cardBackgroundColor="#ADD2E8">
+            app:cardBackgroundColor="@color/secondary_blue">
 
             <TextView
                 android:id="@+id/textView7"
@@ -89,14 +87,14 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/inter_regular"
                 android:textStyle="bold"
-                android:textColor="#0029BA" />
+                android:textColor="@color/primary_blue" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:contentPadding="10dp"
-            app:cardBackgroundColor="#ADE8C1"
+            app:cardBackgroundColor="@color/secondary_green"
             android:layout_gravity="center">
 
             <TextView
@@ -107,7 +105,7 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/inter_regular"
                 android:textStyle="bold"
-                android:textColor="#009C2C" />
+                android:textColor="@color/primary_green" />
         </androidx.cardview.widget.CardView>
     </ViewAnimator>
 
@@ -181,5 +179,20 @@
                 android:fontFamily="@font/inter_regular" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="#00000000"
+        android:fontFamily="@font/inter_regular"
+        android:text="Delete"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_red"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/cardView2"
+        app:layout_constraintTop_toBottomOf="@+id/cardView2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

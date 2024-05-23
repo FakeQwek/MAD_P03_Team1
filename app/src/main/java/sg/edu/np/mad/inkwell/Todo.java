@@ -3,6 +3,7 @@ package sg.edu.np.mad.inkwell;
 import com.google.type.DateTime;
 
 public class Todo {
+    // Class attribues
     public String todoTitle;
 
     public int todoId;
@@ -13,6 +14,7 @@ public class Todo {
 
     public String todoStatus;
 
+    // Class get methods
     public String getTodoTitle() { return this.todoTitle; }
 
     public int getTodoId() { return this.todoId; }
@@ -23,6 +25,7 @@ public class Todo {
 
     public String getTodoStatus() { return this.todoStatus; }
 
+    // Class set methods
     public void setTodoTitle(String todoTitle) {
         this.todoTitle = todoTitle;
     }
@@ -43,6 +46,7 @@ public class Todo {
         this.todoStatus = todoStatus;
     }
 
+    // Class constructor
     public Todo(String todoTitle, int todoId, String description, String todoDateTime, String todoStatus) {
         this.todoTitle = todoTitle;
         this.todoId = todoId;
