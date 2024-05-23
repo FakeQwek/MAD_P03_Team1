@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -60,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Sets toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //Finds drawer and nav view before setting listener
+        //Finds nav bar drawer and nav view before setting listener
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        //Sets listener to allows for closing and opening of the navbar
         navigationView.bringToFront();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
                 R.string.close_nav);
@@ -73,13 +74,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
-
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-
         decorView.setSystemUiVisibility(uiOptions);
+        /*
+        // Sets help button functionality to bring you to introduction
+        ImageView helpButton = findViewById(R.id.helpButton);
+        helpButton.setOnClickListener(new helpButton.OnClickListener(){
+          @Override
+            public void onClick(view)
+
+        });
+        */
+         
 
 
     }
@@ -97,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
         return true;
-
     }
 
 

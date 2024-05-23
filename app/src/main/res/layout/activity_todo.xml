@@ -5,7 +5,13 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:background="#FFFFFF"
+    android:fadeScrollbars="false"
+    android:fitsSystemWindows="true"
+    android:scrollbarSize="4dp"
+    android:scrollbarThumbVertical="@android:color/darker_gray"
+    android:scrollbars="vertical"
+    android:verticalScrollbarPosition="left">
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
@@ -19,7 +25,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F0F0F0">
+        android:background="#F0F0F0"
+        android:scrollbars="vertical"
+        android:verticalScrollbarPosition="right">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -48,10 +56,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:fontFamily="@font/inter_regular"
             android:text="You have x todos left"
             app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
-            android:fontFamily="@font/inter_regular" />
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <Button
             android:id="@+id/todoButton"
@@ -110,6 +118,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="30dp"
+            android:background="#00FFFFFF"
+            android:fadeScrollbars="false"
+            android:scrollbarSize="4dp"
+            android:scrollbarThumbVertical="@android:color/darker_gray"
+            android:scrollbars="vertical"
+            android:verticalScrollbarPosition="right"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/searchView"
@@ -120,11 +134,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
+            android:backgroundTint="#00000000"
             app:layout_constraintBottom_toBottomOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textView"
-            app:srcCompat="@drawable/plus"
-            android:backgroundTint="#00000000" />
+            app:srcCompat="@drawable/plus" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
