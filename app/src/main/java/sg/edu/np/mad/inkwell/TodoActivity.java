@@ -376,6 +376,12 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 allTodos.remove(todo);
                 todos.remove(todo);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(TodoActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
             }
 
             @Override

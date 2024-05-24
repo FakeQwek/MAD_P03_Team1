@@ -1,17 +1,20 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -182,6 +185,12 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 allFlashcards.remove(flashcard);
                 flashcards.remove(flashcard);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(ViewFlashcardActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) ViewFlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
             }
 
             @Override

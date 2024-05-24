@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -193,6 +195,12 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 allFlashcardCollections.remove(flashcardCollection);
                 flashcardCollections.remove(flashcardCollection);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(FlashcardActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) FlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
             }
 
             @Override
