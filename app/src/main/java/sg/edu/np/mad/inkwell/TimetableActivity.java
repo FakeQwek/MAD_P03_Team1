@@ -1,10 +1,9 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.TimePickerDialog;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -24,17 +22,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class TimetableActivity extends AppCompatActivity {
 
@@ -43,7 +44,6 @@ public class TimetableActivity extends AppCompatActivity {
     private View backgroundOverlay;
     private RecyclerView recyclerView;
     private TimetableAdapter adapter;
-    private List<TimetableData> dataList;
     private Button addNewBtn1;
     private TextView tvDate;
     private CardView startTime, endTime;
@@ -51,21 +51,27 @@ public class TimetableActivity extends AppCompatActivity {
     private TimePicker selectEndTime, selectStartTime;
     private int startHour, startMinute, endHour, endMinute;
     private HashMap<String, Integer> categoryColors;
-    private Spinner categorySpinner;
+    private List<TimetableData> dataList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     private List<String> categoryList = new ArrayList<>();
-    
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
 
+        // set up recycler
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        dataList = new ArrayList<>();
         categoryColors = new HashMap<>();
+
+        Map<String, Object> taskData = new HashMap<>();
+
+        TimetableData.addCategoryToFirestore("Class", ContextCompat.getColor(this, R.color.pastelGreen));
+        TimetableData.addCategoryToFirestore("Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
+        TimetableData.addCategoryToFirestore("Work", ContextCompat.getColor(this, R.color.pastelYellow));
 
         dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400", "class"));
         dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400","meeting"));
@@ -351,5 +357,4 @@ public class TimetableActivity extends AppCompatActivity {
 
         dialog.show();
     }
-
 }
