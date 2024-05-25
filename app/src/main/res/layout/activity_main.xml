@@ -20,6 +20,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/helpButton"
+            android:layout_width="32dp"
+            android:layout_height="31dp"
+            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/question"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="30dp"
+            />
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"

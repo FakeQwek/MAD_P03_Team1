@@ -342,6 +342,12 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         else {
             Log.d("Message", "Unknown page!");
         }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
         return true;
     }
 }

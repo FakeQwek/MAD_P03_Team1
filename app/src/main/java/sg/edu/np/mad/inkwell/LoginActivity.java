@@ -53,13 +53,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
-                //For some reason none of the if statements work, even the workarounds i created dont trigger
-                //Likely some database thing
+
+                //Having network issues when connecting the database on home network, below line of code skips authentication
+                //Remember to comment when pushing to main
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 Log.d("Error", "This shows its working");
-                if (pass == "admin") {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    Log.d("Error", "This should load the main page");
-                }
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
                         auth.signInWithEmailAndPassword(email, pass)
