@@ -157,14 +157,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else {
            Log.d("Message", "Unknown page!");
         }
-        return true;
 
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
         return true;
-
     }
 
 

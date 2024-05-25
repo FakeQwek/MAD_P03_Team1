@@ -32,7 +32,7 @@ public class Navbar {
         else if (id == R.id.nav_calendar) {
             Log.d("Alert", "Opening calendar");
         }
-        else if (id == R.id.nav_home) {
+        else if (id == R.id.nav_main) {
             Log.d("Alert", "Opening homepage");
         }
         else if (id == R.id.nav_logout) {
