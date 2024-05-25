@@ -301,24 +301,43 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            /* Replace intent with other function for fragment
-            Intent Login = new Intent(MainActivity.this, Login.class);
-            startActivity(Login);
-            */
-            Log.d( "Message", "Opening notes");
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(NotesActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(NotesActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(NotesActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");
