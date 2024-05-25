@@ -49,6 +49,14 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
 
         Switch switch1 = findViewById(R.id.switch1);
 
+        // Checks switch1 if night mode is on and vice versa
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            Log.d("tester", "DARK");
+            switch1.setChecked(true);
+        } else {
+            switch1.setChecked(false);
+        }
+
         // Toggle night mode
         switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -65,30 +73,43 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(SettingsActivity.this, NotesActivity.class);
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(SettingsActivity.this, MainActivity.class);
             startActivity(notesActivity);
-            Log.d( "Alert", "Opening notes");
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(SettingsActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(SettingsActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
             Intent todoActivity = new Intent(SettingsActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
-            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(SettingsActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
             Intent todoActivity = new Intent(SettingsActivity.this, TimetableActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening timetable");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(SettingsActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");

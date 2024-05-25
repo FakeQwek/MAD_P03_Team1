@@ -5,33 +5,36 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/home_nav_icon"
+            android:id="@+id/nav_main"
+            android:icon="@drawable/home_outline"
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_notes"
-            android:icon="@drawable/notes_nav_icon"
+            android:icon="@drawable/note_outline"
             android:title="Notes" />
         <item
+            android:id="@+id/nav_todos"
+            android:icon="@drawable/calendar_check"
+            android:title="Todos" />
+        <item
             android:id="@+id/nav_flashcards"
-            android:icon="@drawable/nav_flashcard_icon"
+            android:icon="@drawable/cards_outline"
             android:title="Flashcards" />
         <item
             android:id="@+id/nav_calendar"
-            android:icon="@drawable/calendar_nav_icon"
+            android:icon="@drawable/calendar_month"
             android:title="Calendar" />
         <item
             android:id="@+id/nav_timetable"
-            android:icon="@drawable/timetable_nav_icon"
+            android:icon="@drawable/calendar_clock"
             android:title="Timetable" />
         <item
-            android:id="@+id/nav_todo"
-            android:icon="@drawable/flashcards_nav_icon"
-            android:title="Todo List" />
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/cog"
+            android:title="Settings" />
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/nav_unlock_icon"
-            android:title="Logout"
-            />
+            android:icon="@drawable/logout"
+            android:title="Log out" />
     </group>
 </menu>
