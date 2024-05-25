@@ -294,6 +294,13 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         long time = hour * 3600000 + minute * 60000;
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
+
+                        Toast toast = new Toast(TodoActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
                     }
                 });
 

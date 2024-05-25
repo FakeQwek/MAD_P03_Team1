@@ -176,6 +176,13 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
 
                         bottomSheetDialog.dismiss();
+
+                        Toast toast = new Toast(FlashcardActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        LayoutInflater layoutInflater = (LayoutInflater) FlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
                     }
                 });
             }
