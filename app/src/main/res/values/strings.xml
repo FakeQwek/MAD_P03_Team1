@@ -41,4 +41,12 @@
     <string name="flashcard_collection_correct_count">%1$d files/%1$d files</string>
 
     <string name="add_new">+ Add new</string>
+
+    <string-array name="category_options">
+        <item>Class</item>
+        <item>Meeting</item>
+        <item>Add New Option...</item>
+    </string-array>
+
+
 </resources>
