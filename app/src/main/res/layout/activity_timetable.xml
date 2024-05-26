@@ -8,31 +8,39 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.appcompat.widget.Toolbar>
+
     <!-- guidelines for layout -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.075" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_rHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.925" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <!-- scrollView -->
     <androidx.core.widget.NestedScrollView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/guideline_vertical"
@@ -101,17 +109,16 @@
             <!-- add new button -->
             <Button
                 android:id="@+id/addNewBtn1"
-                android:layout_width="340dp"
+                android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="75dp"
                 android:text="+ Add new"
                 android:textSize="17sp"
                 app:cornerRadius="20dp"
-                app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
-                app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
                 app:layout_constraintBottom_toTopOf="parent"
-                />
+                app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
+                app:layout_constraintStart_toStartOf="@id/guideline_horizontal" />
 
         </LinearLayout>
 
@@ -123,7 +130,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#80000000"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <!-- sliding panel -->
     <LinearLayout
@@ -131,10 +138,10 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/top_rounded_corners"
+        android:background="@drawable/sliding_panel"
         android:padding="16dp"
-        android:visibility="visible"
-        app:layout_constraintHeight_percent="0.75"
+        android:visibility="gone"
+        app:layout_constraintHeight_percent="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

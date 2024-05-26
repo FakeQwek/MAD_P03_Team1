@@ -54,19 +54,4 @@ public class TimetableData {
             return color;
         }
     }
-
-    public static void addCategoryToFirestore(String name, int color) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Category category = new Category(name, color);
-
-        db.collection("categories")
-                .add(category)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Category added with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("Firestore", "Error adding category", e);
-                });
-    }
-
 }

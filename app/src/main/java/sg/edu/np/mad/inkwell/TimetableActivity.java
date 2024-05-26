@@ -1,6 +1,7 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -24,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +41,9 @@ import android.widget.Spinner;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class TimetableActivity extends AppCompatActivity {
 
@@ -54,35 +62,11 @@ public class TimetableActivity extends AppCompatActivity {
     private List<TimetableData> dataList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     private List<String> categoryList = new ArrayList<>();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
-
-        // set up recycler
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        categoryColors = new HashMap<>();
-
-        Map<String, Object> taskData = new HashMap<>();
-
-        TimetableData.addCategoryToFirestore("Class", ContextCompat.getColor(this, R.color.pastelGreen));
-        TimetableData.addCategoryToFirestore("Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
-        TimetableData.addCategoryToFirestore("Work", ContextCompat.getColor(this, R.color.pastelYellow));
-
-        dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400", "class"));
-        dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400","meeting"));
-        dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400","class"));
-        dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400","meeting"));
-
-        categoryColors.put("class", ContextCompat.getColor(this, R.color.pastelCoral));
-        categoryColors.put("meeting", ContextCompat.getColor(this, R.color.pastelBlue));
-
-        adapter = new TimetableAdapter(this, dataList, categoryColors);
-        recyclerView.setAdapter(adapter);
 
         addNewBtn1 = findViewById(R.id.addNewBtn1);
         slidingPanel = findViewById(R.id.slidingPanel);
@@ -96,6 +80,58 @@ public class TimetableActivity extends AppCompatActivity {
         tvDate = findViewById(R.id.tvDate);
         Button btnClear = findViewById(R.id.btnClear);
 
+        // init Firebase
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            // set up RecyclerView
+            recyclerView = findViewById(R.id.recyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            categoryColors = new HashMap<>();
+
+            adapter = new TimetableAdapter(this, dataList, categoryColors);
+            recyclerView.setAdapter(adapter);
+
+            // get data from Firestore
+            db.collection("users").document(userId).collection("timetable")
+                    .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@NonNull QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("Firestore", "Listen failed.", e);
+                                return;
+                            }
+
+                            dataList.clear();
+                            for (QueryDocumentSnapshot doc : snapshots) {
+                                TimetableData data = doc.toObject(TimetableData.class);
+                                dataList.add(data);
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+
+            // add categories to Firestore
+            addCategoryToFirestore(db, userId, "Class", ContextCompat.getColor(this, R.color.pastelCoral));
+            addCategoryToFirestore(db, userId, "Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
+
+            addNewBtn1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String title = "New Title";
+                    String description = "New Description";
+                    String startTime = "1300";
+                    String endTime = "1400";
+                    String category = "Class";
+
+                    addTimetableData(db, userId, title, description, startTime, endTime, category);
+                }
+            });
+        }
 
         TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
 
@@ -157,10 +193,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        categoryColors = new HashMap<>();
-        categoryColors.put("Class", ContextCompat.getColor(this, R.color.pastelCoral));
-        categoryColors.put("Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
-
         categoryList.add("class");
         categoryList.add("meeting");
 
@@ -186,6 +218,7 @@ public class TimetableActivity extends AppCompatActivity {
         categoryList.add("Add New Option");
         spinnerAdapter.notifyDataSetChanged();
     }
+
 
     private void showTimePickerDialog(final boolean isStartTime) {
         int hour = isStartTime ? startHour : endHour;
@@ -244,6 +277,7 @@ public class TimetableActivity extends AppCompatActivity {
         tvEndTime.setText(currentTime);
     }
 
+    // when add new category selected, open pop-up
     private void showAddOptionPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -256,7 +290,7 @@ public class TimetableActivity extends AppCompatActivity {
 
         final AlertDialog dialog = builder.create();
 
-        // Add color buttons dynamically
+        // add color buttons dynamically
         int[] colors = {R.color.pastelCoral, R.color.pastelBlue, R.color.pastelGreen, R.color.pastelPurple, R.color.pastelYellow};
         for (final int color : colors) {
             Button colorButton = new Button(this);
@@ -279,10 +313,10 @@ public class TimetableActivity extends AppCompatActivity {
                     getResources().getDimensionPixelSize(R.dimen.color_button_size),
                     getResources().getDimensionPixelSize(R.dimen.color_button_size)
             );
-            params.setMargins(10, 10, 10, 10); // Adjust margins as needed
+            params.setMargins(10, 10, 10, 10);
             colorButton.setLayoutParams(params);
 
-            // Add a circular background programmatically
+            // add circular bg to colour
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.OVAL);
             shape.setColor(ContextCompat.getColor(this, color));
@@ -297,13 +331,13 @@ public class TimetableActivity extends AppCompatActivity {
                     v.setSelected(!isSelected);
 
                     if (isSelected) {
-                        // Restore original size
+                        // go back to original size when selected
                         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
                         params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
                         params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
                         v.setLayoutParams(params);
                     } else {
-                        // Enlarge button when selected
+                        // make color circle bigger when selected
                         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
                         params.width = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
                         params.height = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
@@ -314,7 +348,7 @@ public class TimetableActivity extends AppCompatActivity {
                         View child = colorLayout.getChildAt(i);
                         if (child != v) {
                             child.setSelected(false);
-                            // Restore original size for unselected buttons
+                            // bring back original size for unselected buttons
                             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) child.getLayoutParams();
                             params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
                             params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
@@ -356,5 +390,35 @@ public class TimetableActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    // add the collections category to specific user
+    private void addCategoryToFirestore(FirebaseFirestore db, String userId, String category, int color) {
+        Map<String, Object> categoryData = new HashMap<>();
+        categoryData.put("color", color);
+
+        db.collection("users")
+                .document(userId)
+                .collection("categories")
+                .document(category)
+                .set(categoryData)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Category added successfully"))
+                .addOnFailureListener(e -> Log.w("Firestore", "Error adding category", e));
+    }
+
+    private void addTimetableData(FirebaseFirestore db, String userId, String title, String description, String startTime, String endTime, String category) {
+        Map<String, Object> timetableData = new HashMap<>();
+        timetableData.put("title", title);
+        timetableData.put("description", description);
+        timetableData.put("startTime", startTime);
+        timetableData.put("endTime", endTime);
+        timetableData.put("category", category);
+
+        db.collection("users")
+                .document(userId)
+                .collection("timetable")
+                .add(timetableData)
+                .addOnSuccessListener(documentReference -> Log.d("Firestore", "Timetable data added successfully"))
+                .addOnFailureListener(e -> Log.w("Firestore", "Error adding timetable data", e));
     }
 }

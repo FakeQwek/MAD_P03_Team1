@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import java.util.HashMap;
-import android.graphics.Color;
 
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
 
@@ -23,6 +22,11 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         this.context = context;
         this.dataList = dataList;
         this.categoryColors = categoryColors;
+    }
+
+    public TimetableAdapter(List<TimetableData> dataList) {
+        this.dataList = dataList;
+        this.categoryColors = new HashMap<>();
     }
 
     @NonNull
@@ -72,17 +76,11 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     }
 
     private int getColorForCategory(String category) {
-        switch (category) {
-            case "class":
-                return ContextCompat.getColor(context, R.color.pastelCoral);
-            case "meeting":
-                return ContextCompat.getColor(context, R.color.pastelBlue);
-            case "outing":
-                return ContextCompat.getColor(context, R.color.pastelYellow);
-            case "study":
-                return ContextCompat.getColor(context, R.color.pastelPurple);
-            default:
-                return Color.WHITE; // Default color
+        Integer color = categoryColors.get(category);
+        if (color != null) {
+            return color;
+        } else {
+            return ContextCompat.getColor(context, R.color.white);
         }
     }
 }
