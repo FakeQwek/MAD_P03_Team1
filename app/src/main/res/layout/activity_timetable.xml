@@ -167,7 +167,7 @@
         android:layout_weight="1"
         android:background="@drawable/sliding_panel"
         android:padding="16dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintHeight_percent="0.75"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -228,8 +228,8 @@
                     <!-- divider -->
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@android:color/darker_gray"/>
+                        android:layout_height="1dp"
+                        android:background="@color/primary_grey"/>
 
                     <!-- edit location text -->
                     <EditText
@@ -313,7 +313,7 @@
                                         android:layout_marginTop="7dp"
                                         android:layout_weight="1"
                                         android:text="start"
-                                        android:textColor="@color/white" />
+                                        android:textColor="@color/primary_grey" />
                                 </LinearLayout>
 
                             </androidx.cardview.widget.CardView>
@@ -334,8 +334,8 @@
                     <!-- divider -->
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@android:color/darker_gray"/>
+                        android:layout_height="1dp"
+                        android:background="@color/primary_grey"/>
 
                     <!-- endTimePicker layout -->
                     <LinearLayout
@@ -354,7 +354,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="20dp"
-                                android:paddingVertical="10dp"
+                                android:paddingVertical="15dp"
                                 android:text="Ends"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -389,7 +389,7 @@
                                         android:layout_marginTop="7dp"
                                         android:layout_weight="1"
                                         android:text="start"
-                                        android:textColor="@color/white" />
+                                        android:textColor="@color/primary_grey" />
                                 </LinearLayout>
 
                             </androidx.cardview.widget.CardView>
@@ -440,7 +440,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="20dp"
-                                android:paddingVertical="10dp"
+                                android:paddingVertical="15dp"
                                 android:text="Notification"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -491,7 +491,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="20dp"
-                                android:paddingVertical="10dp"
+                                android:paddingVertical="15dp"
                                 android:text="Mark As"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -506,6 +506,7 @@
 
                             <Spinner
                                 android:id="@+id/categorySpinner"
+                                android:background="@color/secondary_white"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 
