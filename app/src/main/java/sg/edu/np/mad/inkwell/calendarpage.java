@@ -16,10 +16,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -178,6 +181,7 @@ public class calendarpage extends AppCompatActivity {
                                                 public void onSuccess(Void aVoid) {
                                                     displayEventsForDate(date);
                                                     Toast.makeText(calendarpage.this, "Event Deleted", Toast.LENGTH_SHORT).show();
+                                                    showNotification("Event Deleted", "Your event has been deleted successfully.");
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -247,6 +251,7 @@ public class calendarpage extends AppCompatActivity {
                                                         displayEventsForDate(date);
                                                         setAlarmForEvent(date);
                                                         Toast.makeText(calendarpage.this, "Event Edited", Toast.LENGTH_SHORT).show();
+                                                        showNotification("Event Edited", "Your event has been edited successfully.");
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
@@ -302,6 +307,7 @@ public class calendarpage extends AppCompatActivity {
                                                 displayEventsForDate(date);
                                                 setAlarmForEvent(date);
                                                 Toast.makeText(calendarpage.this, "Event Saved", Toast.LENGTH_SHORT).show();
+                                                showNotification("Event Created", "Your event has been created successfully.");
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -339,5 +345,17 @@ public class calendarpage extends AppCompatActivity {
         if (alarmManager != null) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
+    }
+
+    private void showNotification(String title, String content) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.plus)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }
