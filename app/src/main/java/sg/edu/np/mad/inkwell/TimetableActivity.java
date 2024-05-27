@@ -1,7 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +35,7 @@ import java.util.TimeZone;
 import android.app.AlertDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.ImageButton;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,7 +51,7 @@ public class TimetableActivity extends AppCompatActivity {
     private View backgroundOverlay;
     private RecyclerView recyclerView;
     private TimetableAdapter adapter;
-    private Button addNewBtn1;
+    private ImageButton addNewBtn1;
     private TextView tvDate;
     private CardView startTime, endTime;
     private TextView tvStartTime,tvEndTime;
@@ -68,7 +67,7 @@ public class TimetableActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
 
-        addNewBtn1 = findViewById(R.id.addNewBtn1);
+        addNewBtn1 = findViewById(R.id.addNewTaskbtn);
         slidingPanel = findViewById(R.id.slidingPanel);
         backgroundOverlay = findViewById(R.id.backgroundOverlay);
         tvStartTime = findViewById(R.id.tvStartTime);

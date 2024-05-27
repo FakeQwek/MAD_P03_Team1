@@ -24,7 +24,8 @@
             android:layout_height="wrap_content"
             android:text="Title"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:fontFamily="@font/inter_regular" />
 
         <TextView
             android:id="@+id/tvDescription"

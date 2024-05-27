@@ -6,6 +6,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/secondary_white"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -52,17 +53,41 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- title -->
+                <TextView
+                    android:id="@+id/tvTimetable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Timetable"
+                    android:fontFamily="@font/inter_regular"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    />
+
+                <ImageButton
+                    android:id="@+id/addNewTaskbtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#00000000"
+                    android:gravity="end|center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toEndOf="@id/tvTimetable"
+                    app:srcCompat="@drawable/plus" />
+
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/tvTimetable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Timetable"
-                android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@id/guideline_horizontal"
-                app:layout_constraintTop_toBottomOf="@id/guideline_vertical" />
+                android:layout_marginVertical="10dp"
+                android:text="You have x events today"/>
 
             <!-- date cardView -->
             <LinearLayout
@@ -71,14 +96,22 @@
                 android:orientation="horizontal"
                 android:gravity="center">
 
+                <ImageView
+                    android:id="@+id/leftArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/chevron_left"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="visible" />
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardDate"
                     android:layout_width="150dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="20dp"
-                    app:cardBackgroundColor="@color/purple"
+                    app:cardBackgroundColor="@color/white"
                     app:cardElevation="4dp"
-                    app:cardCornerRadius="200dp">
+                    app:cardCornerRadius="10dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -90,14 +123,23 @@
                             android:id="@+id/tvDate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="tv"
-                            android:padding="10dp"
-                            android:textColor="@color/black"
+                            android:text="current date"
+                            android:padding="7.5dp"
+                            android:fontFamily="@font/inter_regular"
                             android:textStyle="bold" />
 
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
+
+                <ImageView
+                    android:id="@+id/rightArrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/chevron_right"
+                    android:layout_marginStart="10dp"
+                    android:visibility="visible" />
+
             </LinearLayout>
 
             <!-- recyclerView to show events -->
@@ -106,22 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- add new button -->
-            <Button
-                android:id="@+id/addNewBtn1"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="75dp"
-                android:text="+ Add new"
-                android:textSize="17sp"
-                app:cornerRadius="20dp"
-                app:layout_constraintBottom_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/guideline_rHorizontal"
-                app:layout_constraintStart_toStartOf="@id/guideline_horizontal" />
-
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
     <!-- darken background when panel is up -->
@@ -141,7 +168,7 @@
         android:background="@drawable/sliding_panel"
         android:padding="16dp"
         android:visibility="gone"
-        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintHeight_percent="0.75"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -176,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -225,7 +252,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -270,7 +297,7 @@
                                 android:layout_width="75dp"
                                 android:layout_height="35dp"
                                 android:layout_marginEnd="20dp"
-                                app:cardBackgroundColor="@color/black"
+                                app:cardBackgroundColor="@color/secondary_white"
                                 app:cardCornerRadius="8dp">
 
                                 <LinearLayout
@@ -346,7 +373,7 @@
                                 android:layout_marginEnd="20dp"
                                 android:layout_width="75dp"
                                 android:layout_height="35dp"
-                                app:cardBackgroundColor="@color/black"
+                                app:cardBackgroundColor="@color/secondary_white"
                                 app:cardCornerRadius="8dp">
 
                                 <LinearLayout
@@ -389,7 +416,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
@@ -440,7 +467,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardBackgroundColor="@color/purple"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="8dp">
 
                 <LinearLayout
