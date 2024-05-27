@@ -1,6 +1,9 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.TimePickerDialog;
+import android.app.DatePickerDialog;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +14,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -36,12 +41,14 @@ import android.app.AlertDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -60,14 +67,19 @@ public class TimetableActivity extends AppCompatActivity {
     private TimetableAdapter adapter;
     private ImageButton addNewBtn;
     private TextView tvDate;
-    private CardView startTime, endTime;
+    private CardView startTime, endTime, startDate, endDate;
     private TextView tvStartTime,tvEndTime;
     private TimePicker selectEndTime, selectStartTime;
+    private DatePicker selectEndDate, selectStartDate;
     private int startHour, startMinute, endHour, endMinute;
+    private int selectedColor = 0;
     private HashMap<String, Integer> categoryColors;
     private List<TimetableData> dataList = new ArrayList<>();
     private ArrayAdapter<String> spinnerAdapter;
     private List<String> categoryList = new ArrayList<>();
+    private int startYear, startMonth, startDayOfMonth;
+    private int endYear, endMonth, endDayOfMonth;
+    private TextView tvStartDate, tvEndDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +93,14 @@ public class TimetableActivity extends AppCompatActivity {
         tvEndTime = findViewById(R.id.tvEndTime);
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
+        startDate = findViewById(R.id.startDate);
+        endDate = findViewById(R.id.endDate);
         selectStartTime = findViewById(R.id.selectStartTime);
         selectEndTime = findViewById(R.id.selectEndTime);
         tvDate = findViewById(R.id.tvDate);
         Button btnClear = findViewById(R.id.btnClear);
+        tvStartDate = findViewById(R.id.tvStartDate);
+        tvEndDate = findViewById(R.id.tvEndDate);
 
         // Initialize Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -162,6 +178,13 @@ public class TimetableActivity extends AppCompatActivity {
 
         tvStartTime.setText(currentTime);
         tvEndTime.setText(currentTime);
+
+        startYear = endYear = calendar.get(Calendar.YEAR);
+        startMonth = endMonth = calendar.get(Calendar.MONTH);
+        startDayOfMonth = endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
+        tvEndDate.setText(formatDate(endYear, endMonth, endDayOfMonth));
+
         Date date = calendar.getTime();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
@@ -199,10 +222,26 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
+        startDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(false);
+            }
+        });
+
+
         endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 showTimePickerDialog(false);
+            }
+        });
+
+        endDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(false);
             }
         });
 
@@ -252,6 +291,40 @@ public class TimetableActivity extends AppCompatActivity {
         timePickerDialog.show();
     }
 
+    private void showDatePickerDialog(final boolean isStartDate) {
+        int year = isStartDate ? startYear : endYear;
+        int month = isStartDate ? startMonth : endMonth;
+        int dayOfMonth = isStartDate ? startDayOfMonth : endDayOfMonth;
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        if (isStartDate) {
+                            startYear = year;
+                            startMonth = monthOfYear;
+                            startDayOfMonth = dayOfMonth;
+                            tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
+                        } else {
+                            endYear = year;
+                            endMonth = monthOfYear;
+                            endDayOfMonth = dayOfMonth;
+                            tvEndDate.setText(formatDate(endYear, endMonth, endDayOfMonth));
+                        }
+                    }
+                }, year, month, dayOfMonth);
+
+        datePickerDialog.show();
+    }
+
+    private String formatDate(int year, int month, int dayOfMonth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, dayOfMonth);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        return sdf.format(calendar.getTime());
+    }
+
+
     private void toggleSlidingPanel() {
         if (!isPanelShown) {
             // Slide up animation
@@ -291,32 +364,33 @@ public class TimetableActivity extends AppCompatActivity {
     // when add new category selected, open pop-up
     private void showAddOptionPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        String userId = String.valueOf(currentUser);
+
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.add_new_cat_popup, null);
         builder.setView(dialogView);
 
-        final EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
-        final LinearLayout colorLayout = dialogView.findViewById(R.id.colorLayout);
+        EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
+        LinearLayout colorLayout = dialogView.findViewById(R.id.colorLayout);
         Button btnAddCategory = dialogView.findViewById(R.id.btnAddCategory);
 
         final AlertDialog dialog = builder.create();
 
-        // add color buttons dynamically
+        // Add color buttons dynamically
         int[] colors = {R.color.pastelCoral, R.color.pastelBlue, R.color.pastelGreen, R.color.pastelPurple, R.color.pastelYellow};
         for (final int color : colors) {
             Button colorButton = new Button(this);
             colorButton.setBackgroundColor(ContextCompat.getColor(this, color));
+
+            // Set the tag to the color resource ID
             colorButton.setTag(color);
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    v.setSelected(true);
-                    for (int i = 0; i < colorLayout.getChildCount(); i++) {
-                        View child = colorLayout.getChildAt(i);
-                        if (child != v) {
-                            child.setSelected(false);
-                        }
-                    }
+                    selectedColor = (int) v.getTag();
                 }
             });
 
@@ -327,84 +401,38 @@ public class TimetableActivity extends AppCompatActivity {
             params.setMargins(10, 10, 10, 10);
             colorButton.setLayoutParams(params);
 
-            // add circular bg to colour
+            // Add circular background to color button
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.OVAL);
             shape.setColor(ContextCompat.getColor(this, color));
             colorButton.setBackground(shape);
 
             colorLayout.addView(colorButton);
-
-            colorButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    boolean isSelected = v.isSelected();
-                    v.setSelected(!isSelected);
-
-                    if (isSelected) {
-                        // go back to original size when selected
-                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
-                        params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
-                        params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
-                        v.setLayoutParams(params);
-                    } else {
-                        // make color circle bigger when selected
-                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
-                        params.width = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
-                        params.height = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
-                        v.setLayoutParams(params);
-                    }
-
-                    for (int i = 0; i < colorLayout.getChildCount(); i++) {
-                        View child = colorLayout.getChildAt(i);
-                        if (child != v) {
-                            child.setSelected(false);
-                            // bring back original size for unselected buttons
-                            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) child.getLayoutParams();
-                            params.width = getResources().getDimensionPixelSize(R.dimen.color_button_size);
-                            params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
-                            child.setLayoutParams(params);
-                        }
-                    }
-                }
-            });
         }
 
         btnAddCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String categoryName = etCategoryName.getText().toString().trim();
-                int selectedColor = -1;
-                for (int i = 0; i < colorLayout.getChildCount(); i++) {
-                    View child = colorLayout.getChildAt(i);
-                    if (child.isSelected()) {
-                        selectedColor = (int) child.getTag();
-                        break;
-                    }
-                }
-                if (!categoryName.isEmpty() && selectedColor != -1) {
-                    categoryList.add(categoryList.size() - 1, categoryName); // Add before "Add New Option"
-                    categoryColors.put(categoryName, ContextCompat.getColor(TimetableActivity.this, selectedColor));
-                    spinnerAdapter.notifyDataSetChanged();
-                    dialog.dismiss();
+                if (!categoryName.isEmpty()) {
+                    // Get selected color as a hex string
+                    String hexColor = String.format("#%06X", (0xFFFFFF & selectedColor));
+
+                    // Add category to Firestore
+                    addCategoryToFirestore(db, userId, categoryName, Integer.parseInt(hexColor));
+                    dialog.dismiss(); // Close the dialog after adding the category
                 } else {
-                    // Show error message
-                    if (categoryName.isEmpty()) {
-                        etCategoryName.setError("Category name required");
-                    }
-                    if (selectedColor == -1) {
-                        TextView selectColorTextView = dialogView.findViewById(R.id.tvSelectColor);
-                        selectColorTextView.setError("Select a color");
-                    }
+                    Toast.makeText(TimetableActivity.this, "Enter a category name", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         dialog.show();
+
+        dialog.show();
     }
 
     // add the collections category to specific user
-
     private void initCategories(FirebaseFirestore db, String userId) {
         Map<String, Object> classCategory = new HashMap<>();
         classCategory.put("name", "Class");
@@ -449,25 +477,31 @@ public class TimetableActivity extends AppCompatActivity {
 
 
     private void addCategoryToFirestore(FirebaseFirestore db, String userId, String categoryName, int color) {
+        // Use category name as the document ID
         db.collection("users").document(userId).collection("categories")
-                .whereEqualTo("name", categoryName)
+                .document(categoryName)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            if (task.getResult().isEmpty()) {
-                                // Category doesn't exist, add it
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                // Category already exists
+                                Log.d("Firestore", "Category already exists");
+                            } else {
+                                // Category doesn't exist, add it with the category name as ID
                                 Map<String, Object> category = new HashMap<>();
                                 category.put("name", categoryName);
                                 category.put("color", color);
 
                                 db.collection("users").document(userId).collection("categories")
-                                        .add(category)
-                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        .document(categoryName)
+                                        .set(category)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
-                                            public void onSuccess(DocumentReference documentReference) {
-                                                Log.d("Firestore", "Category added with ID: " + documentReference.getId());
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("Firestore", "Category added successfully");
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -476,9 +510,6 @@ public class TimetableActivity extends AppCompatActivity {
                                                 Log.w("Firestore", "Error adding category", e);
                                             }
                                         });
-                            } else {
-                                // Category already exists
-                                Log.d("Firestore", "Category already exists");
                             }
                         } else {
                             Log.w("Firestore", "Error getting categories", task.getException());
