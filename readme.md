@@ -31,7 +31,7 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication – Jin Xuan
+- Login and Authentication(firebase) – Jin Xuan
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
 - SQLite Database - Jin Xuan
