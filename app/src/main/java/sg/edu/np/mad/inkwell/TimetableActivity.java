@@ -1,7 +1,11 @@
 package sg.edu.np.mad.inkwell;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -28,6 +32,9 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,6 +54,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -80,6 +88,11 @@ public class TimetableActivity extends AppCompatActivity {
     private int startYear, startMonth, startDayOfMonth;
     private int endYear, endMonth, endDayOfMonth;
     private TextView tvStartDate, tvEndDate;
+    private EditText etToDo, etLocation;
+    private Spinner categorySpinner;
+
+    public TimetableActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +114,13 @@ public class TimetableActivity extends AppCompatActivity {
         Button btnClear = findViewById(R.id.btnClear);
         tvStartDate = findViewById(R.id.tvStartDate);
         tvEndDate = findViewById(R.id.tvEndDate);
+        etToDo = findViewById(R.id.etToDo);
+        etLocation = findViewById(R.id.etLocation);
+        tvStartDate = findViewById(R.id.tvStartDate);
+        tvStartTime = findViewById(R.id.tvStartTime);
+        tvEndDate = findViewById(R.id.tvEndDate);
+        tvEndTime = findViewById(R.id.tvEndTime);
+        Button btnSave = findViewById(R.id.btnSave);
 
         // Initialize Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -109,21 +129,27 @@ public class TimetableActivity extends AppCompatActivity {
 
         // Initialize category list and spinner adapter
         List<String> categoryList = new ArrayList<>();
+        categoryList.add("Category 1");
+        categoryList.add("Category 2");
+        categoryList.add("Category 3");
+
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinner = findViewById(R.id.categorySpinner);
-        spinner.setAdapter(spinnerAdapter);
+        Spinner categorySpinner = findViewById(R.id.categorySpinner); // Assuming you have a spinner with id categorySpinner in your layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.category_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+
 
         if (currentUser != null) {
             String userId = currentUser.getUid();
+            checkAndInitializeCategories(db, userId);
+            createEvents(db, userId);
 
             // Set up RecyclerView
             recyclerView = findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             categoryColors = new HashMap<>();
-
-            adapter = new TimetableAdapter(this, dataList, categoryColors);
-            recyclerView.setAdapter(adapter);
 
             // Get data from Firestore
             db.collection("users").document(userId).collection("timetable")
@@ -166,109 +192,136 @@ public class TimetableActivity extends AppCompatActivity {
                         }
                     });
 
-            checkAndInitializeCategories(db, userId);
-        }
+            TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
 
-        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
+            Calendar calendar = Calendar.getInstance(singaporeTimeZone);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
 
-        Calendar calendar = Calendar.getInstance(singaporeTimeZone);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+            tvStartTime.setText(currentTime);
+            tvEndTime.setText(currentTime);
 
-        tvStartTime.setText(currentTime);
-        tvEndTime.setText(currentTime);
+            startYear = endYear = calendar.get(Calendar.YEAR);
+            startMonth = endMonth = calendar.get(Calendar.MONTH);
+            startDayOfMonth = endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+            tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
+            tvEndDate.setText(formatDate(endYear, endMonth, endDayOfMonth));
 
-        startYear = endYear = calendar.get(Calendar.YEAR);
-        startMonth = endMonth = calendar.get(Calendar.MONTH);
-        startDayOfMonth = endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
-        tvEndDate.setText(formatDate(endYear, endMonth, endDayOfMonth));
+            Date date = calendar.getTime();
 
-        Date date = calendar.getTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+            String currentDate = dateFormat.format(date);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
-        String currentDate = dateFormat.format(date);
+            tvDate.setText(currentDate);
 
-        tvDate.setText(currentDate);
-
-        addNewBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleSlidingPanel();
-            }
-        });
-
-        backgroundOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSlidingPanel();
-            }
-        });
-
-        slidingPanel.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                selectStartTime.setVisibility(View.GONE);
-                selectEndTime.setVisibility(View.GONE);
-                return true;
-            }
-        });
-
-        startTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog(true);
-            }
-        });
-
-        startDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(false);
-            }
-        });
-
-
-        endTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                showTimePickerDialog(false);
-            }
-        });
-
-        endDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(false);
-            }
-        });
-
-        btnClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearInputData();
-            }
-        });
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedCategory = parent.getItemAtPosition(position).toString();
-                if (selectedCategory.equals("Add New Option")) {
-                    showAddOptionPopup();
+            addNewBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleSlidingPanel();
                 }
-            }
+            });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+            backgroundOverlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideSlidingPanel();
+                }
+            });
 
-        spinnerAdapter.notifyDataSetChanged();
+            slidingPanel.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    selectStartTime.setVisibility(View.GONE);
+                    selectEndTime.setVisibility(View.GONE);
+                    return true;
+                }
+            });
+
+            startTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showTimePickerDialog(true);
+                }
+            });
+
+            startDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDatePickerDialog(false);
+                }
+            });
+
+
+            endTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    showTimePickerDialog(false);
+                }
+            });
+
+            endDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDatePickerDialog(false);
+                }
+            });
+
+            btnClear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clearInputData();
+                }
+            });
+
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        Map<String, Object> eventData = new HashMap<>();
+                        eventData.put("eventName", etToDo.getText().toString());
+                        eventData.put("eventLocation", etLocation.getText().toString());
+                        eventData.put("startTime", tvStartTime.getText().toString());
+                        eventData.put("endTime", tvEndTime.getText().toString());
+                        eventData.put("category", categorySpinner.getSelectedItem().toString());
+
+                        db.collection("users").document(userId).collection("events").document(String.valueOf(1)).set(eventData);
+                        hideSlidingPanel();
+
+                        Toast toast = new Toast(TimetableActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+
+                        LayoutInflater layoutInflater = (LayoutInflater) TimetableActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
+
+                        Toast.makeText(TimetableActivity.this, "Data saved successfully.", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.e("SaveButtonClick", "Error saving data: " + e.getMessage(), e);
+
+                        Toast.makeText(TimetableActivity.this, "Error saving data. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedCategory = parent.getItemAtPosition(position).toString();
+                    if (selectedCategory.equals("Add New Option")) {
+                        showAddOptionPopup();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+
+            spinnerAdapter.notifyDataSetChanged();
+        }
     }
-
 
     private void showTimePickerDialog(final boolean isStartTime) {
         int hour = isStartTime ? startHour : endHour;
@@ -323,7 +376,6 @@ public class TimetableActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         return sdf.format(calendar.getTime());
     }
-
 
     private void toggleSlidingPanel() {
         if (!isPanelShown) {
@@ -428,8 +480,6 @@ public class TimetableActivity extends AppCompatActivity {
         });
 
         dialog.show();
-
-        dialog.show();
     }
 
     // add the collections category to specific user
@@ -475,7 +525,6 @@ public class TimetableActivity extends AppCompatActivity {
                 });
     }
 
-
     private void addCategoryToFirestore(FirebaseFirestore db, String userId, String categoryName, int color) {
         // Use category name as the document ID
         db.collection("users").document(userId).collection("categories")
@@ -518,6 +567,64 @@ public class TimetableActivity extends AppCompatActivity {
                 });
     }
 
+    private void createEvents(FirebaseFirestore db, String userId) {
+        // Reference the events collection under the user's document
+        CollectionReference eventsCollection = db.collection("users").document(userId).collection("events");
+
+        // Check if the events collection already exists
+        eventsCollection.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().isEmpty()) {
+                                // Events collection doesn't exist, create it with fields
+                                Map<String, Object> eventData = new HashMap<>();
+                                eventData.put("eventName", "");
+                                eventData.put("eventLocation","");
+                                eventData.put("startTime", "");
+                                eventData.put("endTime", "");
+                                eventData.put("category", "");
+
+                                // Create the events collection with a dummy document and fields
+                                eventsCollection.document("0").set(eventData)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("Firestore", "Empty events collection created for user: " + userId);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e("Firestore", "Error creating empty events collection", e);
+                                            }
+                                        });
+                            } else {
+                                // Events collection already exists, check if it's empty and log a message
+                                eventsCollection.limit(1).get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    if (task.getResult().isEmpty()) {
+                                                        Log.d("Firestore", "Events collection already exists but is empty for user: " + userId);
+                                                    } else {
+                                                        Log.d("Firestore", "Events collection already exists and is not empty for user: " + userId);
+                                                    }
+                                                } else {
+                                                    Log.e("Firestore", "Error checking events collection", task.getException());
+                                                }
+                                            }
+                                        });
+                            }
+                        } else {
+                            Log.e("Firestore", "Error checking events collection", task.getException());
+                        }
+                    }
+                });
+    }
+
     private void checkAndInitializeCategories(FirebaseFirestore db, String userId) {
         db.collection("users").document(userId).collection("categories")
                 .get()
@@ -532,24 +639,6 @@ public class TimetableActivity extends AppCompatActivity {
                         } else {
                             Log.e("Firestore", "Error getting categories", task.getException());
                         }
-                    }
-                });
-    }
-
-    private void addTimetableData(FirebaseFirestore db, String userId, String title, String description, String startTime, String endTime, String category) {
-        TimetableData data = new TimetableData(title, description, startTime, endTime, category);
-
-        db.collection("users").document(userId).collection("timetable").add(data)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("Firestore", "TimetableData added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Firestore", "Error adding TimetableData", e);
                     }
                 });
     }

@@ -5,26 +5,23 @@ import android.util.Log;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class TimetableData {
-    private String title;
-    private String description;
+    private String name;
+    private String location;
     public String startTime;
     public String endTime;
     private String category;
 
-    public TimetableData(String title, String description, String startTime, String endTime, String category) {
-        this.title = title;
-        this.description = description;
+    public TimetableData(String name, String location, String startTime, String endTime, String category) {
+        this.name = name;
+        this.location = location;
         this.startTime = startTime;
         this.endTime = endTime;
         this.category = category;
     }
 
-    public String getTitle() {
-
-        return title;
-    }
-    public String getDescription() {
-        return description;
+    public String getName() { return name; }
+    public String getLocation() {
+        return location;
     }
     public String getStartTime() {
         return startTime;

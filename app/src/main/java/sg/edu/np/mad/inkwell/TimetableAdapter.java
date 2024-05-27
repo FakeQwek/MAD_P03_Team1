@@ -40,8 +40,8 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TimetableData data = dataList.get(position);
-        holder.tvTitle.setText(data.getTitle());
-        holder.tvDescription.setText(data.getDescription());
+        holder.tvTitle.setText(data.getName());
+        holder.tvDescription.setText(data.getLocation());
         holder.tvStartTime.setText(data.getStartTime());
         holder.tvEndTime.setText(data.getEndTime());
         int categoryColor = getColorForCategory(data.getCategory());

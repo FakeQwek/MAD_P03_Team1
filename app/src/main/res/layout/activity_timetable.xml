@@ -222,8 +222,7 @@
                         android:ems="10"
                         android:inputType="text"
                         android:hint="Enter task here"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textSize="18sp" />
 
                     <!-- divider -->
                     <View
@@ -242,8 +241,7 @@
                         android:ems="10"
                         android:inputType="text"
                         android:hint="Enter location here"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textSize="18sp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
