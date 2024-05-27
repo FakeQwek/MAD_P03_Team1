@@ -8,20 +8,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
 
     private List<TimetableData> dataList;
+    private ArrayList<TimetableData> events;
+    private TimetableActivity timetableActivity;
     private HashMap<String, Integer> categoryColors;
     private Context context;
 
     // Constructor
-    public TimetableAdapter(Context context, List<TimetableData> dataList, HashMap<String, Integer> categoryColors) {
-        this.context = context;
+    public TimetableAdapter(ArrayList<TimetableData> dataList, ArrayList<TimetableData> events, TimetableActivity timetableActivity) {
         this.dataList = dataList;
-        this.categoryColors = categoryColors;
+        this.events = events;
+        this.timetableActivity = timetableActivity;
     }
 
     public TimetableAdapter(List<TimetableData> dataList) {

@@ -10,13 +10,17 @@ public class TimetableData {
     public String startTime;
     public String endTime;
     private String category;
+    private String startDate;
+    private String endDate;
 
-    public TimetableData(String name, String location, String startTime, String endTime, String category) {
+    public TimetableData(String name, String location, String startTime, String startDate, String endTime, String endDate, String category) {
         this.name = name;
         this.location = location;
         this.startTime = startTime;
         this.endTime = endTime;
         this.category = category;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public String getName() { return name; }
@@ -30,6 +34,8 @@ public class TimetableData {
         return endTime;
     }
     public String getCategory() { return category; }
+    public  String getStartDate() { return startDate; }
+    public String getEndDate() { return endDate; }
 
     // Nested Category class
     public static class Category {

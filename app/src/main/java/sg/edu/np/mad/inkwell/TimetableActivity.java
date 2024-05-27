@@ -1,13 +1,10 @@
 package sg.edu.np.mad.inkwell;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import static java.util.TimeZone.getDefault;
+
 import android.app.TimePickerDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -30,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,8 +52,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -64,11 +62,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 public class TimetableActivity extends AppCompatActivity {
 
     private LinearLayout slidingPanel;
+    private ArrayList<TimetableData> events;
     private boolean isPanelShown = false;
     private View backgroundOverlay;
     private RecyclerView recyclerView;
@@ -122,24 +122,32 @@ public class TimetableActivity extends AppCompatActivity {
         tvEndTime = findViewById(R.id.tvEndTime);
         Button btnSave = findViewById(R.id.btnSave);
 
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+
+        Date date = calendar.getTime();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(date);
+        String today = dateFormat2.format(date);
+        Log.d("today", today);
+
         // Initialize Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
+        ArrayList<TimetableData> eventList = new ArrayList<>();
 
         // Initialize category list and spinner adapter
-        List<String> categoryList = new ArrayList<>();
-        categoryList.add("Category 1");
-        categoryList.add("Category 2");
-        categoryList.add("Category 3");
-
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
-        Spinner categorySpinner = findViewById(R.id.categorySpinner); // Assuming you have a spinner with id categorySpinner in your layout
+        Spinner categorySpinner = findViewById(R.id.categorySpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.category_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
-
 
         if (currentUser != null) {
             String userId = currentUser.getUid();
@@ -147,28 +155,54 @@ public class TimetableActivity extends AppCompatActivity {
             createEvents(db, userId);
 
             // Set up RecyclerView
-            recyclerView = findViewById(R.id.recyclerView);
+            RecyclerView recyclerView = findViewById(R.id.recyclerView);
+            TimetableAdapter timetableAdapter = new TimetableAdapter(eventList);
+            recyclerView.setAdapter(timetableAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            categoryColors = new HashMap<>();
 
             // Get data from Firestore
             db.collection("users").document(userId).collection("timetable")
-                    .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
-                        public void onEvent(@NonNull QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                        public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                             if (e != null) {
                                 Log.w("Firestore", "Listen failed.", e);
                                 return;
                             }
 
-                            dataList.clear();
-                            for (QueryDocumentSnapshot doc : snapshots) {
-                                TimetableData data = doc.toObject(TimetableData.class);
-                                dataList.add(data);
+                            eventList.clear();
+
+                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                if (dc.getType() == DocumentChange.Type.ADDED) {
+                                    try {
+                                        TimetableData data = new TimetableData(
+                                                dc.getDocument().getString("eventName"),
+                                                dc.getDocument().getString("location"),
+                                                dc.getDocument().getString("startTime"),
+                                                dc.getDocument().getString("endTime"),
+                                                dc.getDocument().getString("category"),
+                                                dc.getDocument().getString("startDate"),
+                                                dc.getDocument().getString("endDate")
+                                        );
+                                        eventList.add(data);
+
+                                        // Log each added event for debugging
+                                        Log.d("Firestore", "Added event: " + data.getName() + " on " + data.getStartDate());
+
+                                    } catch (Exception ex) {
+                                        Log.e("Firestore", "Error parsing document: " + ex.getMessage(), ex);
+                                    }
+                                }
                             }
+
+                            // Log the size of the eventList after processing the documents
+                            Log.d("EventListSize", "Event List Size: " + eventList.size());
+
+                            filter(eventList, today);
                             adapter.notifyDataSetChanged();
                         }
                     });
+
 
             // Fetch categories from Firestore and populate the categoryList
             db.collection("users").document(userId).collection("categories")
@@ -194,11 +228,6 @@ public class TimetableActivity extends AppCompatActivity {
 
             TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
 
-            Calendar calendar = Calendar.getInstance(singaporeTimeZone);
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-
             tvStartTime.setText(currentTime);
             tvEndTime.setText(currentTime);
 
@@ -207,11 +236,6 @@ public class TimetableActivity extends AppCompatActivity {
             startDayOfMonth = endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
             tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
             tvEndDate.setText(formatDate(endYear, endMonth, endDayOfMonth));
-
-            Date date = calendar.getTime();
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
-            String currentDate = dateFormat.format(date);
 
             tvDate.setText(currentDate);
 
@@ -252,7 +276,6 @@ public class TimetableActivity extends AppCompatActivity {
                 }
             });
 
-
             endTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -283,11 +306,14 @@ public class TimetableActivity extends AppCompatActivity {
                         eventData.put("eventName", etToDo.getText().toString());
                         eventData.put("eventLocation", etLocation.getText().toString());
                         eventData.put("startTime", tvStartTime.getText().toString());
+                        eventData.put("startDate", tvStartDate.getText().toString());
                         eventData.put("endTime", tvEndTime.getText().toString());
+                        eventData.put("endDate", tvEndDate.getText().toString());
                         eventData.put("category", categorySpinner.getSelectedItem().toString());
 
-                        db.collection("users").document(userId).collection("events").document(String.valueOf(1)).set(eventData);
+                        db.collection("users").document(userId).collection("events").add(eventData);
                         hideSlidingPanel();
+                        clearInputData();
 
                         Toast toast = new Toast(TimetableActivity.this);
                         toast.setDuration(Toast.LENGTH_SHORT);
@@ -305,11 +331,12 @@ public class TimetableActivity extends AppCompatActivity {
                     }
                 }
             });
+
             categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedCategory = parent.getItemAtPosition(position).toString();
-                    if (selectedCategory.equals("Add New Option")) {
+                    String selectedCategory = categorySpinner.getSelectedItem().toString();
+                    if (selectedCategory.equalsIgnoreCase("Add New Option")) {
                         showAddOptionPopup();
                     }
                 }
@@ -480,8 +507,8 @@ public class TimetableActivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
 
+    }
     // add the collections category to specific user
     private void initCategories(FirebaseFirestore db, String userId) {
         Map<String, Object> classCategory = new HashMap<>();
@@ -642,4 +669,50 @@ public class TimetableActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void fetchEventsAndUpdateRecyclerView(FirebaseFirestore db, String userId) {
+        db.collection("users").document(userId).collection("events")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<TimetableData> eventsList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        TimetableData event = document.toObject(TimetableData.class);
+                        eventsList.add(event);
+                    }
+
+                    TimetableAdapter adapter = new TimetableAdapter(eventsList);
+                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure
+                    Log.e("FetchEvents", "Error fetching events: " + e.getMessage(), e);
+                });
+    }
+
+    private void recyclerView(ArrayList<TimetableData> eventList, ArrayList<TimetableData> events) {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        TimetableAdapter adapter = new TimetableAdapter(eventList, events, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    private void filter(ArrayList<TimetableData> eventList, String date) {
+        ArrayList<TimetableData> filterList = new ArrayList<>();
+        for (TimetableData data : eventList){
+            if(data.getStartDate().equals(date)) {
+                filterList.add(data);
+            }
+        }
+        events = filterList;
+        recyclerView(eventList, filterList);
+        Log.d("FilterTest", "Filter applied. Total events: " + filterList.size());
+        Log.d("DebugEvents", "Events size: " + events.size());
+        Log.d("DebugEvents", "FilterList size: " + filterList.size());
+        Log.d("DebugEvents", "EventList size: " + eventList.size());
+    }
+
 }
