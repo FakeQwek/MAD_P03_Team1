@@ -335,7 +335,7 @@ public class calendarpage extends AppCompatActivity {
         int year = Integer.parseInt(dateParts[2]);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, 8, 0, 0); // Notify at 8:00 AM on the event day
+        calendar.set(year, month, day, 0, 0, 0); // Notify at 12:00 AM on the event day
 
         Intent intent = new Intent(this, EventAlarmReceiver.class);
         intent.putExtra("event_date", date);
@@ -345,6 +345,9 @@ public class calendarpage extends AppCompatActivity {
         if (alarmManager != null) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
+
+        // Show notification immediately after setting the alarm
+        showNotification("Event Reminder Set", "A reminder has been set for your event on " + date);
     }
 
     private void showNotification(String title, String content) {
