@@ -52,7 +52,7 @@ Productivity
 *Tasks and Features:*
 - Multimedia upload for notes – Tsun Yang
 - Sharing to collaborators  - Chin Teck
-- Biometric Authentication -  
+- Biometric Authentication -  Jin Xuan
 - Time tracking with work statistics and achievements  -
 - Local storage and encryption – Chin Teck   
 
