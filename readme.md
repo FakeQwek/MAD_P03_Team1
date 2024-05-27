@@ -34,6 +34,7 @@ Productivity
 - Login and Authentication – Jin Xuan
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
+- SQLite Database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 
