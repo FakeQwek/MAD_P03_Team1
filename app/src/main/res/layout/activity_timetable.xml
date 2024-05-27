@@ -167,7 +167,7 @@
         android:layout_weight="1"
         android:background="@drawable/sliding_panel"
         android:padding="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintHeight_percent="0.75"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -507,6 +507,8 @@
                             <Spinner
                                 android:id="@+id/categorySpinner"
                                 android:background="@color/secondary_white"
+                                android:padding="10dp"
+                                android:layout_marginEnd="15dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 

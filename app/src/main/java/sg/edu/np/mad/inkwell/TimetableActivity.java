@@ -37,12 +37,19 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.ImageButton;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
 
 public class TimetableActivity extends AppCompatActivity {
 
@@ -51,7 +58,7 @@ public class TimetableActivity extends AppCompatActivity {
     private View backgroundOverlay;
     private RecyclerView recyclerView;
     private TimetableAdapter adapter;
-    private ImageButton addNewBtn1;
+    private ImageButton addNewBtn;
     private TextView tvDate;
     private CardView startTime, endTime;
     private TextView tvStartTime,tvEndTime;
@@ -67,7 +74,7 @@ public class TimetableActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
 
-        addNewBtn1 = findViewById(R.id.addNewTaskbtn);
+        addNewBtn = findViewById(R.id.addNewTaskbtn);
         slidingPanel = findViewById(R.id.slidingPanel);
         backgroundOverlay = findViewById(R.id.backgroundOverlay);
         tvStartTime = findViewById(R.id.tvStartTime);
@@ -79,15 +86,22 @@ public class TimetableActivity extends AppCompatActivity {
         tvDate = findViewById(R.id.tvDate);
         Button btnClear = findViewById(R.id.btnClear);
 
-        // init Firebase
+        // Initialize Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
 
+        // Initialize category list and spinner adapter
+        List<String> categoryList = new ArrayList<>();
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinner = findViewById(R.id.categorySpinner);
+        spinner.setAdapter(spinnerAdapter);
+
         if (currentUser != null) {
             String userId = currentUser.getUid();
 
-            // set up RecyclerView
+            // Set up RecyclerView
             recyclerView = findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             categoryColors = new HashMap<>();
@@ -95,7 +109,7 @@ public class TimetableActivity extends AppCompatActivity {
             adapter = new TimetableAdapter(this, dataList, categoryColors);
             recyclerView.setAdapter(adapter);
 
-            // get data from Firestore
+            // Get data from Firestore
             db.collection("users").document(userId).collection("timetable")
                     .addSnapshotListener(new com.google.firebase.firestore.EventListener<QuerySnapshot>() {
                         @Override
@@ -114,22 +128,29 @@ public class TimetableActivity extends AppCompatActivity {
                         }
                     });
 
-            // add categories to Firestore
-            addCategoryToFirestore(db, userId, "Class", ContextCompat.getColor(this, R.color.pastelCoral));
-            addCategoryToFirestore(db, userId, "Meeting", ContextCompat.getColor(this, R.color.pastelBlue));
+            // Fetch categories from Firestore and populate the categoryList
+            db.collection("users").document(userId).collection("categories")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    String category = document.getString("name");
+                                    if (category != null) {
+                                        categoryList.add(category);
+                                    }
+                                }
+                                // Add "Add New Option" at the end of the list
+                                categoryList.add("Add New Option");
+                                spinnerAdapter.notifyDataSetChanged();
+                            } else {
+                                Log.w("Firestore", "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
 
-            addNewBtn1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String title = "New Title";
-                    String description = "New Description";
-                    String startTime = "1300";
-                    String endTime = "1400";
-                    String category = "Class";
-
-                    addTimetableData(db, userId, title, description, startTime, endTime, category);
-                }
-            });
+            checkAndInitializeCategories(db, userId);
         }
 
         TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
@@ -148,7 +169,7 @@ public class TimetableActivity extends AppCompatActivity {
 
         tvDate.setText(currentDate);
 
-        addNewBtn1.setOnClickListener(new View.OnClickListener() {
+        addNewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleSlidingPanel();
@@ -192,14 +213,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        categoryList.add("class");
-        categoryList.add("meeting");
-
-        Spinner spinner = findViewById(R.id.categorySpinner);
-        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -214,7 +227,6 @@ public class TimetableActivity extends AppCompatActivity {
             }
         });
 
-        categoryList.add("Add New Option");
         spinnerAdapter.notifyDataSetChanged();
     }
 
@@ -280,7 +292,7 @@ public class TimetableActivity extends AppCompatActivity {
     private void showAddOptionPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.add_new_task_popup, null);
+        View dialogView = inflater.inflate(R.layout.add_new_cat_popup, null);
         builder.setView(dialogView);
 
         final EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
@@ -392,32 +404,122 @@ public class TimetableActivity extends AppCompatActivity {
     }
 
     // add the collections category to specific user
-    private void addCategoryToFirestore(FirebaseFirestore db, String userId, String category, int color) {
-        Map<String, Object> categoryData = new HashMap<>();
-        categoryData.put("color", color);
 
-        db.collection("users")
-                .document(userId)
-                .collection("categories")
-                .document(category)
-                .set(categoryData)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Category added successfully"))
-                .addOnFailureListener(e -> Log.w("Firestore", "Error adding category", e));
+    private void initCategories(FirebaseFirestore db, String userId) {
+        Map<String, Object> classCategory = new HashMap<>();
+        classCategory.put("name", "Class");
+        classCategory.put("color", ContextCompat.getColor(this, R.color.pastelBlue));
+
+        Map<String, Object> meetingCategory = new HashMap<>();
+        meetingCategory.put("name", "Meeting");
+        meetingCategory.put("color", ContextCompat.getColor(this, R.color.pastelCoral));
+
+        // Add "class" category
+        db.collection("users").document(userId).collection("categories").document("Class")
+                .set(classCategory)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Firestore", "Class category added successfully");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Firestore", "Error adding class category", e);
+                    }
+                });
+
+        // Add "meeting" category
+        db.collection("users").document(userId).collection("categories").document("Meeting")
+                .set(meetingCategory)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Firestore", "Meeting category added successfully");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Firestore", "Error adding meeting category", e);
+                    }
+                });
+    }
+
+
+    private void addCategoryToFirestore(FirebaseFirestore db, String userId, String categoryName, int color) {
+        db.collection("users").document(userId).collection("categories")
+                .whereEqualTo("name", categoryName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().isEmpty()) {
+                                // Category doesn't exist, add it
+                                Map<String, Object> category = new HashMap<>();
+                                category.put("name", categoryName);
+                                category.put("color", color);
+
+                                db.collection("users").document(userId).collection("categories")
+                                        .add(category)
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                Log.d("Firestore", "Category added with ID: " + documentReference.getId());
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w("Firestore", "Error adding category", e);
+                                            }
+                                        });
+                            } else {
+                                // Category already exists
+                                Log.d("Firestore", "Category already exists");
+                            }
+                        } else {
+                            Log.w("Firestore", "Error getting categories", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void checkAndInitializeCategories(FirebaseFirestore db, String userId) {
+        db.collection("users").document(userId).collection("categories")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().isEmpty()) {
+                                // Categories collection is empty, initialize categories
+                                initCategories(db, userId);
+                            }
+                        } else {
+                            Log.e("Firestore", "Error getting categories", task.getException());
+                        }
+                    }
+                });
     }
 
     private void addTimetableData(FirebaseFirestore db, String userId, String title, String description, String startTime, String endTime, String category) {
-        Map<String, Object> timetableData = new HashMap<>();
-        timetableData.put("title", title);
-        timetableData.put("description", description);
-        timetableData.put("startTime", startTime);
-        timetableData.put("endTime", endTime);
-        timetableData.put("category", category);
+        TimetableData data = new TimetableData(title, description, startTime, endTime, category);
 
-        db.collection("users")
-                .document(userId)
-                .collection("timetable")
-                .add(timetableData)
-                .addOnSuccessListener(documentReference -> Log.d("Firestore", "Timetable data added successfully"))
-                .addOnFailureListener(e -> Log.w("Firestore", "Error adding timetable data", e));
+        db.collection("users").document(userId).collection("timetable").add(data)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("Firestore", "TimetableData added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("Firestore", "Error adding TimetableData", e);
+                    }
+                });
     }
 }
