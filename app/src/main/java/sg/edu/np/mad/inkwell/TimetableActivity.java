@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -20,12 +21,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,6 +54,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -65,7 +71,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
-public class TimetableActivity extends AppCompatActivity {
+public class TimetableActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private LinearLayout slidingPanel;
     private ArrayList<TimetableData> events;
@@ -98,6 +104,24 @@ public class TimetableActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //Finds drawer and nav view before setting listener
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
+                R.string.close_nav);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        View decorView = getWindow().getDecorView();
+
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+
+        decorView.setSystemUiVisibility(uiOptions);
 
         addNewBtn = findViewById(R.id.addNewTaskbtn);
         slidingPanel = findViewById(R.id.slidingPanel);
@@ -170,36 +194,6 @@ public class TimetableActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            eventList.clear();
-
-                            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                                if (dc.getType() == DocumentChange.Type.ADDED) {
-                                    try {
-                                        TimetableData data = new TimetableData(
-                                                dc.getDocument().getString("eventName"),
-                                                dc.getDocument().getString("location"),
-                                                dc.getDocument().getString("startTime"),
-                                                dc.getDocument().getString("endTime"),
-                                                dc.getDocument().getString("category"),
-                                                dc.getDocument().getString("startDate"),
-                                                dc.getDocument().getString("endDate")
-                                        );
-                                        eventList.add(data);
-
-                                        // Log each added event for debugging
-                                        Log.d("Firestore", "Added event: " + data.getName() + " on " + data.getStartDate());
-
-                                    } catch (Exception ex) {
-                                        Log.e("Firestore", "Error parsing document: " + ex.getMessage(), ex);
-                                    }
-                                }
-                            }
-
-                            // Log the size of the eventList after processing the documents
-                            Log.d("EventListSize", "Event List Size: " + eventList.size());
-
-                            filter(eventList, today);
-                            adapter.notifyDataSetChanged();
                         }
                     });
 
@@ -311,7 +305,7 @@ public class TimetableActivity extends AppCompatActivity {
                         eventData.put("endDate", tvEndDate.getText().toString());
                         eventData.put("category", categorySpinner.getSelectedItem().toString());
 
-                        db.collection("users").document(userId).collection("events").add(eventData);
+                        db.collection("users").document(userId).collection("timetableEvents").add(eventData);
                         hideSlidingPanel();
                         clearInputData();
 
@@ -596,7 +590,7 @@ public class TimetableActivity extends AppCompatActivity {
 
     private void createEvents(FirebaseFirestore db, String userId) {
         // Reference the events collection under the user's document
-        CollectionReference eventsCollection = db.collection("users").document(userId).collection("events");
+        CollectionReference eventsCollection = db.collection("users").document(userId).collection("timetableEvents");
 
         // Check if the events collection already exists
         eventsCollection.get()
@@ -671,7 +665,7 @@ public class TimetableActivity extends AppCompatActivity {
     }
 
     private void fetchEventsAndUpdateRecyclerView(FirebaseFirestore db, String userId) {
-        db.collection("users").document(userId).collection("events")
+        db.collection("users").document(userId).collection("timetableEvents")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<TimetableData> eventsList = new ArrayList<>();
@@ -715,4 +709,8 @@ public class TimetableActivity extends AppCompatActivity {
         Log.d("DebugEvents", "EventList size: " + eventList.size());
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        return false;
+    }
 }
