@@ -63,6 +63,7 @@ Productivity
 - In app calculator and timer - Tsun Yang
 - Feedback survey - Jin Xuan
 - Search other Username through the list - Jin Xuan
+- Create a Username for the account - Jin Xuan
 - Profile Page - Chin Teck
 - Settings Page - Tsun Yang
   
