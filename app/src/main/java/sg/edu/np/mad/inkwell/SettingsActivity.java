@@ -8,15 +8,11 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
@@ -73,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
+        if (menuItem.getItemId() == R.id.nav_home) {
             Intent notesActivity = new Intent(SettingsActivity.this, MainActivity.class);
             startActivity(notesActivity);
             return true;
