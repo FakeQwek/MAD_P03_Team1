@@ -20,6 +20,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText signupEmail, signupPassword;
     private Button signupButton;
     private TextView loginRedirectText;
+    private DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -27,6 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         auth = FirebaseAuth.getInstance();
+        db = new DatabaseHelper(this);
         signupEmail = findViewById(R.id.signup_email);
         signupPassword = findViewById(R.id.signup_password);
         signupButton = findViewById(R.id.signup_button); // Initialize signupButton
@@ -48,8 +50,13 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                                boolean isInserted = db.insertUser(user, pass);
+                                if (isInserted) {
+                                    Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                                } else {
+                                    Toast.makeText(SignUpActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(SignUpActivity.this, "Signup Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
@@ -68,3 +75,4 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 }
+
