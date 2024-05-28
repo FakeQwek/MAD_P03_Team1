@@ -8,6 +8,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FlashcardCollectionViewHolder extends RecyclerView.ViewHolder {
+    // FlashcardCollectionViewHolder for recycler view
     TextView title;
 
     TextView flashcardCount;

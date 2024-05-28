@@ -1,609 +1,113 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.ViewAnimator;
+import android.widget.ImageButton;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.N;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class NotesActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
     // Declaration of variables
 
-    // Latest noteId of most recently created note
-    private int currentNoteId;
+    // currentNoteId keeps track of the ids that have already been assigned
+    public static int currentNoteId;
 
-    // noteId of most recently selected note
-    private int selectedNoteId = 1;
+    // selectedNoteId keeps track of the note that has been selected
+    public static int selectedNoteId = 1;
 
-    // folderId of most recently selected folder
-    private int selectedFolderId;
+    public static ArrayList<File> files = new ArrayList<>();
 
-    // DocumentReference of most recently selected note
-    private DocumentReference noteDocRef;
+    public static ArrayList<Integer> fileIds = new ArrayList<>();
 
-    // noteLayout of most recently selected note
-    private LinearLayout selectedNoteLayout;
+    public static ArrayList<File> fileOrder = new ArrayList<>();
 
-    // folderLayout of most recently selected note
-    private LinearLayout selectedFolderLayout;
+    public static int fileOrderIndex;
 
-    // indentationLevel of most recently selected note
-    private int selectedIndentationLevel;
-
-    // int of how many files there are
-    private int noteCount;
-
-    // Function to inflate folder_bottom_sheet.xml
-    private void openFolderBottomSheet(EditText noteTitle) {
-        // Create new BottomSheetDialog to show folder_bottom_sheet.xml
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(NotesActivity.this);
-        View view = LayoutInflater.from(NotesActivity.this).inflate(R.layout.folder_bottom_sheet, null);
-        bottomSheetDialog.setContentView(view);
-        bottomSheetDialog.show();
-
-        // Get bottomSheetNewFileButton Button and set text
-        Button bottomSheetNewFileButton = view.findViewById(R.id.bottomSheetNewNoteButton);
-        bottomSheetNewFileButton.setText(R.string.bottom_sheet_new_note_button);
-
-        // Set on click listener to bottomSheetNewFileButton to create new file
-        bottomSheetNewFileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currentNoteId++;
-
-                createNewFile(noteDocRef.collection("files"), selectedNoteLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIndentationLevel + 1);
-            }
-        });
-
-        // Get bottomSheetNewFolderButton Button and set text
-        Button bottomSheetNewFolderButton = view.findViewById(R.id.bottomSheetNewFolderButton);
-        bottomSheetNewFolderButton.setText(R.string.bottom_sheet_new_folder_button);
-
-        // Set on click listener to bottomSheetNewFolderButton to create new folder
-        bottomSheetNewFolderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currentNoteId++;
-
-                createNewFolder(noteDocRef.collection("files"), selectedFolderLayout, currentNoteId, findViewById(R.id.noteTitle), findViewById(R.id.noteBody), selectedIndentationLevel + 1);
-            }
-        });
-
-        // Get bottomSheetRenameButton Button and set text
-        Button bottomSheetRenameButton = view.findViewById(R.id.bottomSheetRenameButton);
-        bottomSheetRenameButton.setText(R.string.bottom_sheet_rename_button);
-
-        // Set on click listener to bottomSheetRenameButton to rename folder
-        bottomSheetRenameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rename();
-            }
-        });
-
-        // Get bottomSheetDeleteButton Button and set text
-        Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
-        bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
-
-        // Set on click listener to bottomSheetDeleteButton to delete folder
-        bottomSheetDeleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Map<String, Object> deleteFolder = new HashMap<>();
-                deleteFolder.put("type", "deleted");
-
-                noteDocRef.update(deleteFolder);
-
-                findViewById(selectedFolderId).setVisibility(View.GONE);
-                selectedNoteLayout.setVisibility(View.GONE);
-                selectedFolderLayout.setVisibility(View.GONE);
-            }
-        });
+    // Method to set items in the recycler view
+    private void recyclerView(ArrayList<Object> allNotes) {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        NotesAdapter adapter = new NotesAdapter(allNotes, this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
-    // Function to inflate note_bottom_sheet.xml
-    private void openNoteBottomSheet() {
-        // Create new BottomSheetDialog to show note_bottom_sheet.xml
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(NotesActivity.this);
-        View view = LayoutInflater.from(NotesActivity.this).inflate(R.layout.note_bottom_sheet, null);
-        bottomSheetDialog.setContentView(view);
-        bottomSheetDialog.show();
-
-        // Get bottomSheetDeleteButton Button and set text
-        Button bottomSheetDeleteButton = view.findViewById(R.id.bottomSheetDeleteButton);
-        bottomSheetDeleteButton.setText(R.string.bottom_sheet_delete_button);
-
-        // Set on click listener to bottomSheetDeleteButton to delete note
-        bottomSheetDeleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Map<String, Object> deleteNote = new HashMap<>();
-                deleteNote.put("type", "deleted");
-
-                noteDocRef.update(deleteNote);
-
-                findViewById(selectedNoteId).setVisibility(View.GONE);
-            }
-        });
-    }
-
-    // Function to create a new file
-    private void createNewFile(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        noteCount++;
-
-        // Create new Button and set text for noteButton
-        Button noteButton = new Button(getApplicationContext());
-        noteButton.setGravity(Gravity.START);
-        noteButton.setBackgroundColor(Color.TRANSPARENT);
-        noteButton.setId(id);
-        noteButton.setText(R.string.new_note_title);
-
-        RelativeLayout.LayoutParams noteButtonParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-
-        noteButtonParams.setMargins(50 * indentationLevel, 0, 0, 0);
-
-        noteButton.setLayoutParams(noteButtonParams);
-
-        // Create new file data and sends it to firebase
-        Map<String, Object> noteData = new HashMap<>();
-        noteData.put("type", "file");
-        noteData.put("title", "Title");
-        noteData.put("body", "Enter your text");
-
-        colRef.document(String.valueOf(id)).set(noteData);
-
-        // Set on click listener to noteButton to display note details
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                DocumentReference docRef = colRef.document(String.valueOf(id));
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        selectedNoteId = v.getId();
-                        noteDocRef = docRef;
-
-                        DocumentSnapshot document = task.getResult();
-                        String docNoteTitle = document.getData().get("title").toString();
-                        String docNoteBody = document.getData().get("body").toString();
-                        noteTitle.setText(docNoteTitle);
-                        noteBody.setText(docNoteBody);
-                    }
-                });
-            }
-        });
-
-        // Set on long click listener to noteButton to open note_bottom_sheet.xml
-        noteButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                selectedNoteId = id;
-                noteDocRef = colRef.document(String.valueOf(id));
-
-                openNoteBottomSheet();
-                return true;
-            }
-        });
-
-        // Add noteButton to linearLayout
-        linearLayout.addView(noteButton);
-
-        TextView inkwellDetails = findViewById(R.id.inkwellDetails);
-        String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), noteCount);
-        inkwellDetails.setText(inkwellDetailsText);
-    }
-
-    // Function to create a new folder
-    private void createNewFolder(CollectionReference colRef, LinearLayout linearLayout, int id, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        // Create new Button and set text for folderButton
-        Button folderButton = new Button(getApplicationContext());
-        folderButton.setGravity(Gravity.START);
-        folderButton.setBackgroundColor(Color.TRANSPARENT);
-        folderButton.setId(id);
-        folderButton.setText(R.string.new_folder_title);
-
-        RelativeLayout.LayoutParams noteButtonParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-
-        noteButtonParams.setMargins(50 * indentationLevel, 0, 0, 0);
-
-        folderButton.setLayoutParams(noteButtonParams);
-
-        // Create new folder data and sends it to firebase
-        Map<String, Object> folderData = new HashMap<>();
-        folderData.put("type", "folder");
-        folderData.put("title", "Folder");
-        folderData.put("body", "");
-
-        colRef.document(String.valueOf(id)).set(folderData);
-
-        // Add noteButton to linearLayout
-        linearLayout.addView(folderButton);
-
-        // Create new LinearLayout noteLayout and folderLayout
-        LinearLayout noteLayout = new LinearLayout(getApplicationContext());
-        noteLayout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout folderLayout = new LinearLayout(getApplicationContext());
-        folderLayout.setOrientation(LinearLayout.VERTICAL);
-
-        // Set on click listener to folderButton to open folder_bottom_sheet.xml
-        folderButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                selectedFolderId = id;
-                selectedNoteLayout = noteLayout;
-                selectedFolderLayout = folderLayout;
-                noteDocRef = colRef.document(String.valueOf(id));
-                selectedIndentationLevel = indentationLevel;
-
-                openFolderBottomSheet(noteTitle);
-                return true;
-            }
-        });
-
-        // Add noteLayout and folderLayout to linearLayout
-        linearLayout.addView(noteLayout);
-        linearLayout.addView(folderLayout);
-
-        // Set on click listener to folderButton to toggle view of its children elements
-        folderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (folderLayout.getVisibility() == View.VISIBLE) {
-                    noteLayout.setVisibility(View.GONE);
-                    folderLayout.setVisibility(View.GONE);
-                } else {
-                    noteLayout.setVisibility(View.VISIBLE);
-                    folderLayout.setVisibility(View.VISIBLE);
+    // Method to filter items already in the recycler view
+    private void filter(ArrayList<File> files, ArrayList<Object> notes, String query) {
+        ArrayList<Object> filterList = new ArrayList<>();
+        if (query.isEmpty()) {
+            recyclerView(notes);
+        } else {
+            for (File file : files){
+                if (file.title.toLowerCase().contains(query)) {
+                    filterList.add(file);
                 }
-
             }
-        });
-    }
-
-    // Function to create file on app load
-    private void createFileButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        if (id > currentNoteId) {
-            currentNoteId = id;
+            recyclerView(filterList);
         }
-
-        noteCount++;
-        Log.d("tester", String.valueOf(noteCount));
-
-        // Create new Button and set text for noteButton
-        Button noteButton = new Button(getApplicationContext());
-        noteButton.setGravity(Gravity.START);
-        noteButton.setBackgroundColor(Color.TRANSPARENT);
-        noteButton.setId(id);
-        noteButton.setText(title);
-
-        RelativeLayout.LayoutParams noteButtonParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-
-        noteButtonParams.setMargins(50 * indentationLevel, 0, 0, 0);
-
-        noteButton.setLayoutParams(noteButtonParams);
-
-        // Set on click listener to noteButton to display note details
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                DocumentReference docRef = colRef.document(String.valueOf(id));
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        selectedNoteId = v.getId();
-
-                        noteDocRef = docRef;
-                        selectedIndentationLevel = indentationLevel;
-
-                        DocumentSnapshot document = task.getResult();
-                        String docNoteTitle = document.getData().get("title").toString();
-                        String docNoteBody = document.getData().get("body").toString();
-                        noteTitle.setText(docNoteTitle);
-                        noteBody.setText(docNoteBody);
-                    }
-                });
-            }
-        });
-
-        // Set on long click listener to noteButton to open note_bottom_sheet.xml
-        noteButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                selectedNoteId = id;
-                noteDocRef = colRef.document(String.valueOf(id));
-
-                openNoteBottomSheet();
-                return true;
-            }
-        });
-
-        // Add noteButton to linearLayout
-        linearLayout.addView(noteButton);
-
-        TextView inkwellDetails = findViewById(R.id.inkwellDetails);
-        String inkwellDetailsText = String.format(getResources().getString(R.string.inkwell_details_text), noteCount);
-        inkwellDetails.setText(inkwellDetailsText);
     }
 
-    // Function to create folder on app load
-    private void createFolderButton(CollectionReference colRef, LinearLayout linearLayout, int id, String title, EditText noteTitle, EditText noteBody, int indentationLevel) {
-        if (id > currentNoteId) {
-            currentNoteId = id;
-        }
+    // Method to search the items in recycler view
+    private void search(ArrayList<File> files, ArrayList<Object> notes) {
+        SearchView searchView = findViewById(R.id.searchView);
 
-        // Create new Button and set text for folderButton
-        Button folderButton = new Button(getApplicationContext());
-        folderButton.setGravity(Gravity.START);
-        folderButton.setBackgroundColor(Color.TRANSPARENT);
-        folderButton.setId(id);
-        folderButton.setText(title);
-
-        RelativeLayout.LayoutParams noteButtonParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-
-        noteButtonParams.setMargins(50 * indentationLevel, 0, 0, 0);
-
-        folderButton.setLayoutParams(noteButtonParams);
-
-        // Add folder button to linearLayout
-        linearLayout.addView(folderButton);
-
-        // Create new LinearLayout noteLayout and folderLayout
-        LinearLayout noteLayout = new LinearLayout(getApplicationContext());
-        noteLayout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout folderLayout = new LinearLayout(getApplicationContext());
-        folderLayout.setOrientation(LinearLayout.VERTICAL);
-
-        // Set on long click listener to folderButton to open folder_bottom_sheet.xml
-        folderButton.setOnLongClickListener(new View.OnLongClickListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onLongClick(View v) {
-                selectedFolderId = id;
-                selectedNoteLayout = noteLayout;
-                selectedFolderLayout = folderLayout;
-                noteDocRef = colRef.document(String.valueOf(id));
-                selectedIndentationLevel = indentationLevel;
-
-                openFolderBottomSheet(noteTitle);
-                return true;
+            public boolean onQueryTextSubmit(String query) {
+                filter(files, notes, query);
+                return false;
             }
-        });
 
-        // Call recursive function to create folder children elements on load
-        colRef.document(String.valueOf(id)).collection("files").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String docNoteType = document.getData().get("type").toString();
-                        if (docNoteType.equals("file")) {
-                            createFileButton(colRef.document(String.valueOf(id)).collection("files"), noteLayout, Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, indentationLevel + 1);
-                        } else if (docNoteType.equals("folder")) {
-                            createFolderButton(colRef.document(String.valueOf(id)).collection("files"), folderLayout, Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, indentationLevel + 1);
-                        }
-                    }
-                }
-            }
-        });
-
-        // Add noteLayout and folderLayout to linearLayout
-        linearLayout.addView(noteLayout);
-        linearLayout.addView(folderLayout);
-
-        // Set on click listener to folderButton to toggle view of its children elements
-        folderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (folderLayout.getVisibility() == View.VISIBLE) {
-                    noteLayout.setVisibility(View.GONE);
-                    folderLayout.setVisibility(View.GONE);
-                } else {
-                    noteLayout.setVisibility(View.VISIBLE);
-                    folderLayout.setVisibility(View.VISIBLE);
-                }
+            public boolean onQueryTextChange(String newText) {
+                filter(files, notes, newText);
+                return false;
             }
         });
     }
 
-    // Function to add elements to viewAnimator on app load
-    private void createViewAnimator(EditText noteTitle, EditText noteBody) {
-        // Get viewAnimatorButton Button
-        Button viewAnimatorButton = findViewById(R.id.viewAnimatorButton);
-
-        // Get viewAnimator ViewAnimator
-        ViewAnimator viewAnimator = findViewById(R.id.viewAnimator);
-
-        // Get searchButton Button
-        Button searchButton = findViewById(R.id.searchButton);
-
-        // Set on click listener to searchButton to open searchMenu
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewAnimator.setDisplayedChild(2);
-            }
-        });
-
-        LinearLayout viewOne = findViewById(R.id.noteList);
-        LinearLayout viewTwo = findViewById(R.id.menuList);
-
-        // Create new Button and set text for searchMenuButton
-        Button searchMenuButton = new Button(getApplicationContext());
-        searchMenuButton.setBackgroundColor(Color.TRANSPARENT);
-        searchMenuButton.setGravity(Gravity.START);
-        searchMenuButton.setText("Search");
-        viewTwo.addView(searchMenuButton);
-
-        // Set on click listener to searchMenuButton to open searchMenu
-        searchMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewAnimator.setDisplayedChild(2);
-            }
-        });
-
-        // Create new Button and set text for tagsButton
-        Button tagsButton = new Button(getApplicationContext());
-        tagsButton.setBackgroundColor(Color.TRANSPARENT);
-        tagsButton.setGravity(Gravity.START);
-        tagsButton.setText("Tags");
-        viewTwo.addView(tagsButton);
-
-        // Set on click listener to viewAnimatorButton to change displayed child
-        viewAnimatorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (viewAnimator.getDisplayedChild() == 0) {
-                    viewAnimator.setDisplayedChild(1);
-                } else {
-                    viewAnimator.setDisplayedChild(0);
-                }
-            }
-        });
-
-        // Get searchList LinearLayout
-        LinearLayout searchList = findViewById(R.id.searchList);
-
-        // Get searchBarEditText TextInputEditText
-        TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
-
-        // Set text change listener to searchBarEditText
-        searchBarEditText.addTextChangedListener(new MainActivity.TextChangedListener<TextInputEditText>(searchBarEditText) {
-            @Override
-            public void onTextChanged(TextInputEditText searchBarEditText, Editable s) {
-                searchList.removeAllViews();
-
-                search(db.collection("notes"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
-            }
-        });
-    }
-
-    // Function to search for existing files
-    private void search(CollectionReference colRef, LinearLayout linearLayout, Editable searchString, EditText noteTitle, EditText noteBody) {
-        // Read from firebase and create files on search
-        colRef.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String docNoteType = document.getData().get("type").toString();
-                                int docNoteId = Integer.parseInt(document.getId());
-                                if (docNoteType.equals("file")) {
-                                    String docNoteTitle = document.getData().get("title").toString();
-                                    if (docNoteTitle.contains(searchString)) {
-                                        Button noteButton = new Button(getApplicationContext());
-                                        noteButton.setGravity(Gravity.START);
-                                        noteButton.setBackgroundColor(Color.TRANSPARENT);
-
-                                        String docNoteBody = document.getData().get("body").toString();
-
-                                        noteButton.setId(docNoteId);
-                                        noteButton.setText(docNoteTitle);
-
-                                        noteButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                selectedNoteId = docNoteId;
-
-                                                noteDocRef = document.getReference();
-
-                                                noteTitle.setText(docNoteTitle);
-                                                noteBody.setText(docNoteBody);
-                                            }
-                                        });
-                                        linearLayout.addView(noteButton);
-                                    }
-                                } else if (docNoteType.equals("folder")) {
-                                    TextInputEditText searchBarEditText = findViewById(R.id.searchBarEditText);
-
-                                    search(colRef.document(String.valueOf(docNoteId)).collection("files"), findViewById(R.id.searchList), searchBarEditText.getText(), noteTitle, noteBody);
-                                }
-                            }
-                        } else {
-                            Log.d("testing", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-    }
-
-    // Function to rename files and folders
-    private void rename() {
-        View renamePopupView = LayoutInflater.from(NotesActivity.this).inflate(R.layout.rename_popup, null);
-
-        PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
-
-        TextInputEditText renameEditText = renamePopupView.findViewById(R.id.renameEditText);
-
-        // Get renameButton Button
-        Button renameButton = renamePopupView.findViewById(R.id.renameButton);
-
-        // Set on click listener to renameButton to open rename_popup.xml
-        renameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String newTitle = renameEditText.getText().toString();
-
-                Map<String, Object> newFolder = new HashMap<>();
-                newFolder.put("title", newTitle);
-
-                noteDocRef.update(newFolder);
-
-                Button buttonTitle = findViewById(selectedFolderId);
-                buttonTitle.setText(newTitle);
-
-                renamePopupWindow.dismiss();
-            }
-        });
-
-        renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
+    // Method to notify recycler view a new item has been inserted
+    private void notifyInsert() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(0);
     }
 
     @Override
@@ -614,6 +118,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         //Sets toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         //Finds drawer and nav view before setting listener
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -625,43 +130,48 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 
         decorView.setSystemUiVisibility(uiOptions);
 
-        // Get addNoteButton Button
-        //Adding Notes Code
-        Button addNoteButton = findViewById(R.id.addNoteButton);
+        ArrayList<Object> notes = new ArrayList<>();
 
-        // Create new Note object
-        Note note = new Note("", "");
-
-        // Get noteTitle and noteBody EditText and set text
         EditText noteTitle = findViewById(R.id.noteTitle);
         EditText noteBody = findViewById(R.id.noteBody);
-        noteTitle.setText(note.title);
-        noteBody.setText(note.body);
 
-        // Read from firebase and create files and folders on app load
-        db.collection("notes")
+        fileOrder = new ArrayList<>();
+
+        fileOrderIndex = -1;
+
+        // Read from firebase and create files and folders on create
+        db.collection("users").document(currentFirebaseUserUid).collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            createViewAnimator(noteTitle, noteBody);
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                search(files, notes);
                                 String docNoteType = document.getData().get("type").toString();
-                                if (docNoteType.equals("file")) {
-                                    createFileButton(db.collection("notes"), findViewById(R.id.noteList), Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, 0);
-                                } else if (docNoteType.equals("folder")) {
-                                    createFolderButton(db.collection("notes"), findViewById(R.id.noteList), Integer.parseInt(document.getId()), document.getData().get("title").toString(), noteTitle, noteBody, 0);
+                                String docNoteUid = document.getData().get("uid").toString();
+                                if (docNoteType.equals("file") && docNoteUid.equals(currentFirebaseUserUid)) {
+                                    if (Integer.parseInt(document.getId()) > currentNoteId) {
+                                        currentNoteId = Integer.parseInt(document.getId());
+                                    }
+
+                                    File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
+                                    notes.add(file);
+                                    filter(files, notes, "");
+                                } else if (docNoteType.equals("folder") && docNoteUid.equals(currentFirebaseUserUid)) {
+                                    if (Integer.parseInt(document.getId()) > currentNoteId) {
+                                        currentNoteId = Integer.parseInt(document.getId());
+                                    }
+
+                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
+                                    notes.add(folder);
+                                    filter(files, notes, "");
                                 }
                             }
                         } else {
@@ -670,59 +180,120 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                     }
                 });
 
-        // Set text change listener on noteTitle
-        noteTitle.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(noteTitle) {
-            @Override
-            public void onTextChanged(EditText noteTitle, Editable s) {
-                // Update note title data in firebase
-                note.updateTitle(noteTitle.getText().toString());
-                Log.i("testing", noteTitle.getText().toString());
+        ImageButton addFileButton = findViewById(R.id.addFileButton);
 
-                Map<String, Object> newNote = new HashMap<>();
-                newNote.put("title", note.title);
-
-                noteDocRef.update(newNote);
-
-                Button buttonTitle = findViewById(selectedNoteId);
-                buttonTitle.setText(note.title);
-            }
-        });
-
-        // Set text change listener on noteBody
-        noteBody.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(noteBody) {
-            @Override
-            public void onTextChanged(EditText noteBody, Editable s) {
-                // Update note body data in firebase
-                note.updateBody(noteBody.getText().toString());
-                Log.i("testing", noteBody.getText().toString());
-
-                Map<String, Object> newNote = new HashMap<>();
-                newNote.put("body", note.body);
-
-                noteDocRef.update(newNote);
-            }
-        });
-
-        // Set on click listener to addNoteButton to create new file
-        addNoteButton.setOnClickListener(new View.OnClickListener() {
+        // Adds a file to firebase and updates the recycler view
+        addFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 currentNoteId++;
 
-                createNewFile(db.collection("notes"), findViewById(R.id.noteList), currentNoteId, noteTitle, noteBody, 0);
+                Map<String, Object> fileData = new HashMap<>();
+                fileData.put("title", "Title");
+                fileData.put("body", "Enter your text");
+                fileData.put("type", "file");
+                fileData.put("uid", currentFirebaseUserUid);
+
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
+
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)));
+                fileIds.add(file.id);
+                files.add(file);
+                notes.add(0, file);
+
+                if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else {
+                    notifyInsert();
+                }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
-        // Get addFolderButton Button
-        Button addFolderButton = findViewById(R.id.addFolderButton);
+        ImageButton addFolderButton = findViewById(R.id.addFolderButton);
 
-        // Set on click listener to addFolderButton to create new folder
+        // Adds a folder to firebase and updates the recycler view
         addFolderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 currentNoteId++;
 
-                createNewFolder(db.collection("notes"), findViewById(R.id.noteList), currentNoteId, noteTitle, noteBody, 0);
+                Map<String, Object> folderData = new HashMap<>();
+                folderData.put("title", "Folder");
+                folderData.put("body", "");
+                folderData.put("type", "folder");
+                folderData.put("uid", currentFirebaseUserUid);
+
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
+
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"));
+                notes.add(0, folder);
+
+                if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else {
+                    notifyInsert();
+                }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
+            }
+        });
+
+        ImageButton leftButton = findViewById(R.id.leftButton);
+
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex > 0) {
+                    fileOrderIndex--;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton rightButton = findViewById(R.id.rightButton);
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex < fileOrder.size() - 1) {
+                    fileOrderIndex++;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton readOnlyButton = findViewById(R.id.readOnlyButton);
+
+        readOnlyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (noteTitle.isEnabled()) {
+                    noteTitle.setEnabled(false);
+                    noteBody.setEnabled(false);
+                    readOnlyButton.setImageResource(R.drawable.pencil_outline);
+                } else {
+                    noteTitle.setEnabled(true);
+                    noteBody.setEnabled(true);
+                    readOnlyButton.setImageResource(R.drawable.book_open_blank_variant_outline);
+                }
             }
         });
     }
@@ -730,28 +301,53 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            /* Replace intent with other function for fragment
-            Intent Login = new Intent(MainActivity.this, Login.class);
-            startActivity(Login);
-            */
-            Log.d( "Message", "Opening notes");
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(NotesActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(NotesActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(NotesActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");
         }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
         return true;
     }
 }
