@@ -2,7 +2,6 @@
 
 package sg.edu.np.mad.inkwell;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,8 +43,10 @@ public class Navbar {
         else if (id == R.id.nav_calendar) {
             Log.d("Alert", "Opening calendar");
         }
+
         else if (id == R.id.nav_home) {
             Intent newActivity = new Intent(CurrentActivity, MainActivity.class);
+
             Log.d("Alert", "Opening homepage");
             return newActivity;
         }

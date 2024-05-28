@@ -88,10 +88,10 @@
                 android:id="@+id/signupRedirectText"
                 android:text="Not yet registered? Sign Up"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
                 android:padding="8dp"
+                android:layout_marginTop="10dp"
                 android:textColor="@color/lavender"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

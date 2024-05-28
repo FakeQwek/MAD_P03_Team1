@@ -8,14 +8,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,8 +21,11 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -92,6 +94,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
+
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("uid", "");
+        userData.put("type", "");
+        db.collection("users").document(currentFirebaseUserUid).set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
     }
 
     @Override
@@ -102,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+       
         int id = menuItem.getItemId();
         // If home button is pressed trigger toast from navbar class
         if (id == R.id.nav_home) {
@@ -113,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
         return true;
+
     }
 
 

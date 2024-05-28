@@ -280,7 +280,9 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         bottomSheetDialog.dismiss();
 
                         Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                        Date date = new Date();
+                        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(date));
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
                         try {
@@ -292,6 +294,13 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         long time = hour * 3600000 + minute * 60000;
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
+
+                        Toast toast = new Toast(TodoActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
                     }
                 });
 
@@ -374,6 +383,12 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 allTodos.remove(todo);
                 todos.remove(todo);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(TodoActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
             }
 
             @Override
@@ -389,10 +404,53 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(TodoActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(TodoActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
+            Intent todoActivity = new Intent(TodoActivity.this, TodoActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(TodoActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(TodoActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
+        }
+        else {
+            Log.d("Message", "Unknown page!");
+        }
+
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
+
         return true;
     }
 }

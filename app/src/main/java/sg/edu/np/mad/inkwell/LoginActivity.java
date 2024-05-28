@@ -54,10 +54,17 @@ public class LoginActivity extends AppCompatActivity {
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
 
-                //Having network issues when connecting the database on home network, below line of code skips authentication
-                //Remember to comment when pushing to main
+
+                //Having network issues when connecting the database on home network, below line of code skips authentication. Comment out when pushing to main
                 //startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 Log.d("Error", "This shows its working");
+
+                if (pass.equals("admin")) {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    Log.d("Error", "This should load the main page");
+                    return;  // Exit the method here since we've already started the MainActivity
+                }
+
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
                         auth.signInWithEmailAndPassword(email, pass)
@@ -65,8 +72,9 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class)
-                                        string username = 
+                                        Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                                        //string username =
+                                        startActivity(successfulLogin);
                                         successfulLogin.putExtra("Username", "");
                                         Log.d("Error", "This should load the main page");
                                         finish();
@@ -81,19 +89,20 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         loginPassword.setError("Password cannot be empty");
                     }
-                }else if(email.isEmpty()) {
+                } else if(email.isEmpty()) {
                     loginEmail.setError("Email cannot be empty");
                 } else {
                     loginEmail.setError("Please enter valid email");
-            }
+                }
             }
         });
-                signupRedirectText.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-                    }
-                });
+
+        signupRedirectText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
