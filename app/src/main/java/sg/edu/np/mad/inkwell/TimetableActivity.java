@@ -5,6 +5,7 @@ import static java.util.TimeZone.getDefault;
 import android.app.TimePickerDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -178,25 +179,35 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             checkAndInitializeCategories(db, userId);
             createEvents(db, userId);
 
-            // Set up RecyclerView
-            RecyclerView recyclerView = findViewById(R.id.recyclerView);
-            TimetableAdapter timetableAdapter = new TimetableAdapter(eventList);
-            recyclerView.setAdapter(timetableAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
             // Get data from Firestore
-            db.collection("users").document(userId).collection("timetable")
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            db.collection("users").document(userId).collection("timetableEvents")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
-                        public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w("Firestore", "Listen failed.", e);
-                                return;
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    String name = document.getString("eventName");
+                                    String loc = document.getString("eventLocation");
+                                    String startTime = document.getString("startTime");
+                                    String endTime = document.getString("endTime");
+                                    String startDate = document.getString("startDate");
+                                    String endDate = document.getString("endDate");
+                                    String category = document.getString("category");
+                                    Log.d("firestore", "getting data");
+                                    if (name != null && name != "") {
+                                        TimetableData data = new TimetableData(name, loc, startTime, startDate, endTime, endDate, category);
+                                        eventList.add(data);
+                                    }
+                                }
+                            } else {
+                                Log.w("Firestore", "Error getting documents.", task.getException());
                             }
 
+                            Log.d("firestore", "running filter");
+                            filter(eventList, today);
                         }
                     });
-
 
             // Fetch categories from Firestore and populate the categoryList
             db.collection("users").document(userId).collection("categories")
@@ -305,9 +316,16 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                         eventData.put("endDate", tvEndDate.getText().toString());
                         eventData.put("category", categorySpinner.getSelectedItem().toString());
 
+                        TimetableData data = new TimetableData(etToDo.getText().toString(), etLocation.getText().toString(),
+                                tvStartTime.getText().toString(),tvStartDate.getText().toString(),tvEndTime.getText().toString(),
+                                tvEndDate.getText().toString(),categorySpinner.getSelectedItem().toString());
+
                         db.collection("users").document(userId).collection("timetableEvents").add(eventData);
+                        eventList.add(data);
                         hideSlidingPanel();
                         clearInputData();
+
+                        filter(eventList,today);
 
                         Toast toast = new Toast(TimetableActivity.this);
                         toast.setDuration(Toast.LENGTH_SHORT);
@@ -674,7 +692,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                         eventsList.add(event);
                     }
 
-                    TimetableAdapter adapter = new TimetableAdapter(eventsList);
                     recyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                 })
@@ -684,9 +701,9 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 });
     }
 
-    private void recyclerView(ArrayList<TimetableData> eventList, ArrayList<TimetableData> events) {
+    private void recyclerView(ArrayList<TimetableData> eventList, ArrayList<TimetableData> event) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        TimetableAdapter adapter = new TimetableAdapter(eventList, events, this);
+        TimetableAdapter adapter = new TimetableAdapter(eventList, event, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -696,21 +713,63 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
     private void filter(ArrayList<TimetableData> eventList, String date) {
         ArrayList<TimetableData> filterList = new ArrayList<>();
-        for (TimetableData data : eventList){
-            if(data.getStartDate().equals(date)) {
+        for (TimetableData data : eventList) {
+            if (data.getStartDate() != null && data.getStartDate().equals(date)) {
                 filterList.add(data);
             }
         }
-        events = filterList;
+        this.events = filterList;
         recyclerView(eventList, filterList);
-        Log.d("FilterTest", "Filter applied. Total events: " + filterList.size());
-        Log.d("DebugEvents", "Events size: " + events.size());
-        Log.d("DebugEvents", "FilterList size: " + filterList.size());
-        Log.d("DebugEvents", "EventList size: " + eventList.size());
     }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(TimetableActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, NotesActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, TodoActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, FlashcardActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, TimetableActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, TimetableActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent timetableActivity = new Intent(TimetableActivity.this, SettingsActivity.class);
+            startActivity(timetableActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
+        }
+        else {
+            Log.d("Message", "Unknown page!");
+        }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
+        return true;
     }
 }

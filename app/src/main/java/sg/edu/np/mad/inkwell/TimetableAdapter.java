@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
 
@@ -26,10 +26,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         this.dataList = dataList;
         this.events = events;
         this.timetableActivity = timetableActivity;
-    }
-
-    public TimetableAdapter(List<TimetableData> dataList) {
-        this.dataList = dataList;
+        this.context = timetableActivity;  // Initialize context here
         this.categoryColors = new HashMap<>();
     }
 
@@ -53,11 +50,9 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         holder.colorIndicator.setBackgroundColor(categoryColor);
     }
 
-    public void updateCategoryColor(String category, int color) {
-        if (categoryColors.containsKey(category)) {
-            categoryColors.put(category, color);
-            notifyDataSetChanged(); // Notify RecyclerView of data change
-        }
+    public void setCategoryColor(String category, int color) {
+        categoryColors.put(category, color);
+        notifyDataSetChanged(); // Notify RecyclerView of data change
     }
 
     @Override
