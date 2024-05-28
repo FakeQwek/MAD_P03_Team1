@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -174,6 +176,13 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(currentFlashcardCollectionId)).set(flashcardCollectionData);
 
                         bottomSheetDialog.dismiss();
+
+                        Toast toast = new Toast(FlashcardActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        LayoutInflater layoutInflater = (LayoutInflater) FlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
                     }
                 });
             }
@@ -193,6 +202,12 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 allFlashcardCollections.remove(flashcardCollection);
                 flashcardCollections.remove(flashcardCollection);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(FlashcardActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) FlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
             }
 
             @Override
@@ -208,24 +223,43 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(FlashcardActivity.this, NotesActivity.class);
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(FlashcardActivity.this, MainActivity.class);
             startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(FlashcardActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(FlashcardActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
             Intent todoActivity = new Intent(FlashcardActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening calendar");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent todoActivity = new Intent(FlashcardActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(FlashcardActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(FlashcardActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");

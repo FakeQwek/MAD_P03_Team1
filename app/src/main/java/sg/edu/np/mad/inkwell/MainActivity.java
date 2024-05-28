@@ -99,8 +99,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-        Button button = findViewById(R.id.button);
-
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
@@ -108,15 +106,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-
-        // Set night mode
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
-        });
-
     }
 
     @Override
@@ -127,11 +116,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(MainActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(MainActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
+            Intent todoActivity = new Intent(MainActivity.this, TodoActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(MainActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
+        }
+        else {
+           Log.d("Message", "Unknown page!");
+        }
+
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
         return true;
+
     }
 
 

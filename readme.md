@@ -15,11 +15,11 @@ Productivity
 # Team Information #
 
 ## Team Members ##
-1. Chin Teck
-2. Rithika
-3. Tsun Yang
-4. Jun Kai
-5. Jin Xuan
+1. Chin Teck (S10255880)
+2. Rithika (S10257149)
+3. Tsun Yang (S10255665)
+4. Jun Kai (S10259948)
+5. Jin Xuan (S10262474)
 
 ## Task Allocation ##
 
@@ -31,11 +31,13 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication – Jin Xuan
+- Login and Authentication(firebase) – Jin Xuan
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
+- SQLite Database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
+- Main Menu - Tsun Yang
 
 *Concepts:* 
 - Database storage – Chin Teck 
@@ -51,9 +53,10 @@ Productivity
 *Tasks and Features:*
 - Multimedia upload for notes – Tsun Yang
 - Sharing to collaborators  - Chin Teck
-- Biometric Authentication -  
+- Biometric Authentication -  Jin Xuan
 - Time tracking with work statistics and achievements  -
 - Local storage and encryption – Chin Teck   
+
 
 *Other* 
 - Publishing App - Tsun Yang

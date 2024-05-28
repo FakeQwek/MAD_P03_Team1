@@ -1,13 +1,16 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -25,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -201,6 +206,13 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 } else {
                     notifyInsert();
                 }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
@@ -228,6 +240,13 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 } else {
                     notifyInsert();
                 }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
@@ -282,10 +301,53 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(NotesActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
+            Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(NotesActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_timetable) {
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(NotesActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
+        }
+        else {
+            Log.d("Message", "Unknown page!");
+        }
+
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
+
         return true;
     }
 }
