@@ -32,6 +32,7 @@ Productivity
 - Calender – Jun Kai 
 - Timetable - Rithika 
 - Login and Authentication(firebase) – Jin Xuan
+- User Accounts - Chin Teck
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
 - SQLite Database - Jin Xuan
@@ -42,8 +43,9 @@ Productivity
 *Concepts:* 
 - Database storage – Chin Teck 
 - RecyclerView – Rithika 
-- Responsive Layout – Tsun Yang 
-- Authentication – Jin Xuan 
+- Responsive Layout – Tsun Yang
+- Authentication – Jin Xuan
+- Notifications - Chin Teck
 
 *Other* 
 - Padlet and Readme - Tsun Yang
@@ -54,8 +56,15 @@ Productivity
 - Multimedia upload for notes – Tsun Yang
 - Sharing to collaborators  - Chin Teck
 - Biometric Authentication -  Jin Xuan
-- Time tracking with work statistics and achievements  -
-- Local storage and encryption – Chin Teck   
+- Time tracking with work statistics and achievements  - Rithika
+- AI Helpbot - Chin Teck
+- Email and OTP Verification - Jin Xuan
+- Splash Screen Effect - Jin Xuan
+- In app calculator and timer - Tsun Yang
+- Feedback survey - Jin Xuan
+- Profile Page - Chin Teck
+- Settings Page - Tsun Yang
+  
 
 
 *Other* 
