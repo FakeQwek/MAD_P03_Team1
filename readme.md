@@ -36,6 +36,7 @@ Productivity
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
 - SQLite Database - Jin Xuan
+- Shared Preferences database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 - Main Menu - Tsun Yang
@@ -65,6 +66,9 @@ Productivity
 - Search other Username through the list - Jin Xuan
 - Create a Username for the account - Jin Xuan
 - Dashboard Service(track login status) - Jin Xuan
+- lottie Animation - Jin Xuan
+- Security Question Service - Jin Xuan
+- Social Media authentication service - Jin Xuan
 - Profile Page - Chin Teck
 - Settings Page - Tsun Yang
   
