@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 //Having network issues when connecting the database on home network, below line of code skips authentication
                 //Remember to comment when pushing to main
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                //startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 Log.d("Error", "This shows its working");
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
@@ -65,7 +65,9 @@ public class LoginActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class)
+                                        string username = 
+                                        successfulLogin.putExtra("Username", "");
                                         Log.d("Error", "This should load the main page");
                                         finish();
                                     }

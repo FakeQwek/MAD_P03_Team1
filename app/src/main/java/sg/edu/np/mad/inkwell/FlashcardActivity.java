@@ -206,30 +206,11 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
     }
 
     //Allows movement between activities upon clicking
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(FlashcardActivity.this, NotesActivity.class);
-            startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
-        }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            Log.d("Message", "Opening home");
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, FlashcardActivity.class);
-            startActivity(todoActivity);
-            Log.d("Message", "Opening calendar");
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
         return true;
     }
 }

@@ -7,15 +7,15 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,11 +24,8 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -37,10 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Get id of current user
-    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-    // Interface to add TextChangedListener
+    // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
         private T target;
 
@@ -81,10 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-  
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
@@ -93,29 +85,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageView helpButton = findViewById(R.id.helpButton);
         helpButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View V) {
-                startActivity(new Intent(MainActivity.this, Intro1.class));
+                startActivity(new Intent(MainActivity.this, MainActivity.class));
             }
         });
 
 
 
-        Button button = findViewById(R.id.button);
-
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("uid", "");
-        userData.put("type", "");
-        db.collection("users").document(currentFirebaseUserUid).set(userData);
-        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
-        db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
-        db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-
-        // Set night mode
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
-        });
 
     }
 
@@ -128,6 +103,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
+        // If home button is pressed trigger toast from navbar class
+        if (id == R.id.nav_home) {
+            Navbar navbar = new Navbar(this);
+            Intent newActivity = navbar.redirect(id, true);
+            return true;
+        }
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
