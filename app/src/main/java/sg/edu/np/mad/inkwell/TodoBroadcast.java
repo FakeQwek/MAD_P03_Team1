@@ -8,6 +8,10 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class TodoBroadcast extends BroadcastReceiver {
     // Setup for notification to be sent
     @Override
@@ -20,6 +24,9 @@ public class TodoBroadcast extends BroadcastReceiver {
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
 
-        notificationManagerCompat.notify(0, builder.build());
+        Date date = new Date();
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(date));
+
+        notificationManagerCompat.notify(id, builder.build());
     }
 }

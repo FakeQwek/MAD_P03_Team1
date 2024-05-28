@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
@@ -23,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -34,6 +36,9 @@ import java.util.ArrayList;
 public class QuizFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
 
@@ -86,7 +91,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
         ProgressBar progressBar = findViewById(R.id.progressBar);
 
         // Read from firebase and create flashcards on create
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -110,19 +115,20 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
-                stillLearning++;
                 if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                    db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else if (currentFlashcardPosition == questionList.size()) {
+                    stillLearning++;
                     viewAnimator.setDisplayedChild(2);
                     knownCount.setText(String.valueOf(correct));
                     stillLearningCount.setText(String.valueOf(stillLearning));
                     progressBar.setMax(correct + stillLearning);
                     progressBar.setProgress(correct);
                 } else {
+                    stillLearning++;
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
                         viewAnimator.setDisplayedChild(1);
@@ -141,19 +147,20 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             @Override
             public void onClick(View v) {
                 currentFlashcardPosition++;
-                correct++;
                 if (currentFlashcardPosition > questionList.size()) {
                     Intent flashcardActivity = new Intent(QuizFlashcardActivity.this, FlashcardActivity.class);
                     startActivity(flashcardActivity);
 
-                    db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
+                    db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", correct);
                 } else if (currentFlashcardPosition == questionList.size()) {
+                    correct++;
                     viewAnimator.setDisplayedChild(2);
                     knownCount.setText(String.valueOf(correct));
                     stillLearningCount.setText(String.valueOf(stillLearning));
                     progressBar.setMax(correct + stillLearning);
                     progressBar.setProgress(correct);
                 } else {
+                    correct++;
                     if (viewAnimator.getDisplayedChild() == 0) {
                         question2.setText(questionList.get(currentFlashcardPosition));
                         viewAnimator.setDisplayedChild(1);
@@ -165,7 +172,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             }
         });
 
-        Button answerButton1 = findViewById(R.id.answerButton1);
+        ImageButton answerButton1 = findViewById(R.id.answerButton1);
 
         // Toggles between the question and answer
         answerButton1.setOnClickListener(new View.OnClickListener() {
@@ -173,13 +180,15 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 if (question1.getText() == answerList.get(currentFlashcardPosition)) {
                     question1.setText(questionList.get(currentFlashcardPosition));
+                    answerButton1.setImageResource(R.drawable.eye_off_outline);
                 } else {
                     question1.setText(answerList.get(currentFlashcardPosition));
+                    answerButton1.setImageResource(R.drawable.eye_outline);
                 }
             }
         });
 
-        Button answerButton2 = findViewById(R.id.answerButton2);
+        ImageButton answerButton2 = findViewById(R.id.answerButton2);
 
         // Toggles between the question and answer
         answerButton2.setOnClickListener(new View.OnClickListener() {
@@ -187,8 +196,10 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
             public void onClick(View v) {
                 if (question2.getText() == answerList.get(currentFlashcardPosition)) {
                     question2.setText(questionList.get(currentFlashcardPosition));
+                    answerButton2.setImageResource(R.drawable.eye_off_outline);
                 } else {
                     question2.setText(answerList.get(currentFlashcardPosition));
+                    answerButton2.setImageResource(R.drawable.eye_outline);
                 }
             }
         });
@@ -196,32 +207,10 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(QuizFlashcardActivity.this, NotesActivity.class);
-            startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
-        }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
-            Intent todoActivity = new Intent(QuizFlashcardActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            Log.d("Message", "Opening home");
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(QuizFlashcardActivity.this, ViewFlashcardActivity.class);
-            startActivity(todoActivity);
-            Log.d("Message", "Opening home");
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
         return true;
     }
 }

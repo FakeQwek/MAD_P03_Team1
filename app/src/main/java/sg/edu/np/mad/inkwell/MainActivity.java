@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -23,7 +24,11 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Interface to add TextChangedListener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -62,33 +70,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Sets toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //Finds drawer and nav view before setting listener
+        //Finds nav bar drawer and nav view before setting listener
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        //Sets listener to allows for closing and opening of the navbar
         navigationView.bringToFront();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
                 R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+  
         View decorView = getWindow().getDecorView();
-
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-
         decorView.setSystemUiVisibility(uiOptions);
+        /*
+        // Sets help button functionality to bring you to introduction
+        ImageView helpButton = findViewById(R.id.helpButton);
+        helpButton.setOnClickListener(new helpButton.OnClickListener(){
+          @Override
+            public void onClick(view)
 
-        Button button = findViewById(R.id.button);
-
-        // Set night mode
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
         });
+        */
+         
 
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("uid", "");
+        userData.put("type", "");
+        db.collection("users").document(currentFirebaseUserUid).set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
     }
 
     @Override
@@ -97,38 +114,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
-    //Allows movement between activities upon clicking
-    @Override
+    //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(MainActivity.this, NotesActivity.class);
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(MainActivity.this, MainActivity.class);
             startActivity(notesActivity);
-            Log.d( "Alert", "Opening notes");
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(MainActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(MainActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
             Intent todoActivity = new Intent(MainActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
-            Log.d("Alert", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
             Intent todoActivity = new Intent(MainActivity.this, TimetableActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening timetable");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
            Log.d("Message", "Unknown page!");
         }
-    return true;
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+        return true;
+
     }
+
+
+
+
+
 }

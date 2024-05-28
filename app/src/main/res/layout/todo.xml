@@ -24,12 +24,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
+                android:fontFamily="@font/inter_regular"
                 android:text="do the scrum time"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:fontFamily="@font/inter_regular" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/todoDescription"
@@ -78,11 +78,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TO DO"
+                        android:textColor="#000000"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:textColor="#000000"/>
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardView3"
@@ -100,6 +100,7 @@
             </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

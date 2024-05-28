@@ -1,13 +1,16 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -22,10 +25,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +54,10 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     public static ArrayList<File> files = new ArrayList<>();
 
     public static ArrayList<Integer> fileIds = new ArrayList<>();
+
+    public static ArrayList<File> fileOrder = new ArrayList<>();
+
+    public static int fileOrderIndex;
 
     // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes) {
@@ -130,8 +138,15 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
         ArrayList<Object> notes = new ArrayList<>();
 
+        EditText noteTitle = findViewById(R.id.noteTitle);
+        EditText noteBody = findViewById(R.id.noteBody);
+
+        fileOrder = new ArrayList<>();
+
+        fileOrderIndex = -1;
+
         // Read from firebase and create files and folders on create
-        db.collection("notes")
+        db.collection("users").document(currentFirebaseUserUid).collection("notes")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -154,7 +169,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                         currentNoteId = Integer.parseInt(document.getId());
                                     }
 
-                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("notes"));
+                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                                     notes.add(folder);
                                     filter(files, notes, "");
                                 }
@@ -179,9 +194,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 fileData.put("type", "file");
                 fileData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
 
-                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("notes").document(String.valueOf(currentNoteId)));
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)));
                 fileIds.add(file.id);
                 files.add(file);
                 notes.add(0, file);
@@ -191,6 +206,13 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 } else {
                     notifyInsert();
                 }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
@@ -208,9 +230,9 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 folderData.put("type", "folder");
                 folderData.put("uid", currentFirebaseUserUid);
 
-                db.collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
+                db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("notes"));
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                 notes.add(0, folder);
 
                 if (currentNoteId == 1) {
@@ -218,36 +240,114 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 } else {
                     notifyInsert();
                 }
+
+                Toast toast = new Toast(NotesActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) NotesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
+        ImageButton leftButton = findViewById(R.id.leftButton);
+
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex > 0) {
+                    fileOrderIndex--;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton rightButton = findViewById(R.id.rightButton);
+
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fileOrderIndex < fileOrder.size() - 1) {
+                    fileOrderIndex++;
+                    selectedNoteId = fileOrder.get(fileOrderIndex).id;
+
+                    noteTitle.setText(fileOrder.get(fileOrderIndex).title);
+                    noteBody.setText(fileOrder.get(fileOrderIndex).body);
+                }
+            }
+        });
+
+        ImageButton readOnlyButton = findViewById(R.id.readOnlyButton);
+
+        readOnlyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (noteTitle.isEnabled()) {
+                    noteTitle.setEnabled(false);
+                    noteBody.setEnabled(false);
+                    readOnlyButton.setImageResource(R.drawable.pencil_outline);
+                } else {
+                    noteTitle.setEnabled(true);
+                    noteBody.setEnabled(true);
+                    readOnlyButton.setImageResource(R.drawable.book_open_blank_variant_outline);
+                }
+            }
+        });
     }
 
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            /* Replace intent with other function for fragment
-            Intent Login = new Intent(MainActivity.this, Login.class);
-            startActivity(Login);
-            */
-            Log.d( "Message", "Opening notes");
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
+            startActivity(notesActivity);
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(NotesActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(NotesActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(NotesActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");
         }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
         return true;
     }
 }

@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.text.Editable;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -89,9 +91,26 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     NotesActivity.selectedNoteId = file.getId();
+                    NotesActivity.fileOrderIndex++;
 
                     noteTitle.setText(file.getTitle());
                     noteBody.setText(file.getBody());
+
+                    if (NotesActivity.fileOrder.isEmpty()) {
+                        NotesActivity.fileOrder.add(file);
+                    } else if (NotesActivity.fileOrder.get(NotesActivity.fileOrderIndex - 1) != file) {
+                        Log.d("tester", String.valueOf(NotesActivity.fileOrderIndex));
+                        Log.d("tester", String.valueOf(NotesActivity.fileOrder.size()));
+                        if (NotesActivity.fileOrderIndex != NotesActivity.fileOrder.size()) {
+                            int count = NotesActivity.fileOrder.size() - NotesActivity.fileOrderIndex;
+                            Log.d("tester1", String.valueOf(count));
+                            for (int i = 0; i < count; i++) {
+                                Log.d("tester", "for LOOP");
+                                NotesActivity.fileOrder.remove(NotesActivity.fileOrder.size() - 1);
+                            }
+                        }
+                        NotesActivity.fileOrder.add(file);
+                    }
                 }
             });
 
@@ -117,6 +136,13 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             fileViewHolder.fileButton.setVisibility(View.GONE);
 
                             bottomSheetDialog.dismiss();
+
+                            Toast toast = new Toast(notesActivity);
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            LayoutInflater layoutInflater = (LayoutInflater) notesActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                            toast.setView(view);
+                            toast.show();
                         }
                     });
                     return false;
@@ -194,8 +220,10 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 public void onClick(View v) {
                     if (folderViewHolder.recyclerView.getVisibility() == View.VISIBLE) {
                         folderViewHolder.recyclerView.setVisibility(View.GONE);
+                        folderViewHolder.chevron.setImageResource(R.drawable.chevron_up);
                     } else {
                         folderViewHolder.recyclerView.setVisibility(View.VISIBLE);
+                        folderViewHolder.chevron.setImageResource(R.drawable.chevron_down);
                     }
                 }
             });
@@ -234,6 +262,13 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
 
                             bottomSheetDialog.dismiss();
+
+                            Toast toast = new Toast(notesActivity);
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            LayoutInflater layoutInflater = (LayoutInflater) notesActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = layoutInflater.inflate(R.layout.toast_added, null);
+                            toast.setView(view);
+                            toast.show();
                         }
                     });
 
@@ -259,6 +294,13 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
 
                             bottomSheetDialog.dismiss();
+
+                            Toast toast = new Toast(notesActivity);
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            LayoutInflater layoutInflater = (LayoutInflater) notesActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = layoutInflater.inflate(R.layout.toast_added, null);
+                            toast.setView(view);
+                            toast.show();
                         }
                     });
 
@@ -310,6 +352,13 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folderViewHolder.constraintLayout.setVisibility(View.GONE);
 
                             bottomSheetDialog.dismiss();
+
+                            Toast toast = new Toast(notesActivity);
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            LayoutInflater layoutInflater = (LayoutInflater) notesActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                            toast.setView(view);
+                            toast.show();
                         }
                     });
                     return false;

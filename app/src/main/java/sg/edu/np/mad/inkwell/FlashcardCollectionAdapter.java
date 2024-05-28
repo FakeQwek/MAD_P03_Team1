@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -30,6 +31,9 @@ import java.util.Map;
 public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCollectionViewHolder> {
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Declaration of variables
     private ArrayList<FlashcardCollection> allFlashcardCollections;
@@ -59,9 +63,6 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
         holder.title.setText(flashcardCollection.getTitle());
         holder.flashcardCount.setText(flashcardCollection.getCorrect() + "/" + flashcardCollection.getFlashcardCount());
 
-        // Create animation popup
-        Animation popup = AnimationUtils.loadAnimation(flashcardActivity, R.anim.popup);
-
         RecyclerView recyclerView = flashcardActivity.findViewById(R.id.recyclerView);
 
         holder.progressBar.setMax(flashcardCollection.getFlashcardCount());
@@ -87,49 +88,38 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                 bottomSheetDialog.setContentView(view);
                 bottomSheetDialog.show();
 
-                Button flashcardCollectionRenameButton = view.findViewById(R.id.flashcardCollectionRenameButton);
-                flashcardCollectionRenameButton.setText("Rename");
+                TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
 
-                // Rename flashcard collection
-                flashcardCollectionRenameButton.setOnClickListener(new View.OnClickListener() {
+                Button cancelButton = view.findViewById(R.id.cancelButton);
+
+                // Cancels the process
+                cancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        View renamePopupView = LayoutInflater.from(flashcardActivity).inflate(R.layout.rename_popup, null);
+                        bottomSheetDialog.dismiss();
+                    }
+                });
 
-                        renamePopupView.startAnimation(popup);
+                Button doneButton = view.findViewById(R.id.doneButton);
 
-                        PopupWindow renamePopupWindow = new PopupWindow(renamePopupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+                // Changes the data in firebase
+                doneButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> newFlashcardCollection = new HashMap<>();
+                        newFlashcardCollection.put("title", titleEditText.getText().toString());
 
-                        TextInputEditText renameEditText = renamePopupView.findViewById(R.id.renameEditText);
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.id)).update(newFlashcardCollection);
 
-                        Button renameButton = renamePopupView.findViewById(R.id.renameButton);
+                        flashcardCollection.setTitle(titleEditText.getText().toString());
 
-                        renameButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String newTitle = renameEditText.getText().toString();
-
-                                Map<String, Object> newFlashcardCollection = new HashMap<>();
-                                newFlashcardCollection.put("title", newTitle);
-
-                                db.collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).update(newFlashcardCollection);
-
-                                flashcardCollection.setTitle(newTitle);
-
-                                recyclerView.getAdapter().notifyDataSetChanged();
-
-                                renamePopupWindow.dismiss();
-                            }
-                        });
-
-                        renamePopupWindow.showAtLocation(renamePopupView, Gravity.CENTER, 0, 0);
+                        recyclerView.getAdapter().notifyDataSetChanged();
 
                         bottomSheetDialog.dismiss();
                     }
                 });
 
-                Button flashcardCollectionDeleteButton = view.findViewById(R.id.flashcardCollectionDeleteButton);
-                flashcardCollectionDeleteButton.setText("Delete");
+                Button flashcardCollectionDeleteButton = view.findViewById(R.id.deleteButton);
 
                 // Delete flashcard collection
                 flashcardCollectionDeleteButton.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +129,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                         flashcardCollectionList.remove(flashcardCollection);
                         recyclerView.getAdapter().notifyDataSetChanged();
 
-                        db.collection("flashcardCollections")
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections")
                                 .document(String.valueOf(flashcardCollection.getId()))
                                 .collection("flashcards")
                                 .get()
@@ -156,7 +146,7 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
                                     }
                                 });
 
-                        db.collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).delete();
+                        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(flashcardCollection.getId())).delete();
 
                         bottomSheetDialog.dismiss();
                     }

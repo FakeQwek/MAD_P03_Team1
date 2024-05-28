@@ -9,6 +9,7 @@ import android.app.RemoteAction;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +38,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +85,8 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
     public static String currentStatus = "todo";
 
+    private ArrayList<Todo> todos;
+
     int hour = 0;
 
     int minute = 0;
@@ -106,14 +111,15 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     }
 
     // Method to filter items already in the recycler view
-    private void filter(ArrayList<Todo> todos, String status, String query) {
+    private void filter(ArrayList<Todo> allTodos, String status, String query) {
         ArrayList<Todo> filterList = new ArrayList<>();
-        for (Todo todo : todos){
+        for (Todo todo : allTodos){
             if(todo.getTodoStatus().equals(status) && todo.getTodoTitle().toLowerCase().contains(query)) {
                 filterList.add(todo);
             }
         }
-        recyclerView(todos, filterList);
+        todos = filterList;
+        recyclerView(allTodos, filterList);
     }
 
     // Create notification channel for sending notifications
@@ -159,10 +165,12 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
         ArrayList<Todo> allTodos = new ArrayList<>();
 
+        RecyclerView recyclerView = findViewById(R.id.todoRecyclerView);
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         // Read from firebase and create todos on create
-        db.collection("todos")
+        db.collection("users").document(currentFirebaseUserUid).collection("todos")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -268,11 +276,13 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         todoData.put("dateTime", simpleDateFormat.format(Calendar.getInstance().getTime()));
                         todoData.put("status", "todo");
                         todoData.put("uid", currentFirebaseUserUid);
-                        db.collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
+                        db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(currentTodoId + 1)).set(todoData);
                         bottomSheetDialog.dismiss();
 
                         Intent intent = new Intent(TodoActivity.this, TodoBroadcast.class);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                        Date date = new Date();
+                        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss",  Locale.US).format(date));
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(TodoActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
                         try {
@@ -284,6 +294,13 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                         long time = hour * 3600000 + minute * 60000;
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
+
+                        Toast toast = new Toast(TodoActivity.this);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.toast_added, null);
+                        toast.setView(view);
+                        toast.show();
                     }
                 });
 
@@ -351,31 +368,89 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 return false;
             }
         });
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getAdapterPosition();
+                Todo todo = todos.get(position);
+                db.collection("users").document(currentFirebaseUserUid).collection("todos").document(String.valueOf(todo.todoId)).delete();
+                allTodos.remove(todo);
+                todos.remove(todo);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(TodoActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) TodoActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.80f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(TodoActivity.this, NotesActivity.class);
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(TodoActivity.this, MainActivity.class);
             startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
-//            Intent todoActivity = new Intent(TodoActivity.this, TodoActivity.class);
-//            startActivity(todoActivity);
-            Log.d("Message", "Opening home");
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(TodoActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
+            Intent todoActivity = new Intent(TodoActivity.this, TodoActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_flashcards) {
+            Intent todoActivity = new Intent(TodoActivity.this, FlashcardActivity.class);
+            startActivity(todoActivity);
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Log.d("Message", "Opening calendar");
+            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(TodoActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");
         }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
         return true;
     }
 }
