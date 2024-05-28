@@ -60,17 +60,16 @@ Productivity
 - Time tracking with work statistics and achievements  - Rithika
 - AI Helpbot - Chin Teck
 - Email and OTP Verification - Jin Xuan
-- Splash Screen Effect - Jin Xuan
-- In app calculator and timer - Tsun Yang
+- Splash Screen Effect/Lottie Animation - Jin Xuan
+- In app calculator - Tsun Yang
 - Feedback survey - Jin Xuan
-- Search other Username through the list - Jin Xuan
-- Create a Username for the account before going into the app- Jin Xuan
+- Create a Username for the account - Jin Xuan
 - Dashboard Service(track login status) - Jin Xuan
-- lottie Animation - Jin Xuan
 - Security Question Service - Jin Xuan
-- Social Media authentication service - Jin Xuan
+- Social Media Authentication Service - Jin Xuan
 - Profile Page - Chin Teck
 - Settings Page - Tsun Yang
+- Cloud Storage - Tsun Yang
   
 
 
