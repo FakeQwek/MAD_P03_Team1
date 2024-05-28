@@ -445,11 +445,14 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         int minute = calendar.get(Calendar.MINUTE);
 
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+        String currentDate = String.format(Locale.getDefault(), "dd-MM-yyyy");
 
         etToDo.setText("");
         etLocation.setText("");
         tvStartTime.setText(currentTime);
         tvEndTime.setText(currentTime);
+        tvStartDate.setText(currentDate);
+        tvEndDate.setText(currentDate);
     }
 
     // when add new category selected, open pop-up
@@ -679,25 +682,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                             Log.e("Firestore", "Error getting categories", task.getException());
                         }
                     }
-                });
-    }
-
-    private void fetchEventsAndUpdateRecyclerView(FirebaseFirestore db, String userId) {
-        db.collection("users").document(userId).collection("timetableEvents")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<TimetableData> eventsList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        TimetableData event = document.toObject(TimetableData.class);
-                        eventsList.add(event);
-                    }
-
-                    recyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failure
-                    Log.e("FetchEvents", "Error fetching events: " + e.getMessage(), e);
                 });
     }
 
