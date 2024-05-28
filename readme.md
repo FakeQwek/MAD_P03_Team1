@@ -31,7 +31,10 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication – Jin Xuan 
+- Login and Authentication(firebase) – Jin Xuan
+- Sign Up and Reset Password - Jin Xuan
+- Walkthrough Intro - Jin Xuan
+- SQLite Database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 
@@ -49,7 +52,7 @@ Productivity
 *Tasks and Features:*
 - Multimedia upload for notes – Tsun Yang
 - Sharing to collaborators  - Chin Teck
-- Biometric Authentication -  
+- Biometric Authentication -  Jin Xuan
 - Time tracking with work statistics and achievements  -
 - Local storage and encryption – Chin Teck   
 

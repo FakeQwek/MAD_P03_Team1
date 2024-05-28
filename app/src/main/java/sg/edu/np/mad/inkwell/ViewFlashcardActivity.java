@@ -1,17 +1,20 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 
 import androidx.activity.EdgeToEdge;
@@ -28,10 +31,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -45,11 +50,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ViewFlashcardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    // Get id of current user
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    // Declaration of variables
+
+    // currentFlashcardId keeps track of the ids that have already been assigned
     private int currentFlashcardId;
 
+    private ArrayList<Flashcard> flashcards;
+
+    // Method to set items in the recycler view
     private void recyclerView(ArrayList<Flashcard> allFlashcards, ArrayList<Flashcard> flashcards) {
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FlashcardAdapter adapter = new FlashcardAdapter(allFlashcards, flashcards, this);
@@ -60,14 +74,16 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
-    private void filter(ArrayList<Flashcard> flashcards, String query) {
+    // Method to filter items already in the recycler view
+    private void filter(ArrayList<Flashcard> allFlashcards, String query) {
         ArrayList<Flashcard> filterList = new ArrayList<>();
-        for (Flashcard flashcard : flashcards){
+        for (Flashcard flashcard : allFlashcards){
             if(flashcard.getQuestion().toLowerCase().contains(query)) {
                 filterList.add(flashcard);
             }
         }
-        recyclerView(flashcards, filterList);
+        flashcards = filterList;
+        recyclerView(allFlashcards, filterList);
     }
 
     @Override
@@ -89,12 +105,6 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-
-        Log.d("tester1", String.valueOf(FlashcardActivity.selectedFlashcardCollectionId));
-
-
         View decorView = getWindow().getDecorView();
 
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -103,7 +113,10 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         ArrayList<Flashcard> allFlashcards = new ArrayList<>();
 
-        db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+
+        // Read from firebase and create flashcards on create
+        db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots,
@@ -113,6 +126,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                             return;
                         }
 
+                        // Adds items to recycler view on create and everytime new data is added to firebase
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
                                 if (Integer.parseInt(dc.getDocument().getId()) > currentFlashcardId) {
@@ -121,8 +135,6 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                                 Flashcard flashcard = new Flashcard(dc.getDocument().getData().get("question").toString(), dc.getDocument().getData().get("answer").toString(), Integer.parseInt(dc.getDocument().getId()));
                                 allFlashcards.add(flashcard);
                                 filter(allFlashcards, "");
-                            } else if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                Log.d("tester", String.valueOf(allFlashcards.size()));
                             }
                         }
                     }
@@ -130,20 +142,29 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
 
         ImageButton addFlashcardButton = findViewById(R.id.addFlashcardButton);
 
+        // Adds a flashcard to firebase
         addFlashcardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Map<String, Object> flashcardData = new HashMap<>();
                 flashcardData.put("question", "New flashcard");
                 flashcardData.put("answer", "answer");
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(currentFlashcardId + 1)).set(flashcardData);
 
-                db.collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(1));
+
+                Toast toast = new Toast(ViewFlashcardActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) ViewFlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_added, null);
+                toast.setView(view);
+                toast.show();
             }
         });
 
         Button quizButton = findViewById(R.id.quizButton);
 
+        // Go to QuizFlashcardActivity
         quizButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,29 +177,79 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
             }
         });
 
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getAdapterPosition();
+                Flashcard flashcard = allFlashcards.get(position);
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.id)).delete();
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
+                allFlashcards.remove(flashcard);
+                flashcards.remove(flashcard);
+                recyclerView.getAdapter().notifyItemRemoved(position);
+                Toast toast = new Toast(ViewFlashcardActivity.this);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                LayoutInflater layoutInflater = (LayoutInflater) ViewFlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(R.layout.toast_deleted, null);
+                toast.setView(view);
+                toast.show();
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.80f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent notesActivity = new Intent(ViewFlashcardActivity.this, NotesActivity.class);
+        if (menuItem.getItemId() == R.id.nav_main) {
+            Intent notesActivity = new Intent(ViewFlashcardActivity.this, MainActivity.class);
             startActivity(notesActivity);
-            Log.d( "Message", "Opening notes");
+            return true;
         }
-        else if (menuItem.getItemId() == R.id.nav_todo) {
+        else if (menuItem.getItemId() == R.id.nav_notes) {
+            Intent todoActivity = new Intent(ViewFlashcardActivity.this, NotesActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_todos) {
             Intent todoActivity = new Intent(ViewFlashcardActivity.this, TodoActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening home");
             return true;
         }
         else if (menuItem.getItemId() == R.id.nav_flashcards) {
             Intent todoActivity = new Intent(ViewFlashcardActivity.this, FlashcardActivity.class);
             startActivity(todoActivity);
-            Log.d("Message", "Opening calendar");
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_calendar) {
+            Intent todoActivity = new Intent(ViewFlashcardActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
         }
         else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Log.d("Message", "Opening timetable");
+            Intent todoActivity = new Intent(ViewFlashcardActivity.this, TimetableActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_settings) {
+            Intent todoActivity = new Intent(ViewFlashcardActivity.this, SettingsActivity.class);
+            startActivity(todoActivity);
+            return true;
+        }
+        else if (menuItem.getItemId() == R.id.nav_logout) {
+            Log.d("Message", "Logout");
         }
         else {
             Log.d("Message", "Unknown page!");
