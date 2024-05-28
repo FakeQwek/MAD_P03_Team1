@@ -62,6 +62,7 @@ Productivity
 - Splash Screen Effect - Jin Xuan
 - In app calculator and timer - Tsun Yang
 - Feedback survey - Jin Xuan
+- Search other Username through the list - Jin Xuan
 - Profile Page - Chin Teck
 - Settings Page - Tsun Yang
   
