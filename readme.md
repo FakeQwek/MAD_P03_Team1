@@ -64,7 +64,7 @@ Productivity
 - In app calculator and timer - Tsun Yang
 - Feedback survey - Jin Xuan
 - Search other Username through the list - Jin Xuan
-- Create a Username for the account - Jin Xuan
+- Create a Username for the account before going into the app- Jin Xuan
 - Dashboard Service(track login status) - Jin Xuan
 - lottie Animation - Jin Xuan
 - Security Question Service - Jin Xuan
