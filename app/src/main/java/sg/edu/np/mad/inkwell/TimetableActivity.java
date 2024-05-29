@@ -37,6 +37,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -143,6 +145,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
 
         Date date = calendar.getTime();
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based, so add 1
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
         SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
@@ -595,9 +601,12 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         Calendar calendar = Calendar.getInstance(singaporeTimeZone);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based, so add 1
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-        String currentDate = String.format(Locale.getDefault(), "dd-MM-yyyy");
+        String currentDate = String.format(Locale.getDefault(), "dd-MM-yyyy",day,month,year);
 
         etToDo.setText("");
         etLocation.setText("");
@@ -744,9 +753,25 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 filterList.add(data);
             }
         }
+
+        // Sort the filterList based on startTime and endTime
+        Collections.sort(filterList, new Comparator<TimetableData>() {
+            @Override
+            public int compare(TimetableData data1, TimetableData data2) {
+                // Compare by startTime first
+                int startTimeComparison = data1.getStartTime().compareTo(data2.getStartTime());
+                if (startTimeComparison != 0) {
+                    return startTimeComparison;
+                }
+                // If startTime is the same, compare by endTime
+                return data1.getEndTime().compareTo(data2.getEndTime());
+            }
+        });
+
         this.events = filterList;
         recyclerView(eventList, filterList);
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.nav_main) {
