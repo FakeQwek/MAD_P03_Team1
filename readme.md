@@ -31,12 +31,10 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication(firebase) – Jin Xuan
+- Login – Jin Xuan
 - User Accounts - Chin Teck
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
-- SQLite Database - Jin Xuan
-- Shared Preferences database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 - Main Menu - Tsun Yang
