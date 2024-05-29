@@ -80,7 +80,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     private boolean isPanelShown = false;
     private View backgroundOverlay;
     private RecyclerView recyclerView;
-    private ImageButton addNewBtn;
+    private ImageButton addNewBtn, leftBtn, rightBtn;
     private TextView tvDate;
     private CardView startTime, endTime, startDate, endDate;
     private TextView tvStartTime,tvEndTime;
@@ -99,7 +99,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         setContentView(R.layout.activity_timetable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //Finds drawer and nav view before setting listener
+        // finds drawer and nav view before setting listener
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -138,6 +138,8 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         tvEndDate = findViewById(R.id.tvEndDate);
         tvEndTime = findViewById(R.id.tvEndTime);
         Button btnSave = findViewById(R.id.btnSave);
+        leftBtn = findViewById(R.id.leftArrow);
+        rightBtn = findViewById(R.id.rightArrow);
 
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -147,7 +149,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         Date date = calendar.getTime();
 
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based, so add 1
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
@@ -175,34 +177,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             createEvents(db, userId);
 
             // Get data from Firestore
-            db.collection("users").document(userId).collection("timetableEvents")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    String name = document.getString("eventName");
-                                    String loc = document.getString("eventLocation");
-                                    String startTime = document.getString("startTime");
-                                    String endTime = document.getString("endTime");
-                                    String startDate = document.getString("startDate");
-                                    String endDate = document.getString("endDate");
-                                    String category = document.getString("category");
-                                    Log.d("firestore", "getting data");
-                                    if (name != null && name != "") {
-                                        TimetableData data = new TimetableData(name, loc, startTime, startDate, endTime, endDate, category);
-                                        eventList.add(data);
-                                    }
-                                }
-                            } else {
-                                Log.w("Firestore", "Error getting documents.", task.getException());
-                            }
-
-                            Log.d("firestore", "running filter");
-                            filter(eventList, today);
-                        }
-                    });
+            fetchEventData(db, userId, eventList,today);
 
             // Fetch categories from Firestore and populate the categoryList
             fetchCategoriesFromFirestore();
@@ -272,6 +247,59 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            leftBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Decrement the calendar by one day
+                    calendar.add(Calendar.DAY_OF_MONTH, -1);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+                    // Format the previous day date
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+                    String previousDay = dateFormat.format(calendar.getTime());
+
+                    // Update tvDate with the formatted previous day date
+                    tvDate.setText(previousDay);
+
+                    // Format the previous day date in the "dd-MM-yyyy" format for filtering
+                    SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                    String prevDay = dateFormat2.format(calendar.getTime());
+                    Log.d("PREV DAY",prevDay);
+
+                    // Filter the event list based on the previous day date
+                    fetchEventData(db, userId, eventList,prevDay);
+                }
+            });
+
+            // Right button click listener
+            rightBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Increment the calendar by one day
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+                    // Format the previous day date
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
+                    String tmr = dateFormat.format(calendar.getTime());
+
+                    // Update tvDate with the formatted previous day date
+                    tvDate.setText(tmr);
+
+                    // Format the previous day date in the "dd-MM-yyyy" format for filtering
+                    SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                    String nextDay = dateFormat2.format(calendar.getTime());
+
+                    Log.d("NEXT DAY",nextDay);
+
+                    // Filter the event list based on the previous day date
+                    fetchEventData(db, userId, eventList,nextDay);
+                }
+            });
+
             btnClear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -336,6 +364,38 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
             adapter.notifyDataSetChanged();
         }
+    }
+
+    private void fetchEventData(FirebaseFirestore db, String userId, ArrayList<TimetableData> eventList, String date) {
+        db.collection("users").document(userId).collection("timetableEvents")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            eventList.clear(); // Clear existing data
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String name = document.getString("eventName");
+                                String loc = document.getString("eventLocation");
+                                String startTime = document.getString("startTime");
+                                String endTime = document.getString("endTime");
+                                String startDate = document.getString("startDate");
+                                String endDate = document.getString("endDate");
+                                String category = document.getString("category");
+                                Log.d("firestore", "getting data");
+                                if (name != null && name != "" && startDate.equals(date)) {
+                                    TimetableData data = new TimetableData(name, loc, startTime, startDate, endTime, endDate, category);
+                                    eventList.add(data);
+                                }
+                            }
+                        } else {
+                            Log.w("Firestore", "Error getting documents.", task.getException());
+                        }
+
+                        Log.d("firestore", "running filter");
+                        filter(eventList,date);
+                    }
+                });
     }
 
     private void fetchCategoriesFromFirestore() {
@@ -566,7 +626,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
         datePickerDialog.show();
     }
-
     private String formatDate(int year, int month, int dayOfMonth) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, dayOfMonth);
@@ -602,7 +661,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based, so add 1
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
@@ -823,4 +882,5 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
         return true;
     }
+
 }
