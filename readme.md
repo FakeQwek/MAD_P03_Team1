@@ -38,6 +38,8 @@ Productivity
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 - Main Menu - Tsun Yang
+- Settings - Chin Teck
+- Dark Mode - Chin Teck
 
 *Concepts:* 
 - Database storage – Chin Teck 
@@ -66,8 +68,8 @@ Productivity
 - Security Question Service - Jin Xuan
 - Search through the list of other people username - Jin Xuan
 - Profile Page - Chin Teck
-- Settings Page - Tsun Yang
 - Cloud Storage - Tsun Yang
+- Alarm page - Tsun Yang
   
 
 
