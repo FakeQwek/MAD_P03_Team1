@@ -64,7 +64,7 @@ Productivity
 - Create a Username for the account - Jin Xuan
 - Dashboard Service(track login status) - Jin Xuan
 - Security Question Service - Jin Xuan
-- Social Media Authentication Service - Jin Xuan
+- Search through the list of other people username - Jin Xuan
 - Profile Page - Chin Teck
 - Settings Page - Tsun Yang
 - Cloud Storage - Tsun Yang
