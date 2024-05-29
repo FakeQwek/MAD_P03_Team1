@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -34,7 +36,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     // Get id of current user
-    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    //Commenting out temporarily if this is commented out please uncomment
+    //String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -87,9 +90,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageView helpButton = findViewById(R.id.helpButton);
         helpButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View V) {
-                startActivity(new Intent(MainActivity.this, MainActivity.class));
+                startActivity(new Intent(MainActivity.this, Intro1.class));
             }
         });
+
+        String name = getIntent().getStringExtra("Username");
+        if (name != null) {
+            name = name.substring(0, 1).toUpperCase() + name.substring(1);
+            Log.d("Alert", "name is" + name);
+            TextView nameText = findViewById(R.id.accountName);
+            nameText.setText(name);
+        }
 
 
 
@@ -99,10 +110,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
+        //Commenting out temporarily if this is commented out please uncomment
+        /*
         db.collection("users").document(currentFirebaseUserUid).set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
+        */
+
     }
 
     @Override
@@ -127,8 +142,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
 
     }
-
-
 
 
 

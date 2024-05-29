@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.checkerframework.checker.units.qual.Current;
+
 public class Navbar {
     private Activity CurrentActivity;
     private String currentActivityName;
@@ -18,7 +20,6 @@ public class Navbar {
         if (id == R.id.nav_home && isMain){
             Toast toast = Toast.makeText(CurrentActivity.getBaseContext(), "Already in Homepage", Toast.LENGTH_SHORT);
             toast.show();
-
         }
         return null;
     }
@@ -41,12 +42,13 @@ public class Navbar {
             return newActivity;
         }
         else if (id == R.id.nav_calendar) {
+            Intent newActivity = new Intent(CurrentActivity, calendarpage.class);
             Log.d("Alert", "Opening calendar");
+            return newActivity;
         }
 
         else if (id == R.id.nav_home) {
             Intent newActivity = new Intent(CurrentActivity, MainActivity.class);
-
             Log.d("Alert", "Opening homepage");
             return newActivity;
         }
@@ -59,6 +61,12 @@ public class Navbar {
             Intent newActivity = new Intent(CurrentActivity, TimetableActivity.class);
             Log.d("Alert", "Opening timetable");
             return newActivity;
+        }
+        else if (id == R.id.nav_settings) {
+            Intent newActivity = new Intent(CurrentActivity, SettingsActivity.class);
+            Log.d("Alert", "Opening settings");
+            return newActivity;
+
         }
         else {
            Log.d("Alert", "Unknown page!");

@@ -35,7 +35,15 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signupRedirectText;
     private Button loginButton;
     TextView forgotPassword;
-
+    private void transferName(Intent successfulLogin) {
+        EditText emailText = findViewById(R.id.login_email);
+        String email = emailText.getText().toString();
+        String[] twoParts = email.split("@", 2);
+        //Log.d("Alert", "Email name is " + twoParts[0]);
+        successfulLogin.putExtra("Username", twoParts[0]);
+        startActivity(successfulLogin);
+        //.d("Error", "This should load the main page");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -53,17 +61,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
+                Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                transferName(successfulLogin);
 
 
-                //Having network issues when connecting the database on home network, below line of code skips authentication. Comment out when pushing to main
-                //startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                Log.d("Error", "This shows its working");
 
-                if (pass.equals("admin")) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    Log.d("Error", "This should load the main page");
-                    return;  // Exit the method here since we've already started the MainActivity
-                }
 
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
@@ -71,13 +73,10 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
+                                        //Starts MainActivity and sends username data to main activity
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                                         Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
-                                        //string username =
-                                        startActivity(successfulLogin);
-                                        successfulLogin.putExtra("Username", "");
-                                        Log.d("Error", "This should load the main page");
-                                        finish();
+                                        transferName(successfulLogin);
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -96,6 +95,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
 
         signupRedirectText.setOnClickListener(new View.OnClickListener(){
             @Override
