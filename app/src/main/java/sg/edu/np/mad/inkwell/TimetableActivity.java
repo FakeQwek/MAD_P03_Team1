@@ -77,10 +77,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     private Spinner categorySpinner;
     private ArrayAdapter<String> adapter;
     private List<String> categoryList;
+    Animation slideInLeft;
     private ArrayList<TimetableData> events;
     private boolean isPanelShown = false;
     private View backgroundOverlay;
-    private RecyclerView recyclerView;
     private ImageButton addNewBtn, leftBtn, rightBtn;
     private TextView tvDate;
     private CardView startTime, endTime, startDate, endDate;
@@ -815,6 +815,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     }
 
     private void recyclerView(ArrayList<TimetableData> eventList, ArrayList<TimetableData> event) {
+        Animation slideInLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_left);
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         TimetableAdapter adapter = new TimetableAdapter(eventList, event, this);
 
@@ -829,6 +830,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         recyclerView.setAdapter(adapter);
 
         // Notify the adapter of data changes (optional if data changes dynamically)
+        recyclerView.startAnimation(slideInLeft);
         adapter.notifyDataSetChanged();
     }
 

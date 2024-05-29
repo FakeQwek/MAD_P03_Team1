@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -33,7 +35,6 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     private TimetableActivity context;
     private FirebaseFirestore db;
     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
 
     // Constructor
     public TimetableAdapter(ArrayList<TimetableData> dataList, ArrayList<TimetableData> events, TimetableActivity timetableActivity) {
