@@ -1,12 +1,15 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.AlertDialog;
+import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
@@ -32,16 +36,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class calendarpage extends AppCompatActivity {
 
     private CalendarView calendarView;
     private TextView eventDescriptionTextView;
+    private EditText dateEditText;
+    private Button datePickerButton;
     private FirebaseFirestore db;
+    private String userId;
     public static final String CHANNEL_ID = "EventNotificationChannel";
 
     @Override
@@ -58,9 +67,17 @@ public class calendarpage extends AppCompatActivity {
 
         calendarView = findViewById(R.id.calendarView);
         eventDescriptionTextView = findViewById(R.id.eventDescription);
+        dateEditText = findViewById(R.id.dateEditText);
+        datePickerButton = findViewById(R.id.datePickerButton);
 
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
+
+
+        // Get current user ID
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userId = "8dvh5X3c5sYMOOhHhvv9w5ZvL2n2"; //replace with actual code later
+
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -70,6 +87,8 @@ public class calendarpage extends AppCompatActivity {
                 eventsList(date);
             }
         });
+
+        datePickerButton.setOnClickListener(v -> showDatePickerDialog());
 
         createNotificationChannel();
     }
@@ -88,9 +107,9 @@ public class calendarpage extends AppCompatActivity {
     }
 
     private void displayEventsForDate(String date) {
-        db.collection("events")
-                .document(date)
-                .get()
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -118,13 +137,32 @@ public class calendarpage extends AppCompatActivity {
                 });
     }
 
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                        dateEditText.setText(selectedDate);
+                        displayEventsForDate(selectedDate);
+                    }
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
     private void eventsList(final String date) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Click on event to edit or delete!");
+        builder.setTitle("Click on event to edit or delete.");
 
-        db.collection("events")
-                .document(date)
-                .get()
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
+
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -163,9 +201,10 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Edit", (dialog, which) -> editEvent(date, eventIndex));
 
         builder.setNegativeButton("Delete", (dialog, which) -> {
-            db.collection("events")
-                    .document(date)
-                    .get()
+            db.collection("users")
+                    .document(userId)
+                    .collection("events").document(date).get()
+
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -173,7 +212,10 @@ public class calendarpage extends AppCompatActivity {
                                 List<String> events = (List<String>) documentSnapshot.get("events");
                                 if (events != null && eventIndex < events.size()) {
                                     events.remove(eventIndex);
-                                    db.collection("events")
+
+                                    db.collection("users")
+                                            .document(userId)
+                                            .collection("events")
                                             .document(date)
                                             .update("events", events)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -212,9 +254,9 @@ public class calendarpage extends AppCompatActivity {
         builder.setTitle("Edit Event on " + date);
 
         final EditText input = new EditText(this);
-        db.collection("events")
-                .document(date)
-                .get()
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -232,9 +274,9 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Save", (dialog, which) -> {
             String eventDescription = input.getText().toString();
             if (!eventDescription.isEmpty()) {
-                db.collection("events")
-                        .document(date)
-                        .get()
+                db.collection("users")
+                        .document(userId)
+                        .collection("events").document(date).get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -242,8 +284,9 @@ public class calendarpage extends AppCompatActivity {
                                     List<String> events = (List<String>) documentSnapshot.get("events");
                                     if (events != null && eventIndex < events.size()) {
                                         events.set(eventIndex, eventDescription);
-                                        db.collection("events")
-                                                .document(date)
+                                        db.collection("users")
+                                                .document(userId)
+                                                .collection("events").document(date)
                                                 .update("events", events)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
@@ -284,9 +327,9 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Save", (dialog, which) -> {
             String eventDescription = input.getText().toString();
             if (!eventDescription.isEmpty()) {
-                db.collection("events")
-                        .document(date)
-                        .get()
+                db.collection("users")
+                        .document(userId)
+                        .collection("events").document(date).get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -298,8 +341,9 @@ public class calendarpage extends AppCompatActivity {
                                     }
                                 }
                                 events.add(eventDescription);
-                                db.collection("events")
-                                        .document(date)
+                                db.collection("users")
+                                        .document(userId)
+                                        .collection("events").document(date)
                                         .set(Collections.singletonMap("events", events), SetOptions.merge())
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
