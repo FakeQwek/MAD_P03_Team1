@@ -579,6 +579,24 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             }
         });
 
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> eventData = new HashMap<>();
+                eventData.put("eventName", etToDo.getText().toString());
+                eventData.put("eventLocation", etLocation.getText().toString());
+                eventData.put("startTime", tvStartTime.getText().toString());
+                eventData.put("startDate", tvStartDate.getText().toString());
+                eventData.put("endTime", tvEndTime.getText().toString());
+                eventData.put("endDate", tvEndDate.getText().toString());
+                eventData.put("category", categorySpinner.getSelectedItem().toString());
+
+                hideSlidingPanel();
+                updateTimetableEvent(documentId, eventData, db, userId, eventList, date);
+                fetchEventData(db,userId,eventList,date);
+            }
+        });
+
     }
 
     private void addCategoryToFirestore(String userId, String categoryName, String colorHex) {
@@ -905,6 +923,25 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                     }
                 });
     }
+
+    public void updateTimetableEvent(String documentId, Map<String, Object> newData, FirebaseFirestore db, String userId, ArrayList<TimetableData> eventsList, String date) {
+        db.collection("users").document(userId).collection("timetableEvents").document(documentId)
+                .update(newData)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        fetchEventData(db, userId, eventsList, date);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("TimetableAdapter", "Error updating document", e);
+                        // Handle error, e.g., show a message to the user
+                    }
+                });
+    }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
