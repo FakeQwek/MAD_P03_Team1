@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     // Get id of current user
-  
-    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    //String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -108,12 +108,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
-
+        /*
         db.collection("users").document(currentFirebaseUserUid).set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-
+        */
 
     }
 
