@@ -5,22 +5,24 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import sg.edu.np.mad.inkwell.R;
 import sg.edu.np.mad.inkwell.TimetableActivity;
@@ -35,6 +37,11 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     private TimetableActivity context;
     private FirebaseFirestore db;
     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(TimetableData item);
+    }
 
     // Constructor
     public TimetableAdapter(ArrayList<TimetableData> dataList, ArrayList<TimetableData> events, TimetableActivity timetableActivity) {
@@ -85,9 +92,18 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         return new ViewHolder(view);
     }
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TimetableData data = dataList.get(position);
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String date = dateFormat2.format(calendar.getTime());
+
+        String documentId = data.getDocumentId();
         holder.tvTitle.setText(data.getName());
         holder.tvDescription.setText(data.getLocation());
         holder.tvStartTime.setText(data.getStartTime());
@@ -96,6 +112,13 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         int categoryColor = getColorForCategory(data.getCategory());
 
         holder.catCard.setBackgroundColor(categoryColor);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((TimetableActivity) v.getContext()).onItemClick(data, userId, documentId, db, events, date);
+            }
+        });
     }
 
     @Override

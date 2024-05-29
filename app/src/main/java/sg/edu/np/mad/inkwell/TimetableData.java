@@ -12,6 +12,8 @@ public class TimetableData {
     private String category;
     private String startDate;
     private String endDate;
+    private String documentId;
+
 
     public TimetableData(String name, String location, String startTime, String startDate, String endTime, String endDate, String category) {
         this.name = name;
@@ -36,25 +38,11 @@ public class TimetableData {
     public String getCategory() { return category; }
     public  String getStartDate() { return startDate; }
     public String getEndDate() { return endDate; }
+    public String getDocumentId() {
+        return documentId;
+    }
 
-    // Nested Category class
-    public static class Category {
-        private String name;
-        private int color;
-
-        public Category() {}
-
-        public Category(String name, int color) {
-            this.name = name;
-            this.color = color;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getColor() {
-            return color;
-        }
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 }
