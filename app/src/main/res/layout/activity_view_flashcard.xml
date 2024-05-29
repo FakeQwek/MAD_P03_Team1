@@ -5,7 +5,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
@@ -36,19 +37,12 @@
             android:id="@+id/addFlashcardButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="#00000000"
             app:layout_constraintEnd_toEndOf="@+id/toolbar"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/plus"
-            android:backgroundTint="#00000000" />
-
-        <ImageButton
-            android:id="@+id/deleteFlashcardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/addFlashcardButton"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/trash_can_outline"
-            android:backgroundTint="#00000000"/>
+            app:srcCompat="@drawable/plus" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
