@@ -72,6 +72,9 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_timetable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //Finds nav bar drawer and nav view before setting listener
@@ -84,9 +87,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_timetable);
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

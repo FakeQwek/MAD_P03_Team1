@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.AlertDialog;
+import android.view.MenuItem;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -41,7 +43,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
-public class calendarpage extends AppCompatActivity {
+public class calendarpage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private CalendarView calendarView;
     private TextView eventDescriptionTextView;
@@ -50,6 +52,10 @@ public class calendarpage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_calendarpage);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //Finds nav bar drawer and nav view before setting listener
@@ -62,9 +68,6 @@ public class calendarpage extends AppCompatActivity {
                 R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_calendarpage);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -376,5 +379,20 @@ public class calendarpage extends AppCompatActivity {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        int id = menuItem.getItemId();
+        // If home button is pressed trigger toast from navbar class
+        if (id == R.id.nav_home) {
+            Navbar navbar = new Navbar(this);
+            Intent newActivity = navbar.redirect(id, true);
+            return true;
+        }
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+        return true;
+
     }
 }

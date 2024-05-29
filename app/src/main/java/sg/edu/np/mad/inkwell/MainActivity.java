@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Get firebase
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     // Get id of current user
-    //Commenting out temporarily if this is commented out please uncomment
-    //String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+  
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -48,10 +48,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
 
         @Override
         public void afterTextChanged(Editable s) {
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Sets help button functionality to bring you to introduction
         ImageView helpButton = findViewById(R.id.helpButton);
-        helpButton.setOnClickListener(new View.OnClickListener(){
+        helpButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View V) {
                 startActivity(new Intent(MainActivity.this, Intro1.class));
             }
@@ -103,20 +105,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
-
-
-
-
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
-        //Commenting out temporarily if this is commented out please uncomment
-        /*
+
         db.collection("users").document(currentFirebaseUserUid).set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-        */
+
 
     }
 
@@ -126,9 +123,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
     //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-       
+
         int id = menuItem.getItemId();
         // If home button is pressed trigger toast from navbar class
         if (id == R.id.nav_home) {
@@ -139,10 +137,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
+        Log.d("Alert", "Starting" + newActivity);
         return true;
 
     }
-
 
 
 }

@@ -66,11 +66,9 @@ public class Navbar {
             Intent newActivity = new Intent(CurrentActivity, SettingsActivity.class);
             Log.d("Alert", "Opening settings");
             return newActivity;
-
         }
         else {
            Log.d("Alert", "Unknown page!");
-
         }
 
         Intent newActivity = null;
