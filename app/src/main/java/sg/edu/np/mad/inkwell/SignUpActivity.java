@@ -2,7 +2,9 @@ package sg.edu.np.mad.inkwell;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Button signupButton;
     private TextView loginRedirectText;
     private DatabaseHelper db;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -29,9 +32,11 @@ public class SignUpActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = new DatabaseHelper(this);
+        sharedPreferences = getSharedPreferences("userPrefs", Context.MODE_PRIVATE);
+
         signupEmail = findViewById(R.id.signup_email);
         signupPassword = findViewById(R.id.signup_password);
-        signupButton = findViewById(R.id.signup_button); // Initialize signupButton
+        signupButton = findViewById(R.id.signup_button);
         loginRedirectText = findViewById(R.id.loginRedirectText);
 
         signupButton.setOnClickListener(new View.OnClickListener(){
@@ -52,6 +57,7 @@ public class SignUpActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 boolean isInserted = db.insertUser(user, pass);
                                 if (isInserted) {
+                                    saveToSharedPreferences(user, pass);
                                     Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                                 } else {
@@ -72,7 +78,13 @@ public class SignUpActivity extends AppCompatActivity {
                 startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
             }
         });
+    }
 
+    private void saveToSharedPreferences(String email, String password) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.apply();
     }
 }
 
