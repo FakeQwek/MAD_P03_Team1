@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -23,7 +22,6 @@ import android.widget.TimePicker;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import android.graphics.Color;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -57,44 +55,34 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Text;
 
-
 public class TimetableActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
     private LinearLayout slidingPanel;
-    private Spinner categorySpinner;
+    private LinearLayout updatePanel;
+    private Spinner categorySpinner, updateCategorySpinner;
     private ArrayAdapter<String> adapter;
     private List<String> categoryList;
-    Animation slideInLeft;
-    private ArrayList<TimetableData> events;
     private boolean isPanelShown = false;
     private View backgroundOverlay;
     private ImageButton addNewBtn, leftBtn, rightBtn;
     private TextView tvDate;
     private CardView startTime, endTime, startDate, endDate;
     private TextView tvStartTime,tvEndTime;
-    private TimePicker selectEndTime, selectStartTime;
     private int startHour, startMinute, endHour, endMinute;
-    private HashMap<String, Integer> categoryColors;
     private int startYear, startMonth, startDayOfMonth;
     private int endYear, endMonth, endDayOfMonth;
-    private TextView tvStartDate, tvEndDate;
+    private TextView tvStartDate, tvEndDate, updateEventName, updateLocation, updateStartTime;
+    private TextView updateStartDate, updateEndTime, updateEndDate,xEvents;
     private EditText etToDo, etLocation;
-    private int currentEventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +107,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
         decorView.setSystemUiVisibility(uiOptions);
 
+        // init all ids
         addNewBtn = findViewById(R.id.addNewTaskbtn);
         slidingPanel = findViewById(R.id.slidingPanel);
+        updatePanel = findViewById(R.id.updatePanel);
         backgroundOverlay = findViewById(R.id.backgroundOverlay);
         tvStartTime = findViewById(R.id.tvStartTime);
         tvEndTime = findViewById(R.id.tvEndTime);
@@ -128,8 +118,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         endTime = findViewById(R.id.endTime);
         startDate = findViewById(R.id.startDate);
         endDate = findViewById(R.id.endDate);
-        selectStartTime = findViewById(R.id.selectStartTime);
-        selectEndTime = findViewById(R.id.selectEndTime);
         tvDate = findViewById(R.id.tvDate);
         TextView btnClear = findViewById(R.id.btnClear);
         tvStartDate = findViewById(R.id.tvStartDate);
@@ -143,7 +131,16 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         TextView btnSave = findViewById(R.id.btnSave);
         leftBtn = findViewById(R.id.leftArrow);
         rightBtn = findViewById(R.id.rightArrow);
+        xEvents = findViewById(R.id.x_events);
+        updateEventName = findViewById(R.id.updateEventName);
+        updateLocation = findViewById(R.id.updateLocation);
+        updateStartTime = findViewById(R.id.updateTvStartTime);
+        updateStartDate = findViewById(R.id.updateTvStartDate);
+        updateEndTime = findViewById(R.id.updateTvEndTime);
+        updateEndDate = findViewById(R.id.updateTvEndDate);
+        updateCategorySpinner = findViewById(R.id.updateCategorySpinner);
 
+        // set up calendar data
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -161,26 +158,24 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         ArrayList<TimetableData> eventList = new ArrayList<>();
-        ArrayList<TimetableData> totalEvents = new ArrayList<>();
 
-        // init category list and spinner adapter
+        // init category list
         categoryList = new ArrayList<>();
-        categorySpinner = findViewById(R.id.categorySpinner);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        categorySpinner.setAdapter(adapter);
+        categoryList.add("Class");
+        categoryList.add("Meeting");
 
         if (currentUser != null) {
             String userId = currentUser.getUid();
-            checkAndInitializeCategories(db, userId);
+            initCategories(db, userId);
             createEvents(db, userId);
 
             // get data from Firestore
             fetchEventData(db, userId, eventList,today);
 
             // get categories from Firestore and populate categoryList
-            fetchCategoriesFromFirestore();
+            fetchCategoriesFromFirestore(categoryList);
 
+            // get time
             tvStartTime.setText(currentTime);
             tvEndTime.setText(currentTime);
 
@@ -192,31 +187,24 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
             tvDate.setText(currentDate);
 
+            // open sldingPanel if add new btn clicked
             addNewBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    btnClear.setText("Clear");
-                    btnSave.setText("Add");
                     toggleSlidingPanel();
                 }
             });
 
+            // close sliding panel if bg overlay clicked
             backgroundOverlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     hideSlidingPanel();
+                    hideUpdatePanel();
                 }
             });
 
-            slidingPanel.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    selectStartTime.setVisibility(View.GONE);
-                    selectEndTime.setVisibility(View.GONE);
-                    return true;
-                }
-            });
-
+            // show startTimePicker dialog
             startTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -224,6 +212,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            // show startDatePicker dialog
             startDate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -231,6 +220,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            // show endTimePicker dialog
             endTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -239,6 +229,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            // show endDatePicker dialog
             endDate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -252,9 +243,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 public void onClick(View v) {
                     // Decrement the calendar by one day
                     calendar.add(Calendar.DAY_OF_MONTH, -1);
-                    int year = calendar.get(Calendar.YEAR);
-                    int month = calendar.get(Calendar.MONTH);
-                    int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
                     // format the previous day date
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
@@ -277,27 +265,28 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             rightBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Increment the calendar by one day
+                    // increment the calendar by one day
                     calendar.add(Calendar.DAY_OF_MONTH, 1);
 
-                    // Format the previous day date
+                    // format the previous day date
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM, yyyy", Locale.getDefault());
                     String tmr = dateFormat.format(calendar.getTime());
 
-                    // Update tvDate with the formatted previous day date
+                    // update tvDate with the formatted previous day date
                     tvDate.setText(tmr);
 
-                    // Format the previous day date in the "dd-MM-yyyy" format for filtering
+                    // format date for filtering
                     SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
                     String nextDay = dateFormat2.format(calendar.getTime());
 
                     Log.d("NEXT DAY",nextDay);
 
-                    // Filter the event list based on the previous day date
+                    // set up recyclerView for next day
                     fetchEventData(db, userId, eventList,nextDay);
                 }
             });
 
+            // clear all data inputted onClick
             btnClear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -305,11 +294,12 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            // save new event data to db
             btnSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!etToDo.getText().toString().equals("")) {
-                        if (!etLocation.getText().toString().equals("")) {
+                    if (!etToDo.getText().toString().isEmpty()) {
+                        if (!etLocation.getText().toString().isEmpty()) {
                             try {
                                 Map<String, Object> eventData = new HashMap<>();
                                 eventData.put("eventName", etToDo.getText().toString());
@@ -327,9 +317,11 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                                 db.collection("users").document(userId).collection("timetableEvents").add(eventData);
                                 eventList.add(data);
 
+                                // close sliding panel and remove data for next use
                                 hideSlidingPanel();
                                 clearInputData();
 
+                                // set up reyclerView
                                 filter(eventList, today);
 
                                 Toast toast = new Toast(TimetableActivity.this);
@@ -357,7 +349,8 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
-            categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            // get selected item from spinner onCLick
+            updateCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String selectedCategory = parent.getItemAtPosition(position).toString();
@@ -375,6 +368,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
+    // get event data from db
     private void fetchEventData(FirebaseFirestore db, String userId, ArrayList<TimetableData> eventList, String date) {
         db.collection("users").document(userId).collection("timetableEvents")
                 .get()
@@ -384,6 +378,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                         if (task.isSuccessful()) {
                             eventList.clear(); // Clear existing data
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                // get all data
                                 String docId = document.getId();
                                 String name = document.getString("eventName");
                                 String loc = document.getString("eventLocation");
@@ -396,16 +391,29 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                                     TimetableData data = new TimetableData(name, loc, startTime, startDate, endTime, endDate, category);
                                     data.setDocumentId(docId);
                                     eventList.add(data);
-
                                 }
                             }
                         }
+
+                        // get size of event list
+                        String eventText = "You have " + eventList.size() + " events today";
+                        xEvents.setText(eventText);
+
+                        // set up recyclerView
                         filter(eventList,date);
                     }
                 });
     }
 
-    private void fetchCategoriesFromFirestore() {
+    // get categories from db
+    private void fetchCategoriesFromFirestore(List<String> catList) {
+        categorySpinner = findViewById(R.id.categorySpinner);
+        updateCategorySpinner = findViewById(R.id.updateCategorySpinner);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categoryList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+        updateCategorySpinner.setAdapter(adapter);
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
@@ -419,12 +427,12 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     String category = document.getString("name");
-                                    if (category != null) {
-                                        categoryList.add(category);
+                                    if (category != null && !catList.contains(category)) {
+                                        catList.add(category);
                                     }
                                 }
                                 // add "Add New Option" at the end of the list
-                                categoryList.add("Add New Option");
+                                catList.add("Add New Option");
                                 adapter.notifyDataSetChanged();
                             } else {
                                 Log.w("Firestore", "Error getting documents.", task.getException());
@@ -434,9 +442,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
+    // show add category pop up onClick
     private void showAddOptionPopup() {
+        // init data needed
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         String userId = currentUser != null ? currentUser.getUid() : null;
@@ -452,7 +461,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         final AlertDialog dialog = builder.create();
 
         // add color buttons dynamically
-        int[] colors = {R.color.pastelCoral, R.color.pastelBlue, R.color.pastelGreen, R.color.pastelPurple, R.color.pastelYellow};
+        int[] colors = {R.color.pastelCoral, R.color.pastelBlue, R.color.pastelGreen, R.color.pastelPurple, R.color.pastelYellow, R.color.pastelOrange};
         for (final int color : colors) {
             Button colorButton = new Button(this);
             colorButton.setBackgroundColor(ContextCompat.getColor(this, color));
@@ -470,6 +479,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
+            // set up colour button size
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     getResources().getDimensionPixelSize(R.dimen.color_button_size),
                     getResources().getDimensionPixelSize(R.dimen.color_button_size)
@@ -483,6 +493,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             shape.setColor(ContextCompat.getColor(this, color));
             colorButton.setBackground(shape);
 
+            // add colour button to colour layout
             colorLayout.addView(colorButton);
 
             colorButton.setOnClickListener(new View.OnClickListener() {
@@ -498,7 +509,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                         params.height = getResources().getDimensionPixelSize(R.dimen.color_button_size);
                         v.setLayoutParams(params);
                     } else {
-                        // Enlarge button when selected
+                        // enlarge button when selected
                         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
                         params.width = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
                         params.height = getResources().getDimensionPixelSize(R.dimen.color_button_selected_size);
@@ -520,9 +531,11 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             });
         }
 
+        // add new category to collection onClick
         btnAddCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // get user input data
                 String categoryName = etCategoryName.getText().toString().trim();
                 int selectedColor = -1;
                 for (int i = 0; i < colorLayout.getChildCount(); i++) {
@@ -539,15 +552,14 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
                     // add category to Firestore
                     addCategoryToFirestore(userId, categoryName, hexColor);
-                    dialog.dismiss(); // Close the dialog after adding the category
+                    dialog.dismiss(); // close the dialog after adding the category
                 } else {
                     // Show error message
                     if (categoryName.isEmpty()) {
                         etCategoryName.setError("Category name required");
                     }
                     if (selectedColor == -1) {
-                        TextView selectColorTextView = dialogView.findViewById(R.id.tvSelectColor);
-                        selectColorTextView.setError("Select a color");
+                        Toast.makeText(TimetableActivity.this, "Select colour!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -556,57 +568,61 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         dialog.show();
     }
 
+    // show data of specific item onClick
     public void onItemClick(TimetableData item, String userId, String documentId, FirebaseFirestore db, ArrayList<TimetableData> eventList, String date) {
-        toggleSlidingPanel();
-        TextView saveButton = findViewById(R.id.btnSave);
-        TextView delButton = findViewById(R.id.btnClear);
+        toggleUpdatePanel();
+        TextView updateBtn = findViewById(R.id.btnUpdate);
+        TextView delBtn = findViewById(R.id.btnDelete);
 
-        saveButton.setText("Save");
-        delButton.setText("Delete");
-        etToDo.setText(item.getName());
-        etLocation.setText(item.getLocation());
-        tvStartTime.setText(item.getStartTime());
-        tvStartDate.setText(item.getStartDate());
-        tvEndTime.setText(item.getEndTime());
-        tvEndDate.setText(item.getEndDate());
+        updateBtn.setText(R.string.save);
+        delBtn.setText(R.string.bottom_sheet_delete_button);
+        updateEventName.setText(item.getName());
+        updateLocation.setText(item.getLocation());
+        updateStartTime.setText(item.getStartTime());
+        updateStartDate.setText(item.getStartDate());
+        updateEndTime.setText(item.getEndTime());
+        updateEndDate.setText(item.getEndDate());
 
-        delButton.setOnClickListener(new View.OnClickListener() {
+        // delete data from db
+        delBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearInputData();
+                hideUpdatePanel();
                 deleteEventData(userId, documentId);
-                fetchEventData(db,userId,eventList,date);
+                fetchEventData(db, userId, eventList, date);
             }
         });
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        // update date to db
+        updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Map<String, Object> eventData = new HashMap<>();
-                eventData.put("eventName", etToDo.getText().toString());
-                eventData.put("eventLocation", etLocation.getText().toString());
-                eventData.put("startTime", tvStartTime.getText().toString());
-                eventData.put("startDate", tvStartDate.getText().toString());
-                eventData.put("endTime", tvEndTime.getText().toString());
-                eventData.put("endDate", tvEndDate.getText().toString());
-                eventData.put("category", categorySpinner.getSelectedItem().toString());
+                eventData.put("eventName", updateEventName.getText().toString());
+                eventData.put("eventLocation", updateLocation.getText().toString());
+                eventData.put("startTime", updateStartTime.getText().toString());
+                eventData.put("startDate", updateStartDate.getText().toString());
+                eventData.put("endTime", updateEndTime.getText().toString());
+                eventData.put("endDate", updateEndDate.getText().toString());
+                eventData.put("category", updateCategorySpinner.getSelectedItem().toString());
 
-                hideSlidingPanel();
+                hideUpdatePanel();
                 updateTimetableEvent(documentId, eventData, db, userId, eventList, date);
-                fetchEventData(db,userId,eventList,date);
+                fetchEventData(db, userId, eventList, date);
             }
         });
-
     }
 
+    // add new category to db
     private void addCategoryToFirestore(String userId, String categoryName, String colorHex) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Create a new category object
+        // create a new category object
         Map<String, Object> category = new HashMap<>();
         category.put("name", categoryName);
         category.put("color", colorHex);
 
-        // Add the category to Firestore under the user's collection
+        // cdd the category to Firestore under the user's collection
         db.collection("users").document(userId).collection("categories").document(categoryName)
                 .set(category)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -614,11 +630,11 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(TimetableActivity.this, "Category added", Toast.LENGTH_SHORT).show();
 
-                        // Update the spinner with the new category
+                        // update the spinner with the new category
                         categoryList.add(categoryList.size() - 1, categoryName); // Add before "Add New Option"
                         adapter.notifyDataSetChanged();
 
-                        // Set the spinner to the newly added category
+                        // set the spinner to the newly added category
                         categorySpinner.setSelection(categoryList.size() - 2); // Select the new category
                     }
                 })
@@ -630,6 +646,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 });
     }
 
+    // show timepicker dialog
     private void showTimePickerDialog(final boolean isStartTime) {
         int hour = isStartTime ? startHour : endHour;
         int minute = isStartTime ? startMinute : endMinute;
@@ -637,11 +654,13 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
+                // if true, change startTime text
                 if (isStartTime) {
                     startHour = selectedHour;
                     startMinute = selectedMinute;
                     tvStartTime.setText(String.format("%02d:%02d", startHour, startMinute));
-                } else {
+                } // if false, change endTime text
+                else {
                     endHour = selectedHour;
                     endMinute = selectedMinute;
                     tvEndTime.setText(String.format("%02d:%02d", endHour, endMinute));
@@ -651,6 +670,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         timePickerDialog.show();
     }
 
+    // show datepicker dialog
     private void showDatePickerDialog(final boolean isStartDate) {
         int year = isStartDate ? startYear : endYear;
         int month = isStartDate ? startMonth : endMonth;
@@ -660,12 +680,14 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        // if true, change tvStartDate
                         if (isStartDate) {
                             startYear = year;
                             startMonth = monthOfYear;
                             startDayOfMonth = dayOfMonth;
                             tvStartDate.setText(formatDate(startYear, startMonth, startDayOfMonth));
-                        } else {
+                        } // if false, change tvEndDate
+                        else {
                             endYear = year;
                             endMonth = monthOfYear;
                             endDayOfMonth = dayOfMonth;
@@ -677,6 +699,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         datePickerDialog.show();
     }
 
+    // use to format date in dd-mm-yyyy
     private String formatDate(int year, int month, int dayOfMonth) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, dayOfMonth);
@@ -684,6 +707,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         return sdf.format(calendar.getTime());
     }
 
+    // panel slides up
     private void toggleSlidingPanel() {
         if (!isPanelShown) {
             // Slide up animation
@@ -694,7 +718,18 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
             isPanelShown = true;
         }
     }
+    private void toggleUpdatePanel() {
+        if (!isPanelShown) {
+            // Slide up animation
+            Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+            updatePanel.startAnimation(slideUp);
+            updatePanel.setVisibility(View.VISIBLE);
+            backgroundOverlay.setVisibility(View.VISIBLE);
+            isPanelShown = true;
+        }
+    }
 
+    // panel slides down
     private void hideSlidingPanel() {
         // Slide down animation
         Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
@@ -704,7 +739,18 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         isPanelShown = false;
         clearInputData();
     }
+    private void hideUpdatePanel() {
+        // Slide down animation
+        Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+        updatePanel.startAnimation(slideDown);
+        updatePanel.setVisibility(View.GONE);
+        backgroundOverlay.setVisibility(View.GONE);
+        isPanelShown = false;
+        clearInputData();
+    }
 
+
+    // clear all input data from add new event
     private void clearInputData() {
         TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
         EditText etToDo = findViewById(R.id.etToDo);
@@ -712,12 +758,11 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         Calendar calendar = Calendar.getInstance(singaporeTimeZone);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        Date date = calendar.getTime();
         String currentTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-        String currentDate = String.format(Locale.getDefault(), "dd-MM-yyyy",day,month,year);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        String currentDate = dateFormat.format(date);
 
         etToDo.setText("");
         etLocation.setText("");
@@ -729,47 +774,69 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
     // add the collections category to specific user
     private void initCategories(FirebaseFirestore db, String userId) {
-        Map<String, Object> classCategory = new HashMap<>();
-        classCategory.put("name", "Class");
-        classCategory.put("color", "#ffc6ff");
+        // Reference the categories collection under the user's document
+        CollectionReference categoriesCollection = db.collection("users").document(userId).collection("categories");
 
-        Map<String, Object> meetingCategory = new HashMap<>();
-        meetingCategory.put("name", "Meeting");
-        meetingCategory.put("color", "#ffc09f");
+        // Check if the "Class" category exists
+        categoriesCollection.document("Class").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().exists()) {
+                            Map<String, Object> classCategory = new HashMap<>();
+                            classCategory.put("name", "Class");
+                            classCategory.put("color", "#ffc6ff");
 
-        // Add "class" category
-        db.collection("users").document(userId).collection("categories").document("Class")
-                .set(classCategory)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "Class category added successfully");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Firestore", "Error adding class category", e);
+                            categoriesCollection.document("Class").set(classCategory)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("Firestore", "Class category added successfully");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("Firestore", "Error adding class category", e);
+                                        }
+                                    });
+                        } else {
+                            Log.d("Firestore", "Class category already exists");
+                        }
                     }
                 });
 
-        // Add "meeting" category
-        db.collection("users").document(userId).collection("categories").document("Meeting")
-                .set(meetingCategory)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        // Check if the "Meeting" category exists
+        categoriesCollection.document("Meeting").get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firestore", "Meeting category added successfully");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Firestore", "Error adding meeting category", e);
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().exists()) {
+                            Map<String, Object> meetingCategory = new HashMap<>();
+                            meetingCategory.put("name", "Meeting");
+                            meetingCategory.put("color", "#ffc09f");
+
+                            categoriesCollection.document("Meeting").set(meetingCategory)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("Firestore", "Meeting category added successfully");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("Firestore", "Error adding meeting category", e);
+                                        }
+                                    });
+                        } else {
+                            Log.d("Firestore", "Meeting category already exists");
+                        }
                     }
                 });
     }
 
+    // create events collection
     private void createEvents(FirebaseFirestore db, String userId) {
         // Reference the events collection under the user's document
         CollectionReference eventsCollection = db.collection("users").document(userId).collection("timetableEvents");
@@ -828,44 +895,28 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 });
     }
 
-    private void checkAndInitializeCategories(FirebaseFirestore db, String userId) {
-        db.collection("users").document(userId).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().isEmpty()) {
-                                // Categories collection is empty, initialize categories
-                                initCategories(db, userId);
-                            }
-                        } else {
-                            Log.e("Firestore", "Error getting categories", task.getException());
-                        }
-                    }
-                });
-    }
-
+    // set up recyclerView
     private void recyclerView(ArrayList<TimetableData> eventList, ArrayList<TimetableData> event) {
         Animation slideInLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_left);
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         TimetableAdapter adapter = new TimetableAdapter(eventList, event, this);
 
-        // Ensure the layout manager is set to enable scrolling
+        // snsure the layout manager is set to enable scrolling
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        // Set item animator (optional, for animations)
+        // set item animator
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        // Set the adapter
+        // set the adapter
         recyclerView.setAdapter(adapter);
 
-        // Notify the adapter of data changes (optional if data changes dynamically)
+        // Notify the adapter of data changes
         recyclerView.startAnimation(slideInLeft);
         adapter.notifyDataSetChanged();
     }
 
+    // filter data to bring out only current date
     private void filter(ArrayList<TimetableData> eventList, String date) {
         ArrayList<TimetableData> filterList = new ArrayList<>();
         for (TimetableData data : eventList) {
@@ -873,6 +924,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 filterList.add(data);
             }
         }
+
+        // get size of event list
+        String eventText = "You have " + filterList.size() + " events today";
+        xEvents.setText(eventText);
 
         // Sort the filterList based on startTime and endTime
         Collections.sort(eventList, new Comparator<TimetableData>() {
@@ -888,14 +943,15 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
                 return 0;
             }
         });
 
-        this.events = filterList;
         recyclerView(eventList, filterList);
     }
 
+    // delete event data
     private void deleteEventData(String userId, String documentId) {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -924,6 +980,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 });
     }
 
+    // update event data
     public void updateTimetableEvent(String documentId, Map<String, Object> newData, FirebaseFirestore db, String userId, ArrayList<TimetableData> eventsList, String date) {
         db.collection("users").document(userId).collection("timetableEvents").document(documentId)
                 .update(newData)
@@ -942,7 +999,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 });
     }
 
-
+    // navigation
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.nav_main) {
@@ -994,6 +1051,5 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
         return true;
     }
-
 
 }

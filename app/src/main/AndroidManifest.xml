@@ -89,7 +89,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.timetable.TimetableActivity"
+            android:name=".TimetableActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

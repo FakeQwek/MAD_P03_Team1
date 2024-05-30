@@ -1,11 +1,10 @@
 package sg.edu.np.mad.inkwell;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.firebase.firestore.DocumentSnapshot;
+
 import com.google.firebase.firestore.QuerySnapshot;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -24,10 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import sg.edu.np.mad.inkwell.R;
-import sg.edu.np.mad.inkwell.TimetableActivity;
-import sg.edu.np.mad.inkwell.TimetableData;
-
 public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.ViewHolder> {
 
     private List<TimetableData> dataList;
@@ -39,6 +34,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private OnItemClickListener listener;
 
+    // set up onClick
     public interface OnItemClickListener {
         void onItemClick(TimetableData item);
     }
@@ -79,7 +75,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
                 });
     }
 
-    // Set category color in HashMap
+    // set category color in HashMap
     public void setCategoryColor(String category, int color) {
         categoryColors.put(category, color);
     }
@@ -97,6 +93,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
     }
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // set all data to timetable card
         TimetableData data = dataList.get(position);
         Calendar calendar = Calendar.getInstance();
 
@@ -126,6 +123,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         return dataList.size();
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle, tvDescription, tvStartTime, tvEndTime, category;
         public View catCard;
@@ -141,6 +139,7 @@ public class TimetableAdapter extends RecyclerView.Adapter<TimetableAdapter.View
         }
     }
 
+    // get the specific colours of a category
     private int getColorForCategory(String category) {
         Integer color = categoryColors.get(category);
         if (color != null) {

@@ -40,13 +40,13 @@
 
     <string name="flashcard_collection_correct_count">%1$d files/%1$d files</string>
 
-    <string name="add_new">+ Add new</string>
-
-    <string-array name="category_options">
-        <item>Class</item>
-        <item>Meeting</item>
-        <item>Add New Option...</item>
-    </string-array>
-
-
+    <string name="add_new">Add</string>
+    <string name="add_event">Add Event</string>
+    <string name="timetable">Timetable</string>
+    <string name="x_events">You have x events today</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="eventName">Enter event name</string>
+    <string name="eventLocation">Enter location</string>
+    <string name="markAs">Mark As</string>
 </resources>
