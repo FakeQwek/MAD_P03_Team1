@@ -9,10 +9,11 @@
     <color name="lavender">#8692f7</color>
 
     <color name="pastelCoral">#ffc09f</color>
-    <color name="pastelPurple">#ffc6ff</color>
+    <color name="pastelOrange">#f7d9c4</color>
+    <color name="pastelPurple">#dbcdf0</color>
     <color name="pastelYellow">#fdffb6 </color>
     <color name="pastelGreen">#adf7b6</color>
-    <color name="pastelBlue">#79addc</color>
+    <color name="pastelBlue">#bde0fe</color>
 
     //onboarding colors
     <color name="background">#F0F4F3</color>

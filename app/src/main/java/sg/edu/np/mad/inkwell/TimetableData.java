@@ -1,9 +1,5 @@
 package sg.edu.np.mad.inkwell;
 
-import android.util.Log;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-
 public class TimetableData {
     private String name;
     private String location;
@@ -13,7 +9,6 @@ public class TimetableData {
     private String startDate;
     private String endDate;
     private String documentId;
-
 
     public TimetableData(String name, String location, String startTime, String startDate, String endTime, String endDate, String category) {
         this.name = name;

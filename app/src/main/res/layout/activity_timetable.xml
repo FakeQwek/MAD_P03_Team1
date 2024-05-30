@@ -80,7 +80,7 @@
                     android:id="@+id/tvTimetable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Timetable"
+                    android:text="@string/timetable"
                     android:fontFamily="@font/inter_regular"
                     android:textSize="30sp"
                     android:textStyle="bold"
@@ -100,10 +100,11 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/x_events"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:text="You have x events today"/>
+                android:text="@string/x_events"/>
 
             <!-- date cardView -->
             <LinearLayout
@@ -173,7 +174,7 @@
             android:background="#80000000"
             android:visibility="gone" />
 
-        <!-- sliding panel -->
+        <!-- create event panel -->
         <LinearLayout
             android:id="@+id/slidingPanel"
             android:layout_width="0dp"
@@ -182,7 +183,7 @@
             android:background="@drawable/sliding_panel"
             android:padding="16dp"
             android:visibility="gone"
-            app:layout_constraintHeight_percent="0.75"
+            app:layout_constraintHeight_percent="0.60"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -206,7 +207,7 @@
                         android:id="@+id/btnClear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Clear"
+                        android:text="@string/clear"
                         android:textSize="18sp"
                         android:paddingStart="20dp"
                         android:paddingEnd="8dp"
@@ -220,7 +221,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:text="Add Task"
+                        android:text="@string/add_event"
                         android:gravity="center"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"/>
@@ -230,7 +231,7 @@
                         android:id="@+id/btnSave"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Save"
+                        android:text="@string/save"
                         android:textSize="18sp"
                         android:paddingStart="8dp"
                         android:paddingEnd="20dp"
@@ -260,7 +261,7 @@
                             android:background="@null"
                             android:ems="10"
                             android:inputType="text"
-                            android:hint="Enter task here"
+                            android:hint="@string/eventName"
                             android:textSize="18sp" />
 
                         <!-- divider -->
@@ -279,7 +280,7 @@
                             android:background="@null"
                             android:ems="10"
                             android:inputType="text"
-                            android:hint="Enter location here"
+                            android:hint="@string/eventLocation"
                             android:textSize="18sp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -427,7 +428,7 @@
                                     android:layout_height="wrap_content"
                                     android:paddingHorizontal="20dp"
                                     android:paddingVertical="15dp"
-                                    android:text="Ends"
+                                    android:text="End"
                                     android:textSize="18sp"
                                     android:textStyle="bold" />
 
@@ -484,7 +485,7 @@
                                         <TextView
                                             android:id="@+id/tvEndTime"
                                             android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
+                                            android:layout_height="0dp"
                                             android:layout_marginTop="7dp"
                                             android:layout_weight="1"
                                             android:text="start"
@@ -548,7 +549,7 @@
                                     android:layout_height="wrap_content"
                                     android:paddingHorizontal="20dp"
                                     android:paddingVertical="15dp"
-                                    android:text="Mark As"
+                                    android:text="@string/markAs"
                                     android:textSize="18sp"
                                     android:textStyle="bold" />
 
@@ -562,6 +563,413 @@
 
                                 <Spinner
                                     android:id="@+id/categorySpinner"
+                                    android:background="@color/secondary_white"
+                                    android:padding="10dp"
+                                    android:layout_marginEnd="15dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- update event panel -->
+        <LinearLayout
+            android:id="@+id/updatePanel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/sliding_panel"
+            android:padding="16dp"
+            android:visibility="gone"
+            app:layout_constraintHeight_percent="0.60"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- panel title layout -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="5dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Clear TextView -->
+                    <TextView
+                        android:id="@+id/btnDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/clear"
+                        android:textSize="18sp"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="8dp"
+                        android:gravity="center_vertical"/>
+
+                    <!-- Add New Task TextView -->
+                    <TextView
+                        android:id="@+id/updateEvent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="@string/add_event"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"/>
+
+                    <!-- Add TextView -->
+                    <TextView
+                        android:id="@+id/btnUpdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/save"
+                        android:textSize="18sp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="20dp"
+                        android:gravity="center_vertical"/>
+                </LinearLayout>
+
+                <!-- editText card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- edit task text -->
+                        <EditText
+                            android:id="@+id/updateEventName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="20dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:hint="@string/eventName"
+                            android:textSize="18sp" />
+
+                        <!-- divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/primary_grey"/>
+
+                        <!-- edit location text -->
+                        <EditText
+                            android:id="@+id/updateLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="20dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@null"
+                            android:ems="10"
+                            android:inputType="text"
+                            android:hint="@string/eventLocation"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- timepicker card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- startTimePicker layout -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <!-- tvStart -->
+                                <TextView
+                                    android:id="@+id/updateStart"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingHorizontal="20dp"
+                                    android:paddingVertical="15dp"
+                                    android:text="Starts"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                            <!-- startTime button -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="end|center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.cardview.widget.CardView
+                                    android:id="@+id/updateStartDate"
+                                    android:layout_width="100dp"
+                                    android:layout_height="35dp"
+                                    android:layout_marginEnd="10dp"
+                                    android:paddingHorizontal="40dp"
+                                    app:cardBackgroundColor="@color/secondary_white"
+                                    app:cardCornerRadius="8dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/updateTvStartDate"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="0dp"
+                                            android:layout_marginTop="7dp"
+                                            android:layout_weight="1"
+                                            android:text="start"
+                                            android:textColor="@color/black" />
+                                    </LinearLayout>
+                                </androidx.cardview.widget.CardView>
+
+                                <androidx.cardview.widget.CardView
+                                    android:id="@+id/updatestartTime"
+                                    android:text="time"
+                                    android:layout_width="75dp"
+                                    android:layout_height="35dp"
+                                    android:layout_marginEnd="20dp"
+                                    app:cardBackgroundColor="@color/secondary_white"
+                                    app:cardCornerRadius="8dp">
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/updateTvStartTime"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="0dp"
+                                            android:layout_marginTop="7dp"
+                                            android:layout_weight="1"
+                                            android:text="start"
+                                            android:textColor="@color/black" />
+                                    </LinearLayout>
+
+                                </androidx.cardview.widget.CardView>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+
+                        <DatePicker
+                            android:id="@+id/datePicker"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:calendarViewShown="false"
+                            android:datePickerMode="spinner"
+                            android:visibility="gone"/>
+
+                        <!-- startTimePicker -->
+                        <TimePicker
+                            android:id="@+id/updateSelectStartTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:timePickerMode="spinner"
+                            android:visibility="gone"/>
+
+                        <!-- divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/primary_grey"/>
+
+                        <!-- endTimePicker layout -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/updateTvEnd"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingHorizontal="20dp"
+                                    android:paddingVertical="15dp"
+                                    android:text="End"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                            <!-- endTimePicker button -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="end|center_vertical"
+                                android:orientation="horizontal">
+
+                                <androidx.cardview.widget.CardView
+                                    android:id="@+id/updateEndDate"
+                                    android:layout_width="100dp"
+                                    android:layout_height="35dp"
+                                    android:padding="20dp"
+                                    android:layout_marginEnd="10dp"
+                                    app:cardBackgroundColor="@color/secondary_white"
+                                    app:cardCornerRadius="8dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/updateTvEndDate"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="0dp"
+                                            android:layout_marginTop="7dp"
+                                            android:layout_weight="1"
+                                            android:text="end"
+                                            android:textColor="@color/black" />
+                                    </LinearLayout>
+                                </androidx.cardview.widget.CardView>
+
+
+                                <androidx.cardview.widget.CardView
+                                    android:id="@+id/updateEndTime"
+                                    android:layout_marginEnd="20dp"
+                                    android:layout_width="75dp"
+                                    android:layout_height="35dp"
+                                    app:cardBackgroundColor="@color/secondary_white"
+                                    app:cardCornerRadius="8dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|center_horizontal"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/updateTvEndTime"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="0dp"
+                                            android:layout_marginTop="7dp"
+                                            android:layout_weight="1"
+                                            android:text="start"
+                                            android:textColor="@color/black" />
+                                    </LinearLayout>
+
+                                </androidx.cardview.widget.CardView>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <DatePicker
+                            android:id="@+id/updateselectEndDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:calendarViewShown="false"
+                            android:datePickerMode="spinner"
+                            android:visibility="gone"/>
+
+                        <!-- endTimePicker -->
+                        <TimePicker
+                            android:id="@+id/updateselectEndTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:timePickerMode="spinner"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- tagging card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/updateMarkAs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/updateTvMarkAs"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingHorizontal="20dp"
+                                    android:paddingVertical="15dp"
+                                    android:text="@string/markAs"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="end|center_vertical"
+                                android:orientation="horizontal">
+
+                                <Spinner
+                                    android:id="@+id/updateCategorySpinner"
                                     android:background="@color/secondary_white"
                                     android:padding="10dp"
                                     android:layout_marginEnd="15dp"
