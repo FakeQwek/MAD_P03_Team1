@@ -383,12 +383,6 @@ public class calendarpage extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
         int id = menuItem.getItemId();
-        // If home button is pressed trigger toast from navbar class
-        if (id == R.id.nav_home) {
-            Navbar navbar = new Navbar(this);
-            Intent newActivity = navbar.redirect(id, true);
-            return true;
-        }
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);

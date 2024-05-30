@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -26,8 +27,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -95,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(MainActivity.this, Intro1.class));
             }
         });
-
+        //Gets username value from intent
         String name = getIntent().getStringExtra("Username");
         if (name != null) {
             name = name.substring(0, 1).toUpperCase() + name.substring(1);
@@ -103,6 +110,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             TextView nameText = findViewById(R.id.accountName);
             nameText.setText(name);
         }
+
+        //Sets day, time and date
+        TextClock timeClock = findViewById(R.id.textClock);
+        timeClock.setTimeZone("GMT+08:00");
+        TextView day = findViewById(R.id.dayText);
+        TextView date = findViewById(R.id.dateText);
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE");
+        day.setText(dayFormat.format(currentDate));
+        date.setText(currentDate.toString());
 
 
         Map<String, Object> userData = new HashMap<>();
