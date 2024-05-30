@@ -86,5 +86,20 @@ public class SignUpActivity extends AppCompatActivity {
         editor.putString("password", password);
         editor.apply();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        resetSharedPreferencesToDefault();
+    }
+
+    private void resetSharedPreferencesToDefault() {
+        SharedPreferences sharedPreferences = getSharedPreferences("userPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", "user@gmail.com");
+        editor.putString("password", "Pa$$w0rd");
+        editor.apply();
+    }
 }
+
 
