@@ -21,45 +21,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/calendartitle" />
 
+    <TextView
+        android:id="@+id/calendartitle"
+        android:layout_width="177dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="96dp"
+        android:text="Calendar"
+        android:textSize="40dp"
+        app:layout_constraintStart_toEndOf="@id/imageView2"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="80dp"
-        android:layout_height="81dp"
+        android:id="@+id/imageView3"
+        android:layout_width="76dp"
+        android:layout_height="73dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="84dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_my_calendar" />
 
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="80dp"
-        android:layout_height="81dp"
+        android:id="@+id/imageView2"
+        android:layout_width="76dp"
+        android:layout_height="73dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add" />
-
-    <EditText
-        android:id="@+id/dateEditText"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        android:hint="Search by Date (DD/MM/YYYY)"
-        android:inputType="date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calendarView" />
+        app:srcCompat="@android:drawable/ic_menu_view" />
 
     <Button
         android:id="@+id/datePickerButton"
         android:layout_width="0dp"
         android:layout_height="52dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="Filter Events By Date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -71,7 +68,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:text="Event Description"
         android:textSize="18sp"
@@ -95,15 +92,18 @@
         app:layout_constraintTop_toBottomOf="@id/eventDescription"
         app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/calendartitle"
-        android:layout_width="195dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="72dp"
-        android:text="Calendar"
-        android:textSize="40dp"
-
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="95dp" />
+    <EditText
+        android:id="@+id/dateEditText"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:hint="Search by Date (DD/MM/YYYY)"
+        android:inputType="date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
