@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -40,7 +41,9 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailText.getText().toString();
         String[] twoParts = email.split("@", 2);
         //Log.d("Alert", "Email name is " + twoParts[0]);
-        successfulLogin.putExtra("Username", twoParts[0]);
+        SharedPreferences.Editor editor = getSharedPreferences("Username", MODE_PRIVATE).edit();
+        editor.putString("Username", twoParts[0]);
+        editor.apply();
         startActivity(successfulLogin);
         //.d("Error", "This should load the main page");
     }
@@ -61,8 +64,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
+                /*
                 Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
                 transferName(successfulLogin);
+                */
 
 
 
@@ -73,10 +78,11 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
-                                        //Starts MainActivity and sends username data to main activity
+                                        //Starts MainActivity.
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                                         Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
                                         transferName(successfulLogin);
+
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override

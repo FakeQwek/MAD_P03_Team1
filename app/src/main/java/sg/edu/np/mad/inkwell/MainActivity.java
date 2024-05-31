@@ -1,6 +1,7 @@
 package sg.edu.np.mad.inkwell;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     // Get id of current user
 
-    //String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     // Class to add text change listener
     public abstract static class TextChangedListener<T> implements TextWatcher {
@@ -102,8 +103,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(MainActivity.this, Intro1.class));
             }
         });
-        //Gets username value from intent
-        String name = getIntent().getStringExtra("Username");
+        //Gets username value from shared preferences
+        SharedPreferences prefs = getSharedPreferences("Username", MODE_PRIVATE);
+        String name = prefs.getString("Username", " ");
+
+
         if (name != null) {
             name = name.substring(0, 1).toUpperCase() + name.substring(1);
             Log.d("Alert", "name is" + name);
@@ -125,12 +129,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
-        /*
+
         db.collection("users").document(currentFirebaseUserUid).set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
-        */
+
 
     }
 
