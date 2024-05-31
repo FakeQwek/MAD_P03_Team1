@@ -93,7 +93,10 @@ public class calendarpage extends AppCompatActivity {
 
         // Get current user ID
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        userId = "8dvh5X3c5sYMOOhHhvv9w5ZvL2n2"; //replace with actual code later
+        if (currentUser != null) {    userId = currentUser.getUid();
+        } else {    Toast.makeText(this, "User not authenticated!", Toast.LENGTH_SHORT).show();
+            finish();}
+        //userId = "8dvh5X3c5sYMOOhHhvv9w5ZvL2n2"; //temporary testing placeholder
 
 
 
