@@ -21,6 +21,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +44,11 @@ import android.os.Build;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+import java.util.ArrayList;
+
 
 public class calendarpage extends AppCompatActivity {
 
@@ -49,6 +56,11 @@ public class calendarpage extends AppCompatActivity {
     private TextView eventDescriptionTextView;
     private EditText dateEditText;
     private Button datePickerButton;
+
+    private RecyclerView eventsRecyclerView;
+    private EventsAdapter eventsAdapter;
+
+    private List<String> eventsList;
     private FirebaseFirestore db;
     private String userId;
     public static final String CHANNEL_ID = "EventNotificationChannel";
@@ -69,6 +81,11 @@ public class calendarpage extends AppCompatActivity {
         eventDescriptionTextView = findViewById(R.id.eventDescription);
         dateEditText = findViewById(R.id.dateEditText);
         datePickerButton = findViewById(R.id.datePickerButton);
+        eventsRecyclerView = findViewById(R.id.eventsRecyclerView);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        eventsList = new ArrayList<>();
+        eventsAdapter = new EventsAdapter(eventsList, this::editDelete);
+        eventsRecyclerView.setAdapter(eventsAdapter);
 
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
@@ -77,6 +94,7 @@ public class calendarpage extends AppCompatActivity {
         // Get current user ID
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = "8dvh5X3c5sYMOOhHhvv9w5ZvL2n2"; //replace with actual code later
+
 
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -110,31 +128,18 @@ public class calendarpage extends AppCompatActivity {
         db.collection("users")
                 .document(userId)
                 .collection("events").document(date).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            List<String> events = (List<String>) documentSnapshot.get("events");
-                            if (events != null) {
-                                StringBuilder eventDescriptions = new StringBuilder("Events on " + date + ":\n");
-                                for (String event : events) {
-                                    eventDescriptions.append("- ").append(event).append("\n");
-                                }
-                                eventDescriptionTextView.setText(eventDescriptions.toString());
-                            } else {
-                                eventDescriptionTextView.setText("No Event on " + date);
-                            }
-                        } else {
-                            eventDescriptionTextView.setText("No Event on " + date);
+                .addOnSuccessListener(documentSnapshot -> {
+                    eventsList.clear();
+                    if (documentSnapshot.exists()) {
+                        List<String> events = (List<String>) documentSnapshot.get("events");
+                        if (events != null) {
+                            eventsList.addAll(events);
                         }
                     }
+                    eventsAdapter.notifyDataSetChanged();
+                    eventDescriptionTextView.setText("Events on " + date + ":");
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void showDatePickerDialog() {
@@ -153,6 +158,13 @@ public class calendarpage extends AppCompatActivity {
                     }
                 }, year, month, day);
         datePickerDialog.show();
+    }
+
+    private void editDelete(int position) {
+        String date = dateEditText.getText().toString();
+        if (!date.isEmpty()) {
+            eventsList(date, position);
+        }
     }
 
     private void eventsList(final String date) {
@@ -242,6 +254,75 @@ public class calendarpage extends AppCompatActivity {
                             Toast.makeText(calendarpage.this, "Failed to retrieve events for deletion: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+        });
+
+        builder.setNeutralButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void eventsList(final String date, final int eventIndex) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Click on event to edit or delete.");
+
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> events = (List<String>) documentSnapshot.get("events");
+                        if (events != null && !events.isEmpty()) {
+                            builder.setItems(events.toArray(new String[0]), (dialog, which) -> editDeleteEvent(date, which));
+                        } else {
+                            builder.setMessage("No events for this day.");
+                        }
+                    } else {
+                        builder.setMessage("No events for this day.");
+                    }
+
+                    builder.setPositiveButton("Create Event", (dialog, which) -> addEvent(date));
+                    builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+                    builder.show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    builder.setMessage("Failed to retrieve events.").setPositiveButton("Create Event", (dialog, which) -> addEvent(date));
+                    builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+                    builder.show();
+                });
+    }
+
+    private void editDeleteEvent(final String date, final int eventIndex) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit or Delete Event");
+
+        builder.setPositiveButton("Edit", (dialog, which) -> editEvent(date, eventIndex));
+
+        builder.setNegativeButton("Delete", (dialog, which) -> {
+            db.collection("users")
+                    .document(userId)
+                    .collection("events").document(date).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            List<String> events = (List<String>) documentSnapshot.get("events");
+                            if (events != null && eventIndex < events.size()) {
+                                events.remove(eventIndex);
+
+                                db.collection("users")
+                                        .document(userId)
+                                        .collection("events")
+                                        .document(date)
+                                        .update("events", events)
+                                        .addOnSuccessListener(aVoid -> {
+                                            displayEventsForDate(date);
+                                            Toast.makeText(calendarpage.this, "Event Deleted", Toast.LENGTH_SHORT).show();
+                                            showNotification("Event Deleted", "Your event has been deleted successfully.");
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to delete event: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to retrieve events for deletion: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
 
         builder.setNeutralButton("Cancel", (dialog, which) -> dialog.cancel());
