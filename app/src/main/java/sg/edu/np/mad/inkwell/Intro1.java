@@ -59,7 +59,9 @@ public class Intro1 extends AppCompatActivity {
                     mSLideViewPager.setCurrentItem(getitem(1),true);
                 else {
 
-                    Intent i = new Intent(Intro1.this,mainscreen.class);
+
+                    Intent i = new Intent(Intro1.this,MainActivity.class);
+
                     startActivity(i);
                     finish();
 
@@ -71,12 +73,9 @@ public class Intro1 extends AppCompatActivity {
         skipbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                Intent i = new Intent(Intro1.this,mainscreen.class);
+                Intent i = new Intent(Intro1.this,MainActivity.class);
                 startActivity(i);
                 finish();
-
             }
         });
 

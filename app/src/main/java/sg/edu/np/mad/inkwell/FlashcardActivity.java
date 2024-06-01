@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -24,8 +22,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -34,11 +30,9 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -188,12 +182,14 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
             }
         });
 
+        // Allows for recycler view items to be swiped
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
             }
 
+            // Removes the item from the recycler view and deletes its data from firebase
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
@@ -202,6 +198,8 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 allFlashcardCollections.remove(flashcardCollection);
                 flashcardCollections.remove(flashcardCollection);
                 recyclerView.getAdapter().notifyItemRemoved(position);
+
+                // Delete toast message
                 Toast toast = new Toast(FlashcardActivity.this);
                 toast.setDuration(Toast.LENGTH_SHORT);
                 LayoutInflater layoutInflater = (LayoutInflater) FlashcardActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -210,6 +208,7 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
                 toast.show();
             }
 
+            // Only swipes the item away if 80% of it is off the screen
             @Override
             public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
                 return 0.80f;
@@ -221,49 +220,13 @@ public class FlashcardActivity extends AppCompatActivity implements NavigationVi
     }
 
     //Allows movement between activities upon clicking
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
-            Intent notesActivity = new Intent(FlashcardActivity.this, MainActivity.class);
-            startActivity(notesActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, NotesActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_todos) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, FlashcardActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_settings) {
-            Intent todoActivity = new Intent(FlashcardActivity.this, SettingsActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_logout) {
-            Log.d("Message", "Logout");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+
         return true;
     }
 }

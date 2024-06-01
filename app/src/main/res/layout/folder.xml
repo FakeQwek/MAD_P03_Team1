@@ -18,13 +18,16 @@
             android:layout_height="wrap_content"
             android:background="#00000000"
             android:backgroundTint="#00000000"
+            android:ellipsize="end"
             android:fontFamily="@font/inter_regular"
             android:gravity="center_vertical"
+            android:maxLines="1"
             android:text="Folder"
             android:textAllCaps="false"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@+id/chevron"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:maxWidth="230dp"/>
 
         <ImageView
             android:id="@+id/chevron"

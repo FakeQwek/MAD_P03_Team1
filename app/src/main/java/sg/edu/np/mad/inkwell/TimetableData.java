@@ -1,30 +1,28 @@
 package sg.edu.np.mad.inkwell;
 
-import android.util.Log;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-
 public class TimetableData {
-    private String title;
-    private String description;
+    private String name;
+    private String location;
     public String startTime;
     public String endTime;
     private String category;
+    private String startDate;
+    private String endDate;
+    private String documentId;
 
-    public TimetableData(String title, String description, String startTime, String endTime, String category) {
-        this.title = title;
-        this.description = description;
+    public TimetableData(String name, String location, String startTime, String startDate, String endTime, String endDate, String category) {
+        this.name = name;
+        this.location = location;
         this.startTime = startTime;
         this.endTime = endTime;
         this.category = category;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public String getTitle() {
-
-        return title;
-    }
-    public String getDescription() {
-        return description;
+    public String getName() { return name; }
+    public String getLocation() {
+        return location;
     }
     public String getStartTime() {
         return startTime;
@@ -33,40 +31,13 @@ public class TimetableData {
         return endTime;
     }
     public String getCategory() { return category; }
-
-    // Nested Category class
-    public static class Category {
-        private String name;
-        private int color;
-
-        public Category() {}
-
-        public Category(String name, int color) {
-            this.name = name;
-            this.color = color;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getColor() {
-            return color;
-        }
+    public  String getStartDate() { return startDate; }
+    public String getEndDate() { return endDate; }
+    public String getDocumentId() {
+        return documentId;
     }
 
-    public static void addCategoryToFirestore(String name, int color) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Category category = new Category(name, color);
-
-        db.collection("categories")
-                .add(category)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Category added with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("Firestore", "Error adding category", e);
-                });
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
-
 }
