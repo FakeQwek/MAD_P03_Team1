@@ -160,7 +160,6 @@
                         android:singleLine="true"
                         android:textSize="30sp"
                         android:textStyle="normal" />
-
                     <Switch
                         android:id="@+id/timeSwitch"
                         android:layout_width="115dp"
