@@ -8,8 +8,10 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextClock;
 import android.widget.TextView;
 
@@ -124,6 +126,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE");
         day.setText(dayFormat.format(currentDate));
         date.setText(currentDate.toString());
+
+        //12 hour / 24 hour switch
+        Switch timeSwitch = findViewById(R.id.timeSwitch);
+        timeSwitch.setText("12 Hour");
+
+        timeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                if (!isChecked) {
+                    timeSwitch.setText("12 Hour");
+                    timeClock.setFormat12Hour("h:mm a");
+                }
+                else {
+                    timeSwitch.setText("24 Hour");
+                    timeClock.setFormat12Hour("HH:mm a");
+                }
+            }
+        });
+
 
 
         Map<String, Object> userData = new HashMap<>();
