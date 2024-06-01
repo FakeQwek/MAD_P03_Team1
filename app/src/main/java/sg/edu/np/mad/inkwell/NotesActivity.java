@@ -31,8 +31,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.N;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -365,7 +363,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
+        if (menuItem.getItemId() == R.id.nav_home) {
             Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
             startActivity(notesActivity);
             return true;

@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,7 +36,17 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signupRedirectText;
     private Button loginButton;
     TextView forgotPassword;
-
+    private void transferName(Intent successfulLogin) {
+        EditText emailText = findViewById(R.id.login_email);
+        String email = emailText.getText().toString();
+        String[] twoParts = email.split("@", 2);
+        //Log.d("Alert", "Email name is " + twoParts[0]);
+        SharedPreferences.Editor editor = getSharedPreferences("Username", MODE_PRIVATE).edit();
+        editor.putString("Username", twoParts[0]);
+        editor.apply();
+        startActivity(successfulLogin);
+        //.d("Error", "This should load the main page");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -53,18 +64,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
+                /*
+                Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                transferName(successfulLogin);
+                */
 
-         
 
-                // For some reason none of the if statements work, even the workarounds i created dont trigger
-                // Likely some database thing
-                Log.d("Error", "This shows its working");
 
-                if (pass.equals("admin")) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    Log.d("Error", "This should load the main page");
-                    return;  // Exit the method here since we've already started the MainActivity
-                }
 
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
@@ -72,10 +78,11 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
+                                        //Starts MainActivity.
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, Intro1.class));
-                                        Log.d("Error", "This should load the intro page");
-                                        finish();
+                                        Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                                        transferName(successfulLogin);
+
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -94,6 +101,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
 
         signupRedirectText.setOnClickListener(new View.OnClickListener(){
             @Override
