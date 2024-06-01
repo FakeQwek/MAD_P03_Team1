@@ -126,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE");
         day.setText(dayFormat.format(currentDate));
         date.setText(currentDate.toString());
-
         //12 hour / 24 hour switch
         Switch timeSwitch = findViewById(R.id.timeSwitch);
         timeSwitch.setText("12 Hour");
@@ -144,8 +143,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-
-
 
         // Initialises firebase collections for the user
         Map<String, Object> userData = new HashMap<>();
