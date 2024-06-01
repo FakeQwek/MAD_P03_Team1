@@ -64,7 +64,7 @@ Productivity
 - AI Helpbot - Chin Teck
 - Profile Page - Chin Teck
 - Markdown - Chin Teck
-- Biometric Authentication -  Jin Xuan
+- Biometric Authentication and OTP -  Jin Xuan
 - Splash Screen Effect/Lottie Animation - Jin Xuan
 - Feedback survey - Jin Xuan
 - Create a Username for the account and remember password - Jin Xuan
