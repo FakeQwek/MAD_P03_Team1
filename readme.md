@@ -73,7 +73,9 @@ Productivity
 - Biometric authetication - Jin Xuan
 - Security Question Service - Jin Xuan
 - Time tracking with work statistics and achievements  - Rithika
-- Goal setting and recurring tasks - Rithika 
+- Goal setting and recurring tasks - Rithika
+- Widgets – Rithika
+- Accessibility features – Rithika 
 - Drawing tools with Stylus support - Jun Kai
 - Sync with Google Calendar - Jun Kai
 - Time Blocking and Focus features - Jun Kai
