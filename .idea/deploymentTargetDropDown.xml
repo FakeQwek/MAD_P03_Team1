@@ -2,16 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="FlashcardActivity">
-        <State />
-      </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
-      <entry key="NotesActivity">
-        <State />
-      </entry>
-      <entry key="SettingsActivity">
+      <entry key="app">
         <State />
       </entry>
     </value>
