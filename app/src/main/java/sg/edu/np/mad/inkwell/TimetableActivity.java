@@ -1,10 +1,5 @@
 package sg.edu.np.mad.inkwell;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import android.app.TimePickerDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -25,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import com.google.android.material.navigation.NavigationView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,10 +29,6 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,7 +52,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -71,8 +62,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import org.w3c.dom.Text;
 
+import org.w3c.dom.Text;
 
 public class TimetableActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private LinearLayout slidingPanel;
@@ -86,9 +77,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     private TextView tvDate;
     private CardView startTime, endTime, startDate, endDate;
     private TextView tvStartTime,tvEndTime;
-    private CardView startTime, endTime;
-    private TextView tvStartTime, tvEndTime;
-    private TimePicker selectEndTime, selectStartTime;
     private int startHour, startMinute, endHour, endMinute;
     private int startYear, startMonth, startDayOfMonth;
     private int endYear, endMonth, endDayOfMonth;
@@ -98,44 +86,24 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timetable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //Finds nav bar drawer and nav view before setting listener
+        // finds drawer and nav view before setting listener
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //Sets listener to allows for closing and opening of the navbar
+
         navigationView.bringToFront();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
                 R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-
-        });
-        // set up recycler
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        categoryColors = new HashMap<>();
-
-        Map<String, Object> taskData = new HashMap<>();
 
         View decorView = getWindow().getDecorView();
 
-
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-
-        dataList.add(new TimetableData("Title 1", "Description 1", "1300", "1400", "class"));
-        dataList.add(new TimetableData("Title 2", "Description 2", "1300", "1400", "meeting"));
-        dataList.add(new TimetableData("Title 3", "Description 3", "1300", "1400", "class"));
-        dataList.add(new TimetableData("Title 4", "Description 4", "1300", "1400", "meeting"));
 
         decorView.setSystemUiVisibility(uiOptions);
 
@@ -252,16 +220,10 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
                 }
             });
 
-
             // show endTimePicker dialog
             endTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-        categoryList.add("Add New Option");
-        spinnerAdapter.notifyDataSetChanged();
-
-    }
-
 
                     showTimePickerDialog(false);
                 }
@@ -604,17 +566,6 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
         });
 
         dialog.show();
-
-    }
-
-
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        int id = menuItem.getItemId();
-        Navbar navbar = new Navbar(this);
-        Intent newActivity = navbar.redirect(id);
-        startActivity(newActivity);
-
-        return true;
     }
 
     // show data of specific item onClick
@@ -1051,7 +1002,8 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     // navigation
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-      
+
+
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
@@ -1061,4 +1013,3 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     }
 
 }
-
