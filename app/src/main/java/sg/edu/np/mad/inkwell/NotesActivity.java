@@ -66,10 +66,13 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         NotesAdapter adapter = new NotesAdapter(allNotes, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-        recyclerView.getAdapter().notifyDataSetChanged();
+
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     // Method to filter items already in the recycler view
@@ -91,19 +94,21 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     private void search(ArrayList<File> files, ArrayList<Object> notes) {
         SearchView searchView = findViewById(R.id.searchView);
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filter(files, notes, query);
-                return false;
-            }
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    filter(files, notes, query);
+                    return false;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filter(files, notes, newText);
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    filter(files, notes, newText);
+                    return false;
+                }
+            });
+        }
     }
 
     // Method to notify recycler view a new item has been inserted
@@ -114,13 +119,16 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
 
     private void navigationBar() {
         SearchView searchView = findViewById(R.id.searchView);
-        searchView.setVisibility(View.VISIBLE);
+
+        if (searchView != null) {
+            searchView.setVisibility(View.VISIBLE);
+        }
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setVisibility(View.VISIBLE);
 
-        ImageButton swapButton = findViewById(R.id.swapButton);
-        swapButton.setVisibility(View.VISIBLE);
+        if (recyclerView != null) {
+            recyclerView.setVisibility(View.VISIBLE);
+        }
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
@@ -134,34 +142,40 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         menu.findItem(R.id.nav_settings).setVisible(false);
         menu.findItem(R.id.nav_logout).setVisible(false);
 
-        swapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (menu.hasVisibleItems()) {
-                    menu.findItem(R.id.nav_main).setVisible(false);
-                    menu.findItem(R.id.nav_notes).setVisible(false);
-                    menu.findItem(R.id.nav_todos).setVisible(false);
-                    menu.findItem(R.id.nav_flashcards).setVisible(false);
-                    menu.findItem(R.id.nav_calendar).setVisible(false);
-                    menu.findItem(R.id.nav_timetable).setVisible(false);
-                    menu.findItem(R.id.nav_settings).setVisible(false);
-                    menu.findItem(R.id.nav_logout).setVisible(false);
-                    searchView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                } else {
-                    menu.findItem(R.id.nav_main).setVisible(true);
-                    menu.findItem(R.id.nav_notes).setVisible(true);
-                    menu.findItem(R.id.nav_todos).setVisible(true);
-                    menu.findItem(R.id.nav_flashcards).setVisible(true);
-                    menu.findItem(R.id.nav_calendar).setVisible(true);
-                    menu.findItem(R.id.nav_timetable).setVisible(true);
-                    menu.findItem(R.id.nav_settings).setVisible(true);
-                    menu.findItem(R.id.nav_logout).setVisible(true);
-                    searchView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.GONE);
+        ImageButton swapButton = findViewById(R.id.swapButton);
+
+        if (swapButton != null) {
+            swapButton.setVisibility(View.VISIBLE);
+
+            swapButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (menu.hasVisibleItems()) {
+                        menu.findItem(R.id.nav_main).setVisible(false);
+                        menu.findItem(R.id.nav_notes).setVisible(false);
+                        menu.findItem(R.id.nav_todos).setVisible(false);
+                        menu.findItem(R.id.nav_flashcards).setVisible(false);
+                        menu.findItem(R.id.nav_calendar).setVisible(false);
+                        menu.findItem(R.id.nav_timetable).setVisible(false);
+                        menu.findItem(R.id.nav_settings).setVisible(false);
+                        menu.findItem(R.id.nav_logout).setVisible(false);
+                        searchView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    } else {
+                        menu.findItem(R.id.nav_main).setVisible(true);
+                        menu.findItem(R.id.nav_notes).setVisible(true);
+                        menu.findItem(R.id.nav_todos).setVisible(true);
+                        menu.findItem(R.id.nav_flashcards).setVisible(true);
+                        menu.findItem(R.id.nav_calendar).setVisible(true);
+                        menu.findItem(R.id.nav_timetable).setVisible(true);
+                        menu.findItem(R.id.nav_settings).setVisible(true);
+                        menu.findItem(R.id.nav_logout).setVisible(true);
+                        searchView.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
