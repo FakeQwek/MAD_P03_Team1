@@ -59,7 +59,9 @@ public class Intro1 extends AppCompatActivity {
                     mSLideViewPager.setCurrentItem(getitem(1),true);
                 else {
 
-                    Intent i = new Intent(Intro1.this, MainActivity.class);
+
+                    Intent i = new Intent(Intro1.this,MainActivity.class);
+
                     startActivity(i);
                     finish();
 

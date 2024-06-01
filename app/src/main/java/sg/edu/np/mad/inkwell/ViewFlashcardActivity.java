@@ -163,12 +163,14 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
             }
         });
 
+        // Allows for recycler view items to be swiped
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
             }
 
+            // Removes the item from the recycler view and deletes its data from firebase
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
@@ -186,6 +188,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 toast.show();
             }
 
+            // Only swipes the item away if 80% of it is off the screen
             @Override
             public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
                 return 0.80f;

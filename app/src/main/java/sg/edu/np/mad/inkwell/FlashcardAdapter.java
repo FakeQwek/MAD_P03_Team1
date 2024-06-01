@@ -34,8 +34,6 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
 
     private ViewFlashcardActivity viewFlashcardActivity;
 
-    private boolean deleteMode = false;
-
     // FlashcardAdapter constructor
     public FlashcardAdapter(ArrayList<Flashcard> allFlashcards, ArrayList<Flashcard> flashcardList, ViewFlashcardActivity viewFlashcardActivity) {
         this.allFlashcards = allFlashcards;
@@ -57,41 +55,23 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
         holder.question.setText(flashcard.getQuestion());
         holder.answer.setText(flashcard.getAnswer());
 
-        // Show delete button if not show yet and vice versa
-        if (deleteMode) {
-            holder.deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            holder.deleteButton.setVisibility(View.GONE);
-        }
-
         RecyclerView recyclerView = viewFlashcardActivity.findViewById(R.id.recyclerView);
-
-        ImageButton deleteFlashcardButton = viewFlashcardActivity.findViewById(R.id.deleteFlashcardButton);
-
-        // Changes deleteMode value
-        deleteFlashcardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (deleteMode) {
-                    deleteMode = false;
-                } else {
-                    deleteMode = true;
-                }
-                recyclerView.getAdapter().notifyDataSetChanged();
-            }
-        });
 
         // Deletes flashcard and updates firebase
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.deleteButton.setEnabled(false);
                 allFlashcards.remove(flashcard);
                 flashcardList.remove(flashcard);
-                recyclerView.getAdapter().notifyDataSetChanged();
+                Log.d("tester11", String.valueOf(allFlashcards.size()));
+                Log.d("tester11", String.valueOf(flashcardList.size()));
+                recyclerView.getAdapter().notifyItemRemoved(holder.getAdapterPosition());
 
                 db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).delete();
 
                 db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("flashcardCount", FieldValue.increment(-1));
+                db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).update("correct", 0);
             }
         });
 
@@ -99,6 +79,7 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
         holder.question.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.question) {
             @Override
             public void onTextChanged(EditText question, Editable s) {
+                flashcard.setFlashcardQuestion(question.getText().toString());
                 db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("question", question.getText().toString());
             }
         });
@@ -106,6 +87,7 @@ public class FlashcardAdapter extends RecyclerView.Adapter<FlashcardViewHolder> 
         holder.answer.addTextChangedListener(new MainActivity.TextChangedListener<EditText>(holder.answer) {
             @Override
             public void onTextChanged(EditText answer, Editable s) {
+                flashcard.setFlashcardAnswer(answer.getText().toString());
                 db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document(String.valueOf(FlashcardActivity.selectedFlashcardCollectionId)).collection("flashcards").document(String.valueOf(flashcard.getId())).update("answer", answer.getText().toString());
             }
         });

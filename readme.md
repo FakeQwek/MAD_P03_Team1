@@ -31,19 +31,22 @@ Productivity
 - Notes with typing and file structure – Chin Teck 
 - Calender – Jun Kai 
 - Timetable - Rithika 
-- Login and Authentication(firebase) – Jin Xuan
+- Login – Jin Xuan
+- User Accounts - Chin Teck
 - Sign Up and Reset Password - Jin Xuan
 - Walkthrough Intro - Jin Xuan
-- SQLite Database - Jin Xuan
 - Todo list - Chin Teck
 - Flashcards - Chin Teck
 - Main Menu - Tsun Yang
+- Settings - Chin Teck
+- Dark Mode - Chin Teck
 
 *Concepts:* 
 - Database storage – Chin Teck 
 - RecyclerView – Rithika 
-- Responsive Layout – Tsun Yang 
-- Authentication – Jin Xuan 
+- Responsive Layout – Tsun Yang
+- Authentication – Jin Xuan
+- Notifications - Chin Teck
 
 *Other* 
 - Padlet and Readme - Tsun Yang
@@ -54,8 +57,20 @@ Productivity
 - Multimedia upload for notes – Tsun Yang
 - Sharing to collaborators  - Chin Teck
 - Biometric Authentication -  Jin Xuan
-- Time tracking with work statistics and achievements  -
-- Local storage and encryption – Chin Teck   
+- Time tracking with work statistics and achievements  - Rithika
+- AI Helpbot - Chin Teck
+- Email and OTP Verification - Jin Xuan
+- Splash Screen Effect/Lottie Animation - Jin Xuan
+- In app calculator - Tsun Yang
+- Feedback survey - Jin Xuan
+- Create a Username for the account - Jin Xuan
+- Dashboard Service(track login status) - Jin Xuan
+- Security Question Service - Jin Xuan
+- Search through the list of other people username - Jin Xuan
+- Profile Page - Chin Teck
+- Cloud Storage - Tsun Yang
+- Alarm page - Tsun Yang
+  
 
 
 *Other* 

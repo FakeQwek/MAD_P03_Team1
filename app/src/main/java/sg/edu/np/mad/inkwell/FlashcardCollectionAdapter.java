@@ -90,6 +90,8 @@ public class FlashcardCollectionAdapter extends RecyclerView.Adapter<FlashcardCo
 
                 TextInputEditText titleEditText = view.findViewById(R.id.titleEditText);
 
+                titleEditText.setText(flashcardCollection.title);
+
                 Button cancelButton = view.findViewById(R.id.cancelButton);
 
                 // Cancels the process

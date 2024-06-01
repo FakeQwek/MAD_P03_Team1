@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
+        // Initialises firebase collections for the user
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
@@ -181,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(newActivity);
         Log.d("Alert", "Starting" + newActivity);
         return true;
-
     }
 
 

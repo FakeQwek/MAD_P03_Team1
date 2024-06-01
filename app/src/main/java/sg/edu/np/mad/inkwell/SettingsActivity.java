@@ -47,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity implements NavigationVie
 
         // Checks switch1 if night mode is on and vice versa
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            Log.d("tester", "DARK");
             switch1.setChecked(true);
         } else {
             switch1.setChecked(false);
