@@ -24,10 +24,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="20dp"
-                android:text="Scrum questions"
+                android:layout_marginEnd="150dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Collection name"
                 android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:maxWidth="250dp" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -36,11 +42,12 @@
                 android:layout_height="7dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="150dp"
+                android:layout_marginEnd="110dp"
                 android:progressBackgroundTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title">
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                android:maxWidth="250dp">
 
             </ProgressBar>
 

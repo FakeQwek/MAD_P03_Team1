@@ -90,6 +90,11 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             fileViewHolder.fileButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (noteTitle.getVisibility() == View.GONE) {
+                        noteTitle.setVisibility(View.VISIBLE);
+                        noteBody.setVisibility(View.VISIBLE);
+                    }
+
                     NotesActivity.selectedNoteId = file.getId();
                     NotesActivity.fileOrderIndex++;
 

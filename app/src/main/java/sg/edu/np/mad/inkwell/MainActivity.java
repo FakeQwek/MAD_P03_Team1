@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         */
          
 
+        // Initialises firebase collections for the user
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", "");
         userData.put("type", "");
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
     //Allows movement between activities upon clicking from Navbar class
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.nav_main) {
@@ -163,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
         return true;
-
     }
 
 

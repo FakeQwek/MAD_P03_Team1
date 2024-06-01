@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -110,6 +112,58 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         Objects.requireNonNull(recyclerView.getAdapter()).notifyItemInserted(0);
     }
 
+    private void navigationBar() {
+        SearchView searchView = findViewById(R.id.searchView);
+        searchView.setVisibility(View.VISIBLE);
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        ImageButton swapButton = findViewById(R.id.swapButton);
+        swapButton.setVisibility(View.VISIBLE);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+
+        menu.findItem(R.id.nav_main).setVisible(false);
+        menu.findItem(R.id.nav_notes).setVisible(false);
+        menu.findItem(R.id.nav_todos).setVisible(false);
+        menu.findItem(R.id.nav_flashcards).setVisible(false);
+        menu.findItem(R.id.nav_calendar).setVisible(false);
+        menu.findItem(R.id.nav_timetable).setVisible(false);
+        menu.findItem(R.id.nav_settings).setVisible(false);
+        menu.findItem(R.id.nav_logout).setVisible(false);
+
+        swapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (menu.hasVisibleItems()) {
+                    menu.findItem(R.id.nav_main).setVisible(false);
+                    menu.findItem(R.id.nav_notes).setVisible(false);
+                    menu.findItem(R.id.nav_todos).setVisible(false);
+                    menu.findItem(R.id.nav_flashcards).setVisible(false);
+                    menu.findItem(R.id.nav_calendar).setVisible(false);
+                    menu.findItem(R.id.nav_timetable).setVisible(false);
+                    menu.findItem(R.id.nav_settings).setVisible(false);
+                    menu.findItem(R.id.nav_logout).setVisible(false);
+                    searchView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    menu.findItem(R.id.nav_main).setVisible(true);
+                    menu.findItem(R.id.nav_notes).setVisible(true);
+                    menu.findItem(R.id.nav_todos).setVisible(true);
+                    menu.findItem(R.id.nav_flashcards).setVisible(true);
+                    menu.findItem(R.id.nav_calendar).setVisible(true);
+                    menu.findItem(R.id.nav_timetable).setVisible(true);
+                    menu.findItem(R.id.nav_settings).setVisible(true);
+                    menu.findItem(R.id.nav_logout).setVisible(true);
+                    searchView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,21 +208,17 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 search(files, notes);
+                                navigationBar();
                                 String docNoteType = document.getData().get("type").toString();
                                 String docNoteUid = document.getData().get("uid").toString();
+                                if (Integer.parseInt(document.getId()) > currentNoteId) {
+                                    currentNoteId = Integer.parseInt(document.getId());
+                                }
                                 if (docNoteType.equals("file") && docNoteUid.equals(currentFirebaseUserUid)) {
-                                    if (Integer.parseInt(document.getId()) > currentNoteId) {
-                                        currentNoteId = Integer.parseInt(document.getId());
-                                    }
-
                                     File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
                                     notes.add(file);
                                     filter(files, notes, "");
                                 } else if (docNoteType.equals("folder") && docNoteUid.equals(currentFirebaseUserUid)) {
-                                    if (Integer.parseInt(document.getId()) > currentNoteId) {
-                                        currentNoteId = Integer.parseInt(document.getId());
-                                    }
-
                                     Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
                                     notes.add(folder);
                                     filter(files, notes, "");
