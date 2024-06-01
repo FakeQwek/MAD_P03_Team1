@@ -2,14 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
-
     <application
-        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -21,15 +18,12 @@
         tools:targetApi="31">
         <activity
             android:name=".calendarpage"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,8 +32,7 @@
         </activity>
         <activity
             android:name=".SignUpActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:exported="true" />
         <activity
             android:name=".MainActivity2"
             android:exported="false" />
@@ -54,8 +47,7 @@
         </activity>
         <activity
             android:name=".Intro1"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,8 +58,7 @@
             android:name=".QuizFlashcardActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -78,8 +69,7 @@
             android:name=".FlashcardActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -90,8 +80,7 @@
             android:name=".ViewFlashcardActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -102,8 +91,7 @@
             android:name=".TodoActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -112,8 +100,7 @@
         </activity>
         <activity
             android:name=".TimetableActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -122,8 +109,7 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:exported="true" />
         <activity
             android:name=".Login"
             android:exported="false" />
@@ -131,8 +117,7 @@
             android:name=".SettingsActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -143,8 +128,7 @@
             android:name=".NotesActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Inkwell.NoActionBar"
-            android:screenOrientation="portrait">
+            android:theme="@style/Theme.Inkwell.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -157,6 +141,8 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="EventNotificationChannel" />
+
         <receiver android:name=".TodoBroadcast" />
     </application>
+
 </manifest>
