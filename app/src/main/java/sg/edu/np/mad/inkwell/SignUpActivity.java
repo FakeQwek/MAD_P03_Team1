@@ -2,7 +2,9 @@ package sg.edu.np.mad.inkwell;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,8 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText signupEmail, signupPassword;
     private Button signupButton;
     private TextView loginRedirectText;
+    private DatabaseHelper db;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -27,9 +31,12 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         auth = FirebaseAuth.getInstance();
+        db = new DatabaseHelper(this);
+        sharedPreferences = getSharedPreferences("userPrefs", Context.MODE_PRIVATE);
+
         signupEmail = findViewById(R.id.signup_email);
         signupPassword = findViewById(R.id.signup_password);
-        signupButton = findViewById(R.id.signup_button); // Initialize signupButton
+        signupButton = findViewById(R.id.signup_button);
         loginRedirectText = findViewById(R.id.loginRedirectText);
 
         signupButton.setOnClickListener(new View.OnClickListener(){
@@ -48,8 +55,14 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
-                                Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                                boolean isInserted = db.insertUser(user, pass);
+                                if (isInserted) {
+                                    saveToSharedPreferences(user, pass);
+                                    Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                                } else {
+                                    Toast.makeText(SignUpActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(SignUpActivity.this, "Signup Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
@@ -65,6 +78,28 @@ public class SignUpActivity extends AppCompatActivity {
                 startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
             }
         });
+    }
 
+    private void saveToSharedPreferences(String email, String password) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.apply();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        resetSharedPreferencesToDefault();
+    }
+
+    private void resetSharedPreferencesToDefault() {
+        SharedPreferences sharedPreferences = getSharedPreferences("userPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", "user@gmail.com");
+        editor.putString("password", "Pa$$w0rd");
+        editor.apply();
     }
 }
+
+

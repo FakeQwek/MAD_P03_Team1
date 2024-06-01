@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,7 +36,17 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signupRedirectText;
     private Button loginButton;
     TextView forgotPassword;
-
+    private void transferName(Intent successfulLogin) {
+        EditText emailText = findViewById(R.id.login_email);
+        String email = emailText.getText().toString();
+        String[] twoParts = email.split("@", 2);
+        //Log.d("Alert", "Email name is " + twoParts[0]);
+        SharedPreferences.Editor editor = getSharedPreferences("Username", MODE_PRIVATE).edit();
+        editor.putString("Username", twoParts[0]);
+        editor.apply();
+        startActivity(successfulLogin);
+        //.d("Error", "This should load the main page");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -53,21 +64,25 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view){
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
+                /*
+                Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                transferName(successfulLogin);
+                */
 
-                //Having network issues when connecting the database on home network, below line of code skips authentication
-                //Remember to comment when pushing to main
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                Log.d("Error", "This shows its working");
+
+
+
                 if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     if (!pass.isEmpty()) {
                         auth.signInWithEmailAndPassword(email, pass)
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
+                                        //Starts MainActivity.
                                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        Log.d("Error", "This should load the main page");
-                                        finish();
+                                        Intent successfulLogin = new Intent(LoginActivity.this, MainActivity.class);
+                                        transferName(successfulLogin);
+
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -79,19 +94,23 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         loginPassword.setError("Password cannot be empty");
                     }
-                }else if(email.isEmpty()) {
+                } else if(email.isEmpty()) {
                     loginEmail.setError("Email cannot be empty");
                 } else {
                     loginEmail.setError("Please enter valid email");
-            }
+                }
             }
         });
-                signupRedirectText.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-                    }
-                });
+
+
+
+
+        signupRedirectText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            }
+        });
 
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override

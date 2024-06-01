@@ -2,33 +2,20 @@ package sg.edu.np.mad.inkwell;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewAnimator;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintProperties;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -37,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
@@ -177,12 +163,14 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
             }
         });
 
+        // Allows for recycler view items to be swiped
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
             }
 
+            // Removes the item from the recycler view and deletes its data from firebase
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
@@ -200,6 +188,7 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
                 toast.show();
             }
 
+            // Only swipes the item away if 80% of it is off the screen
             @Override
             public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
                 return 0.80f;
@@ -211,49 +200,12 @@ public class ViewFlashcardActivity extends AppCompatActivity implements Navigati
     }
 
     //Allows movement between activities upon clicking
-    @Override
+
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
-            Intent notesActivity = new Intent(ViewFlashcardActivity.this, MainActivity.class);
-            startActivity(notesActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, NotesActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_todos) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, FlashcardActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_settings) {
-            Intent todoActivity = new Intent(ViewFlashcardActivity.this, SettingsActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_logout) {
-            Log.d("Message", "Logout");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
         return true;
     }
 }
