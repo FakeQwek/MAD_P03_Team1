@@ -5,12 +5,9 @@ import android.app.DatePickerDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.RemoteAction;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,42 +21,27 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.ViewAnimator;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,7 +51,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class TodoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -425,53 +406,10 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
-            Intent notesActivity = new Intent(TodoActivity.this, MainActivity.class);
-            startActivity(notesActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent todoActivity = new Intent(TodoActivity.this, NotesActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_todos) {
-            Intent todoActivity = new Intent(TodoActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(TodoActivity.this, FlashcardActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Intent todoActivity = new Intent(TodoActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_settings) {
-            Intent todoActivity = new Intent(TodoActivity.this, SettingsActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_logout) {
-            Log.d("Message", "Logout");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
-
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
         Intent newActivity = navbar.redirect(id);
         startActivity(newActivity);
-
         return true;
     }
 }

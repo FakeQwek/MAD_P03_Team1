@@ -1,5 +1,10 @@
 package sg.edu.np.mad.inkwell;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,15 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,7 +22,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import sg.edu.np.mad.inkwell.R;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -34,10 +30,10 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginEmail, loginPassword;
     private TextView signupRedirectText;
     private Button loginButton;
-    TextView forgotPassword;
+    private TextView forgotPassword;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Log.d("Alert", "LoginActivity class created");
@@ -54,44 +50,38 @@ public class LoginActivity extends AppCompatActivity {
                 String email = loginEmail.getText().toString();
                 String pass = loginPassword.getText().toString();
 
-         
-
-                // For some reason none of the if statements work, even the workarounds i created dont trigger
-                // Likely some database thing
-                Log.d("Error", "This shows its working");
-
-                if (pass.equals("admin")) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    Log.d("Error", "This should load the main page");
-                    return;  // Exit the method here since we've already started the MainActivity
-                }
-
-                if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    if (!pass.isEmpty()) {
-                        auth.signInWithEmailAndPassword(email, pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(LoginActivity.this, Intro1.class));
-                                        Log.d("Error", "This should load the intro page");
-                                        finish();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(LoginActivity.this, "Login Failure", Toast.LENGTH_SHORT).show();
-                                        Log.d("Error", "This should not load the main page");
-                                    }
-                                });
-                    } else {
-                        loginPassword.setError("Password cannot be empty");
-                    }
-                } else if(email.isEmpty()) {
+                if (email.isEmpty()) {
                     loginEmail.setError("Email cannot be empty");
-                } else {
-                    loginEmail.setError("Please enter valid email");
+                    return;
                 }
+                if (pass.isEmpty()) {
+                    loginPassword.setError("Password cannot be empty");
+                    return;
+                }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    loginEmail.setError("Please enter valid email");
+                    return;
+                }
+
+                auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = auth.getCurrentUser();
+                            if (user != null && user.isEmailVerified()) {
+                                Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, Intro1.class));
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Email not verified. Please verify your email address.", Toast.LENGTH_SHORT).show();
+                                auth.signOut(); // Sign out the user to prevent unauthorized access
+                            }
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
@@ -150,7 +140,6 @@ public class LoginActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
     }
-
 }
+

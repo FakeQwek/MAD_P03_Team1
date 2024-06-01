@@ -31,8 +31,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.N;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -133,7 +131,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
 
-        menu.findItem(R.id.nav_main).setVisible(false);
+        menu.findItem(R.id.nav_home).setVisible(false);
         menu.findItem(R.id.nav_notes).setVisible(false);
         menu.findItem(R.id.nav_todos).setVisible(false);
         menu.findItem(R.id.nav_flashcards).setVisible(false);
@@ -151,7 +149,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 @Override
                 public void onClick(View v) {
                     if (menu.hasVisibleItems()) {
-                        menu.findItem(R.id.nav_main).setVisible(false);
+                        menu.findItem(R.id.nav_home).setVisible(false);
                         menu.findItem(R.id.nav_notes).setVisible(false);
                         menu.findItem(R.id.nav_todos).setVisible(false);
                         menu.findItem(R.id.nav_flashcards).setVisible(false);
@@ -162,7 +160,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                         searchView.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.VISIBLE);
                     } else {
-                        menu.findItem(R.id.nav_main).setVisible(true);
+                        menu.findItem(R.id.nav_home).setVisible(true);
                         menu.findItem(R.id.nav_notes).setVisible(true);
                         menu.findItem(R.id.nav_todos).setVisible(true);
                         menu.findItem(R.id.nav_flashcards).setVisible(true);
@@ -365,47 +363,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     //Allows movement between activities upon clicking
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
-            Intent notesActivity = new Intent(NotesActivity.this, MainActivity.class);
-            startActivity(notesActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent todoActivity = new Intent(NotesActivity.this, NotesActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_todos) {
-            Intent todoActivity = new Intent(NotesActivity.this, TodoActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent todoActivity = new Intent(NotesActivity.this, FlashcardActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Intent todoActivity = new Intent(NotesActivity.this, TimetableActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_settings) {
-            Intent todoActivity = new Intent(NotesActivity.this, SettingsActivity.class);
-            startActivity(todoActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_logout) {
-            Log.d("Message", "Logout");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+
 
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);
