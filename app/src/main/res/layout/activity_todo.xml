@@ -7,13 +7,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:animateLayoutChanges="true">
-    android:background="#FFFFFF"
-    android:fadeScrollbars="false"
-    android:fitsSystemWindows="true"
-    android:scrollbarSize="4dp"
-    android:scrollbarThumbVertical="@android:color/darker_gray"
-    android:scrollbars="vertical"
-    android:verticalScrollbarPosition="left">
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
@@ -28,9 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/secondary_white">
-        android:background="#F0F0F0"
-        android:scrollbars="vertical"
-        android:verticalScrollbarPosition="right">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -117,7 +107,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/todoRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="600dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="30dp"
             android:background="#00FFFFFF"

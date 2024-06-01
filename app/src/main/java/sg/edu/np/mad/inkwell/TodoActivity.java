@@ -293,7 +293,9 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
 
                         long time = hour * 3600000 + minute * 60000;
 
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
+                        if (date.getTime() + time > Calendar.getInstance().getTimeInMillis()) {
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime() + time, pendingIntent);
+                        }
 
                         Toast toast = new Toast(TodoActivity.this);
                         toast.setDuration(Toast.LENGTH_SHORT);
@@ -369,12 +371,14 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        // Allows for recycler view items to be swiped
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
             }
 
+            // Removes the item from the recycler view and deletes its data from firebase
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getAdapterPosition();
@@ -391,6 +395,7 @@ public class TodoActivity extends AppCompatActivity implements NavigationView.On
                 toast.show();
             }
 
+            // Only swipes the item away if 80% of it is off the screen
             @Override
             public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
                 return 0.80f;
