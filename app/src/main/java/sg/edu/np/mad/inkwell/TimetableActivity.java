@@ -1002,47 +1002,7 @@ public class TimetableActivity extends AppCompatActivity implements NavigationVi
     // navigation
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
-            Intent notesActivity = new Intent(TimetableActivity.this, MainActivity.class);
-            startActivity(notesActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_notes) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, NotesActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_todos) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, TodoActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_flashcards) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, FlashcardActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_calendar) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, TimetableActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_timetable) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, TimetableActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_settings) {
-            Intent timetableActivity = new Intent(TimetableActivity.this, SettingsActivity.class);
-            startActivity(timetableActivity);
-            return true;
-        }
-        else if (menuItem.getItemId() == R.id.nav_logout) {
-            Log.d("Message", "Logout");
-        }
-        else {
-            Log.d("Message", "Unknown page!");
-        }
+
 
         int id = menuItem.getItemId();
         Navbar navbar = new Navbar(this);

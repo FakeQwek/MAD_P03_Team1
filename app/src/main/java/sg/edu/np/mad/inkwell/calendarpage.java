@@ -1,29 +1,41 @@
 package sg.edu.np.mad.inkwell;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.AlertDialog;
+import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
@@ -32,16 +44,40 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-public class calendarpage extends AppCompatActivity {
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+import java.util.ArrayList;
+
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+import java.util.ArrayList;
+
+
+public class calendarpage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private CalendarView calendarView;
     private TextView eventDescriptionTextView;
+    private EditText dateEditText;
+    private Button datePickerButton;
+
+    private RecyclerView eventsRecyclerView;
+    private EventsAdapter eventsAdapter;
+
+    private List<String> eventsList;
     private FirebaseFirestore db;
+    private String userId;
     public static final String CHANNEL_ID = "EventNotificationChannel";
 
     @Override
@@ -49,7 +85,18 @@ public class calendarpage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_calendarpage);
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //Finds nav bar drawer and nav view before setting listener
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        //Sets listener to allows for closing and opening of the navbar
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
+                R.string.close_nav);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -58,9 +105,26 @@ public class calendarpage extends AppCompatActivity {
 
         calendarView = findViewById(R.id.calendarView);
         eventDescriptionTextView = findViewById(R.id.eventDescription);
+        dateEditText = findViewById(R.id.dateEditText);
+        datePickerButton = findViewById(R.id.datePickerButton);
+        eventsRecyclerView = findViewById(R.id.eventsRecyclerView);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        eventsList = new ArrayList<>();
+        eventsAdapter = new EventsAdapter(eventsList, this::editDelete);
+        eventsRecyclerView.setAdapter(eventsAdapter);
 
         // Initialize Firestore
         db = FirebaseFirestore.getInstance();
+
+
+        // Get current user ID
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {    userId = currentUser.getUid();
+        } else {    Toast.makeText(this, "User not authenticated!", Toast.LENGTH_SHORT).show();
+            finish();}
+        //userId = "8dvh5X3c5sYMOOhHhvv9w5ZvL2n2"; //temporary testing placeholder
+
+
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -70,6 +134,8 @@ public class calendarpage extends AppCompatActivity {
                 eventsList(date);
             }
         });
+
+        datePickerButton.setOnClickListener(v -> showDatePickerDialog());
 
         createNotificationChannel();
     }
@@ -88,43 +154,56 @@ public class calendarpage extends AppCompatActivity {
     }
 
     private void displayEventsForDate(String date) {
-        db.collection("events")
-                .document(date)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            List<String> events = (List<String>) documentSnapshot.get("events");
-                            if (events != null) {
-                                StringBuilder eventDescriptions = new StringBuilder("Events on " + date + ":\n");
-                                for (String event : events) {
-                                    eventDescriptions.append("- ").append(event).append("\n");
-                                }
-                                eventDescriptionTextView.setText(eventDescriptions.toString());
-                            } else {
-                                eventDescriptionTextView.setText("No Event on " + date);
-                            }
-                        } else {
-                            eventDescriptionTextView.setText("No Event on " + date);
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    eventsList.clear();
+                    if (documentSnapshot.exists()) {
+                        List<String> events = (List<String>) documentSnapshot.get("events");
+                        if (events != null) {
+                            eventsList.addAll(events);
                         }
                     }
+                    eventsAdapter.notifyDataSetChanged();
+                    eventDescriptionTextView.setText("Events on " + date + ":");
                 })
-                .addOnFailureListener(new OnFailureListener() {
+                .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                        dateEditText.setText(selectedDate);
+                        displayEventsForDate(selectedDate);
                     }
-                });
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void editDelete(int position) {
+        String date = dateEditText.getText().toString();
+        if (!date.isEmpty()) {
+            eventsList(date, position);
+        }
     }
 
     private void eventsList(final String date) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Click on event to edit or delete!");
+        builder.setTitle("Click on event to edit or delete.");
 
-        db.collection("events")
-                .document(date)
-                .get()
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
+
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -163,9 +242,10 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Edit", (dialog, which) -> editEvent(date, eventIndex));
 
         builder.setNegativeButton("Delete", (dialog, which) -> {
-            db.collection("events")
-                    .document(date)
-                    .get()
+            db.collection("users")
+                    .document(userId)
+                    .collection("events").document(date).get()
+
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -173,7 +253,10 @@ public class calendarpage extends AppCompatActivity {
                                 List<String> events = (List<String>) documentSnapshot.get("events");
                                 if (events != null && eventIndex < events.size()) {
                                     events.remove(eventIndex);
-                                    db.collection("events")
+
+                                    db.collection("users")
+                                            .document(userId)
+                                            .collection("events")
                                             .document(date)
                                             .update("events", events)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -207,14 +290,83 @@ public class calendarpage extends AppCompatActivity {
         builder.show();
     }
 
+    private void eventsList(final String date, final int eventIndex) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Click on event to edit or delete.");
+
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> events = (List<String>) documentSnapshot.get("events");
+                        if (events != null && !events.isEmpty()) {
+                            builder.setItems(events.toArray(new String[0]), (dialog, which) -> editDeleteEvent(date, which));
+                        } else {
+                            builder.setMessage("No events for this day.");
+                        }
+                    } else {
+                        builder.setMessage("No events for this day.");
+                    }
+
+                    builder.setPositiveButton("Create Event", (dialog, which) -> addEvent(date));
+                    builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+                    builder.show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(calendarpage.this, "Failed to retrieve events: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    builder.setMessage("Failed to retrieve events.").setPositiveButton("Create Event", (dialog, which) -> addEvent(date));
+                    builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+                    builder.show();
+                });
+    }
+
+    private void editDeleteEvent(final String date, final int eventIndex) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit or Delete Event");
+
+        builder.setPositiveButton("Edit", (dialog, which) -> editEvent(date, eventIndex));
+
+        builder.setNegativeButton("Delete", (dialog, which) -> {
+            db.collection("users")
+                    .document(userId)
+                    .collection("events").document(date).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            List<String> events = (List<String>) documentSnapshot.get("events");
+                            if (events != null && eventIndex < events.size()) {
+                                events.remove(eventIndex);
+
+                                db.collection("users")
+                                        .document(userId)
+                                        .collection("events")
+                                        .document(date)
+                                        .update("events", events)
+                                        .addOnSuccessListener(aVoid -> {
+                                            displayEventsForDate(date);
+                                            Toast.makeText(calendarpage.this, "Event Deleted", Toast.LENGTH_SHORT).show();
+                                            showNotification("Event Deleted", "Your event has been deleted successfully.");
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to delete event: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(calendarpage.this, "Failed to retrieve events for deletion: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
+
+        builder.setNeutralButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
     private void editEvent(final String date, final int eventIndex) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Event on " + date);
 
         final EditText input = new EditText(this);
-        db.collection("events")
-                .document(date)
-                .get()
+        db.collection("users")
+                .document(userId)
+                .collection("events").document(date).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -232,9 +384,9 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Save", (dialog, which) -> {
             String eventDescription = input.getText().toString();
             if (!eventDescription.isEmpty()) {
-                db.collection("events")
-                        .document(date)
-                        .get()
+                db.collection("users")
+                        .document(userId)
+                        .collection("events").document(date).get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -242,8 +394,9 @@ public class calendarpage extends AppCompatActivity {
                                     List<String> events = (List<String>) documentSnapshot.get("events");
                                     if (events != null && eventIndex < events.size()) {
                                         events.set(eventIndex, eventDescription);
-                                        db.collection("events")
-                                                .document(date)
+                                        db.collection("users")
+                                                .document(userId)
+                                                .collection("events").document(date)
                                                 .update("events", events)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
@@ -284,9 +437,9 @@ public class calendarpage extends AppCompatActivity {
         builder.setPositiveButton("Save", (dialog, which) -> {
             String eventDescription = input.getText().toString();
             if (!eventDescription.isEmpty()) {
-                db.collection("events")
-                        .document(date)
-                        .get()
+                db.collection("users")
+                        .document(userId)
+                        .collection("events").document(date).get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -298,8 +451,9 @@ public class calendarpage extends AppCompatActivity {
                                     }
                                 }
                                 events.add(eventDescription);
-                                db.collection("events")
-                                        .document(date)
+                                db.collection("users")
+                                        .document(userId)
+                                        .collection("events").document(date)
                                         .set(Collections.singletonMap("events", events), SetOptions.merge())
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -360,5 +514,15 @@ public class calendarpage extends AppCompatActivity {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        int id = menuItem.getItemId();
+        Navbar navbar = new Navbar(this);
+        Intent newActivity = navbar.redirect(id);
+        startActivity(newActivity);
+        return true;
+
     }
 }
