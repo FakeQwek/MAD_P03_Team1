@@ -31,7 +31,7 @@ public class Navbar {
             Log.d( "Alert", "Opening notes");
             return newActivity;
         }
-        else if (id == R.id.nav_todo) {
+        else if (id == R.id.nav_todos) {
             Intent newActivity = new Intent(CurrentActivity, TodoActivity.class);
             Log.d("Alert", "Opening todo list");
             return newActivity;
