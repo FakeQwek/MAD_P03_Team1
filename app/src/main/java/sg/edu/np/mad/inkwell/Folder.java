@@ -3,6 +3,7 @@ package sg.edu.np.mad.inkwell;
 import com.google.firebase.firestore.CollectionReference;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Folder {
     // Folder class attributes
@@ -16,6 +17,10 @@ public class Folder {
 
     public CollectionReference colRef;
 
+    public Date dateCreated;
+
+    public Date dateUpdated;
+
     // Folder class get methods
     public String getTitle() { return this.title; }
 
@@ -27,13 +32,21 @@ public class Folder {
 
     public CollectionReference getColRef() { return this.colRef; }
 
+    public Date getDateCreated() { return this.dateCreated; }
+
+    public Date getDateUpdated() { return this.dateUpdated; }
+
+    public void setDateUpdated(Date dateUpdated) { this.dateUpdated = dateUpdated; }
+
     // Folder class constructor
-    public Folder(String title, String body, int id, String type, CollectionReference colRef) {
+    public Folder(String title, String body, int id, String type, CollectionReference colRef, Date dateCreated, Date dateUpdated) {
         this.title = title;
         this.body = body;
         this.id = id;
         this.type = type;
         this.colRef = colRef;
+        this.dateCreated = dateCreated;
+        this.dateUpdated = dateUpdated;
     }
 
 }

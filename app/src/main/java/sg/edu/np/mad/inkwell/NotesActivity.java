@@ -31,8 +31,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -58,6 +63,8 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
     public static ArrayList<File> fileOrder = new ArrayList<>();
 
     public static int fileOrderIndex;
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
     // Method to set items in the recycler view
     private void recyclerView(ArrayList<Object> allNotes) {
@@ -227,11 +234,21 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                     currentNoteId = Integer.parseInt(document.getId());
                                 }
                                 if (docNoteType.equals("file") && docNoteUid.equals(currentFirebaseUserUid)) {
-                                    File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
+                                    File file;
+                                    try {
+                                        file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference(), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                    } catch (ParseException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                     notes.add(file);
                                     filter(files, notes, "");
                                 } else if (docNoteType.equals("folder") && docNoteUid.equals(currentFirebaseUserUid)) {
-                                    Folder folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"));
+                                    Folder folder;
+                                    try {
+                                        folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                    } catch (ParseException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                     notes.add(folder);
                                     filter(files, notes, "");
                                 }
@@ -250,20 +267,28 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             public void onClick(View v) {
                 currentNoteId++;
 
+                Date currentDate = Calendar.getInstance().getTime();
+
+                String dateString = simpleDateFormat.format(currentDate);
+
                 Map<String, Object> fileData = new HashMap<>();
                 fileData.put("title", "Title");
                 fileData.put("body", "Enter your text");
                 fileData.put("type", "file");
                 fileData.put("uid", currentFirebaseUserUid);
+                fileData.put("dateCreated", dateString);
+                fileData.put("dateUpdated", dateString);
 
                 db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(fileData);
 
-                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)));
+                File file = new File("Title", "Enter your text", currentNoteId, "file", db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)), currentDate, currentDate);
                 fileIds.add(file.id);
                 files.add(file);
                 notes.add(0, file);
 
                 if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else if (notes.size() == 1) {
                     recyclerView(notes);
                 } else {
                     notifyInsert();
@@ -286,18 +311,27 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
             public void onClick(View v) {
                 currentNoteId++;
 
+                Date currentDate = Calendar.getInstance().getTime();
+
+                String dateString = simpleDateFormat.format(currentDate);
+
                 Map<String, Object> folderData = new HashMap<>();
                 folderData.put("title", "Folder");
                 folderData.put("body", "");
                 folderData.put("type", "folder");
                 folderData.put("uid", currentFirebaseUserUid);
+                folderData.put("dateCreated", dateString);
+                folderData.put("dateUpdated", dateString);
+
 
                 db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"));
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"), currentDate, currentDate);
                 notes.add(0, folder);
 
                 if (currentNoteId == 1) {
+                    recyclerView(notes);
+                } else if (notes.size() == 1) {
                     recyclerView(notes);
                 } else {
                     notifyInsert();

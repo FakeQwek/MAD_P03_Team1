@@ -31,8 +31,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.ApiStatus;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -86,6 +91,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             EditText noteTitle = notesActivity.findViewById(R.id.noteTitle);
 
             EditText noteBody = notesActivity.findViewById(R.id.noteBody);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
             fileViewHolder.fileButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -156,6 +163,26 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             toast.show();
                         }
                     });
+
+                    Button fileInformationButton = view.findViewById(R.id.fileInformationButton);
+                    fileInformationButton.setText("Note Information");
+                    fileInformationButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            bottomSheetDialog.dismiss();
+
+                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(notesActivity);
+                            View view = LayoutInflater.from(notesActivity).inflate(R.layout.notes_information_bottom_sheet, null);
+                            bottomSheetDialog.setContentView(view);
+                            bottomSheetDialog.show();
+
+                            TextView dateCreated = view.findViewById(R.id.dateCreated);
+                            dateCreated.setText(simpleDateFormat.format(file.dateCreated));
+
+                            TextView dateUpdated = view.findViewById(R.id.dateUpdated);
+                            dateUpdated.setText(simpleDateFormat.format(file.dateUpdated));
+                        }
+                    });
                     return false;
                 }
             });
@@ -169,6 +196,14 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         file.docRef.update("title", noteTitle.getText().toString());
                         file.setTitle(noteTitle.getText().toString());
                         fileViewHolder.fileButton.setText(noteTitle.getText().toString());
+
+                        Date currentDate = Calendar.getInstance().getTime();
+
+                        String dateString = simpleDateFormat.format(currentDate);
+
+                        file.docRef.update("dateUpdated", dateString);
+
+                        file.setDateUpdated(currentDate);
                     }
                 }
             });
@@ -181,6 +216,14 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     if (file.id == NotesActivity.selectedNoteId) {
                         file.docRef.update("body", noteBody.getText().toString());
                         file.setBody(noteBody.getText().toString());
+
+                        Date currentDate = Calendar.getInstance().getTime();
+
+                        String dateString = simpleDateFormat.format(currentDate);
+
+                        file.docRef.update("dateUpdated", dateString);
+
+                        file.setDateUpdated(currentDate);
                     }
                 }
             });
@@ -192,6 +235,8 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ArrayList<Object> folderAllNotes = new ArrayList<>();
 
             recyclerView(folderAllNotes, folderViewHolder.recyclerView);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
             folder.colRef.document(String.valueOf(folder.id)).collection("files")
                     .get()
@@ -206,7 +251,12 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                             NotesActivity.currentNoteId = Integer.parseInt(document.getId());
                                         }
 
-                                        File file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference());
+                                        File file;
+                                        try {
+                                            file = new File(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, document.getReference(), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                        } catch (ParseException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                         folderAllNotes.add(file);
                                         folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
                                     } else if (docNoteType.equals("folder")) {
@@ -214,7 +264,12 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                             NotesActivity.currentNoteId = Integer.parseInt(document.getId());
                                         }
 
-                                        Folder folder2 = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, folder.colRef.document(String.valueOf(folder.id)).collection("files"));
+                                        Folder folder2;
+                                        try {
+                                            folder2 = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, folder.colRef.document(String.valueOf(folder.id)).collection("files"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                        } catch (ParseException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                         folderAllNotes.add(folder2);
                                         folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
                                     }
@@ -259,18 +314,28 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         public void onClick(View v) {
                             NotesActivity.currentNoteId++;
 
+                            Date currentDate = Calendar.getInstance().getTime();
+
+                            String dateString = simpleDateFormat.format(currentDate);
+
                             Map<String, Object> fileData = new HashMap<>();
                             fileData.put("title", "Title");
                             fileData.put("body", "Enter your text");
                             fileData.put("type", "file");
+                            fileData.put("dateCreated", dateString);
+                            fileData.put("dateUpdated", dateString);
 
                             folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)).set(fileData);
 
-                            File file = new File("Title", "Enter your text", NotesActivity.currentNoteId, "file", folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)));
+                            File file = new File("Title", "Enter your text", NotesActivity.currentNoteId, "file", folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)), currentDate, currentDate);
                             NotesActivity.fileIds.add(file.id);
                             NotesActivity.files.add(file);
                             folderAllNotes.add(0, file);
                             folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
+
+                            folder.colRef.document(String.valueOf(folder.id)).update("dateUpdated", dateString);
+
+                            folder.setDateUpdated(currentDate);
 
                             bottomSheetDialog.dismiss();
 
@@ -293,16 +358,26 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         public void onClick(View v) {
                             NotesActivity.currentNoteId++;
 
+                            Date currentDate = Calendar.getInstance().getTime();
+
+                            String dateString = simpleDateFormat.format(currentDate);
+
                             Map<String, Object> folderData = new HashMap<>();
                             folderData.put("title", "Folder");
                             folderData.put("body", "");
                             folderData.put("type", "folder");
+                            folderData.put("dateCreated", dateString);
+                            folderData.put("dateUpdated", dateString);
 
                             folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)).set(folderData);
 
-                            Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", folder.colRef.document(String.valueOf(folder.id)).collection("files"));
+                            Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", folder.colRef.document(String.valueOf(folder.id)).collection("files"), currentDate, currentDate);
                             folderAllNotes.add(0, folder2);
                             folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
+
+                            folder.colRef.document(String.valueOf(folder.id)).update("dateUpdated", dateString);
+
+                            folder.setDateUpdated(currentDate);
 
                             bottomSheetDialog.dismiss();
 
@@ -338,6 +413,14 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 public void onClick(View v) {
                                     folder.colRef.document(String.valueOf(folder.id)).update("title", renameEditText.getText().toString());
 
+                                    Date currentDate = Calendar.getInstance().getTime();
+
+                                    String dateString = simpleDateFormat.format(currentDate);
+
+                                    folder.colRef.document(String.valueOf(folder.id)).update("dateUpdated", dateString);
+
+                                    folder.setDateUpdated(currentDate);
+
                                     folderViewHolder.folderButton.setText(renameEditText.getText().toString());
 
                                     renamePopupWindow.dismiss();
@@ -370,6 +453,27 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             View view = layoutInflater.inflate(R.layout.toast_deleted, null);
                             toast.setView(view);
                             toast.show();
+                        }
+                    });
+
+                    Button folderInformationButton = view.findViewById(R.id.folderInformationButton);
+                    folderInformationButton.setText("Folder Information");
+
+                    folderInformationButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            bottomSheetDialog.dismiss();
+
+                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(notesActivity);
+                            View view = LayoutInflater.from(notesActivity).inflate(R.layout.notes_information_bottom_sheet, null);
+                            bottomSheetDialog.setContentView(view);
+                            bottomSheetDialog.show();
+
+                            TextView dateCreated = view.findViewById(R.id.dateCreated);
+                            dateCreated.setText(simpleDateFormat.format(folder.dateCreated));
+
+                            TextView dateUpdated = view.findViewById(R.id.dateUpdated);
+                            dateUpdated.setText(simpleDateFormat.format(folder.dateUpdated));
                         }
                     });
                     return false;
