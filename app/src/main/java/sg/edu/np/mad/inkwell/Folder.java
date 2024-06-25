@@ -21,6 +21,8 @@ public class Folder {
 
     public Date dateUpdated;
 
+    public String bookmarkColour;
+
     // Folder class get methods
     public String getTitle() { return this.title; }
 
@@ -36,10 +38,14 @@ public class Folder {
 
     public Date getDateUpdated() { return this.dateUpdated; }
 
+    public String getBookmarkColour() { return this.bookmarkColour; }
+
     public void setDateUpdated(Date dateUpdated) { this.dateUpdated = dateUpdated; }
 
+    public void setBookmarkColour(String bookmarkColour) { this.bookmarkColour = bookmarkColour; }
+
     // Folder class constructor
-    public Folder(String title, String body, int id, String type, CollectionReference colRef, Date dateCreated, Date dateUpdated) {
+    public Folder(String title, String body, int id, String type, CollectionReference colRef, Date dateCreated, Date dateUpdated, String bookmarkColour) {
         this.title = title;
         this.body = body;
         this.id = id;
@@ -47,6 +53,7 @@ public class Folder {
         this.colRef = colRef;
         this.dateCreated = dateCreated;
         this.dateUpdated = dateUpdated;
+        this.bookmarkColour = bookmarkColour;
     }
 
 }

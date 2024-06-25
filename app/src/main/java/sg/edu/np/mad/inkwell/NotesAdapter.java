@@ -1,6 +1,7 @@
 package sg.edu.np.mad.inkwell;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Editable;
 import android.util.Log;
 import android.view.Gravity;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -238,6 +240,20 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
 
+            if (folder.bookmarkColour.equals("red")) {
+                folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                folderViewHolder.bookmark.setColorFilter(Color.parseColor("#e23a2e"));
+            } else if (folder.bookmarkColour.equals("blue")) {
+                folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                folderViewHolder.bookmark.setColorFilter(Color.parseColor("#1a73e8"));
+            } else if (folder.bookmarkColour.equals("yellow")) {
+                folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                folderViewHolder.bookmark.setColorFilter(Color.parseColor("#fbbf12"));
+            } else if (folder.bookmarkColour.equals("green")) {
+                folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                folderViewHolder.bookmark.setColorFilter(Color.parseColor("#279847"));
+            }
+
             folder.colRef.document(String.valueOf(folder.id)).collection("files")
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -266,7 +282,7 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                                         Folder folder2;
                                         try {
-                                            folder2 = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, folder.colRef.document(String.valueOf(folder.id)).collection("files"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                            folder2 = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, folder.colRef.document(String.valueOf(folder.id)).collection("files"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()), document.getData().get("bookmarkColour").toString());
                                         } catch (ParseException e) {
                                             throw new RuntimeException(e);
                                         }
@@ -368,10 +384,11 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             folderData.put("type", "folder");
                             folderData.put("dateCreated", dateString);
                             folderData.put("dateUpdated", dateString);
+                            folderData.put("bookmarkColour", "none");
 
                             folder.colRef.document(String.valueOf(folder.id)).collection("files").document(String.valueOf(NotesActivity.currentNoteId)).set(folderData);
 
-                            Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", folder.colRef.document(String.valueOf(folder.id)).collection("files"), currentDate, currentDate);
+                            Folder folder2 = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", folder.colRef.document(String.valueOf(folder.id)).collection("files"), currentDate, currentDate, "none");
                             folderAllNotes.add(0, folder2);
                             folderViewHolder.recyclerView.getAdapter().notifyItemInserted(folderViewHolder.getAdapterPosition());
 
@@ -474,6 +491,80 @@ public class NotesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                             TextView dateUpdated = view.findViewById(R.id.dateUpdated);
                             dateUpdated.setText(simpleDateFormat.format(folder.dateUpdated));
+                        }
+                    });
+
+                    Button bookmarkButton = view.findViewById(R.id.bookmarkButton);
+                    bookmarkButton.setText("Bookmark");
+
+                    bookmarkButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            bottomSheetDialog.dismiss();
+
+                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(notesActivity);
+                            View view = LayoutInflater.from(notesActivity).inflate(R.layout.bookmark_colour_bottom_sheet, null);
+                            bottomSheetDialog.setContentView(view);
+                            bottomSheetDialog.show();
+
+                            ImageButton none = view.findViewById(R.id.none);
+
+                            none.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    folderViewHolder.bookmark.setVisibility(View.GONE);
+                                    folder.setBookmarkColour("none");
+                                    folder.colRef.document(String.valueOf(folder.id)).update("bookmarkColour", "none");
+                                }
+                            });
+
+                            ImageButton red = view.findViewById(R.id.red);
+
+                            red.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                                    folderViewHolder.bookmark.setColorFilter(Color.parseColor("#e23a2e"));
+                                    folder.setBookmarkColour("red");
+                                    folder.colRef.document(String.valueOf(folder.id)).update("bookmarkColour", "red");
+                                }
+                            });
+
+                            ImageButton blue = view.findViewById(R.id.blue);
+
+                            blue.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                                    folderViewHolder.bookmark.setColorFilter(Color.parseColor("#1a73e8"));
+                                    folder.setBookmarkColour("blue");
+                                    folder.colRef.document(String.valueOf(folder.id)).update("bookmarkColour", "blue");
+                                }
+                            });
+
+                            ImageButton yellow = view.findViewById(R.id.yellow);
+
+                            yellow.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                                    folderViewHolder.bookmark.setColorFilter(Color.parseColor("#fbbf12"));
+                                    folder.setBookmarkColour("yellow");
+                                    folder.colRef.document(String.valueOf(folder.id)).update("bookmarkColour", "yellow");
+                                }
+                            });
+
+                            ImageButton green = view.findViewById(R.id.green);
+
+                            green.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    folderViewHolder.bookmark.setVisibility(View.VISIBLE);
+                                    folderViewHolder.bookmark.setColorFilter(Color.parseColor("#279847"));
+                                    folder.setBookmarkColour("green");
+                                    folder.colRef.document(String.valueOf(folder.id)).update("bookmarkColour", "green");
+                                }
+                            });
                         }
                     });
                     return false;

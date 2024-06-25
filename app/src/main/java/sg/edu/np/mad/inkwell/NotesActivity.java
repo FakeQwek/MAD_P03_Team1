@@ -245,7 +245,7 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                                 } else if (docNoteType.equals("folder") && docNoteUid.equals(currentFirebaseUserUid)) {
                                     Folder folder;
                                     try {
-                                        folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()));
+                                        folder = new Folder(document.getData().get("title").toString(), document.getData().get("body").toString(), Integer.parseInt(document.getId()), docNoteType, db.collection("users").document(currentFirebaseUserUid).collection("notes"), simpleDateFormat.parse(document.getData().get("dateCreated").toString()), simpleDateFormat.parse(document.getData().get("dateUpdated").toString()), document.getData().get("bookmarkColour").toString());
                                     } catch (ParseException e) {
                                         throw new RuntimeException(e);
                                     }
@@ -322,11 +322,12 @@ public class NotesActivity extends AppCompatActivity implements NavigationView.O
                 folderData.put("uid", currentFirebaseUserUid);
                 folderData.put("dateCreated", dateString);
                 folderData.put("dateUpdated", dateString);
+                folderData.put("bookmarkColour", "none");
 
 
                 db.collection("users").document(currentFirebaseUserUid).collection("notes").document(String.valueOf(currentNoteId)).set(folderData);
 
-                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"), currentDate, currentDate);
+                Folder folder = new Folder("Folder", "", NotesActivity.currentNoteId, "folder", db.collection("users").document(currentFirebaseUserUid).collection("notes"), currentDate, currentDate, "none");
                 notes.add(0, folder);
 
                 if (currentNoteId == 1) {
