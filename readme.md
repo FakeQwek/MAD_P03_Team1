@@ -64,7 +64,7 @@ Productivity
 - AI Helpbot - Chin Teck
 - Profile Page - Chin Teck
 - Markdown - Chin Teck
-- Biometric Authentication -  Jin Xuan
+- Biometric Authentication and OTP -  Jin Xuan
 - Splash Screen Effect/Lottie Animation - Jin Xuan
 - Feedback survey - Jin Xuan
 - Create a Username for the account and remember password - Jin Xuan
@@ -73,7 +73,9 @@ Productivity
 - Biometric authetication - Jin Xuan
 - Security Question Service - Jin Xuan
 - Time tracking with work statistics and achievements  - Rithika
-- Goal setting and recurring tasks - Rithika 
+- Goal setting and recurring tasks - Rithika
+- Widgets – Rithika
+- Accessibility features – Rithika 
 - Drawing tools with Stylus support - Jun Kai
 - Sync with Google Calendar - Jun Kai
 - Time Blocking and Focus features - Jun Kai
@@ -124,7 +126,32 @@ The Timetable page allows the user to set events for each day. The event can hav
 
 <img src="https://github.com/FakeQwek/MAD_P03_Team1/assets/133119964/c3595ed3-c1bf-4ace-a6e6-d20dce314db0" width="200" height="400">
 
-The settings page allows the user to configure Inkwell. Currently the user can turn on dark mode.
+The Settings page allows the user to configure Inkwell. Currently the user can turn on dark mode.
+
+
+**Notes**
+
+<img src="https://github.com/FakeQwek/MAD_P03_Team1/assets/133119964/e1791868-d115-4c60-95bd-95bde2dc09c2" width="200" height="400">
+
+The Notes page allows users to create written notes. Notes can be stored in folders and reside in the navbar.
+
+
+**Flashcards**
+
+<img src="https://github.com/FakeQwek/MAD_P03_Team1/assets/133119964/6e3a14e8-af3c-4f7c-852c-94f8d9a54beb" width="200" height="400">
+
+The Flashcards allow users to memorise knowledge. Flashcards can be created and added to collections to be reused.
+
+
+**Todo Page**
+
+<img src="https://github.com/FakeQwek/MAD_P03_Team1/assets/133119964/467fb970-d31b-42b1-8755-7d8c0961c0db" width="200" height="400">
+
+The Todo page allows users to add tasks. Tasks are organised into three categories and include title and description.
+
+
+
+
 
 
 

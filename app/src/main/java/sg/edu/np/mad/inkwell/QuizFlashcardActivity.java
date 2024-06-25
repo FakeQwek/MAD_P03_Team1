@@ -211,7 +211,7 @@ public class QuizFlashcardActivity extends AppCompatActivity implements Navigati
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.nav_main) {
+        if (menuItem.getItemId() == R.id.nav_home) {
             Intent notesActivity = new Intent(QuizFlashcardActivity.this, MainActivity.class);
             startActivity(notesActivity);
             return true;
