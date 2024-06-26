@@ -126,29 +126,11 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                 Log.d("apple", "Selected URI: " + uri);
                 profileImage.setImageURI(uri);
                 imageRef.delete();
-                UploadTask uploadTask = imageRef.putFile(uri);
-//                uploadTask.addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception exception) {
-//                        Log.d("apple", "images/" + uri.getLastPathSegment() + ".jpg");
-//                        Log.d("apple", "FAILED");
-//                    }
-//                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                        Log.d("apple", "PASSED");
-//                    }
-//                });
+                imageRef.putFile(uri);
             } else {
                 Log.d("PhotoPicker", "No media selected");
             }
         });
-
-//        Map<String, Object> userData = new HashMap<>();
-//        userData.put("uid", "");
-//        userData.put("type", "");
-//
-//        db.collection("users").document(currentFirebaseUserUid).collection("profile").document("description").set();
 
         Button changeDescriptionButton = findViewById(R.id.changeDescriptionButton);
 
