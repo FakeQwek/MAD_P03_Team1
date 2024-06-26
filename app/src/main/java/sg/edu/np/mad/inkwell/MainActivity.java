@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         db.collection("users").document(currentFirebaseUserUid).collection("flashcardCollections").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("notes").document("0").set(userData);
         db.collection("users").document(currentFirebaseUserUid).collection("todos").document("0").set(userData);
+        db.collection("users").document(currentFirebaseUserUid).collection("profile").document("0").set(userData);
 
 
     }

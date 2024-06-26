@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,16 +26,31 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    // Get firebase
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -70,6 +87,22 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
         Button changeProfileImageButton = findViewById(R.id.changeProfileImageButton);
 
         ImageView profileImage = findViewById(R.id.profileImage);
+
+        TextView description = findViewById(R.id.description);
+
+        db.collection("users").document(currentFirebaseUserUid).collection("profile").document("description")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                description.setText(document.getData().get("description").toString());
+                            }
+                        }
+                    }
+                });
 
         StorageReference imageRef = storageRef.child("users/" + currentFirebaseUserUid + "/profile.jpg");
 
@@ -108,6 +141,51 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
 //                });
             } else {
                 Log.d("PhotoPicker", "No media selected");
+            }
+        });
+
+//        Map<String, Object> userData = new HashMap<>();
+//        userData.put("uid", "");
+//        userData.put("type", "");
+//
+//        db.collection("users").document(currentFirebaseUserUid).collection("profile").document("description").set();
+
+        Button changeDescriptionButton = findViewById(R.id.changeDescriptionButton);
+
+        changeDescriptionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(ProfileActivity.this);
+                View view = LayoutInflater.from(ProfileActivity.this).inflate(R.layout.rename_bottom_sheet, null);
+                bottomSheetDialog.setContentView(view);
+                bottomSheetDialog.show();
+
+                TextInputEditText descriptionEditText = view.findViewById(R.id.descriptionEditText);
+
+                Button doneButton = view.findViewById(R.id.doneButton);
+
+                doneButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Map<String, Object> newDescription = new HashMap<>();
+                        newDescription.put("description", descriptionEditText.getText().toString());
+
+                        db.collection("users").document(currentFirebaseUserUid).collection("profile").document("description").set(newDescription);
+                        description.setText(descriptionEditText.getText().toString());
+
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+                Button cancelButton = view.findViewById(R.id.cancelButton);
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
             }
         });
 

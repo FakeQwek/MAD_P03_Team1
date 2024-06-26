@@ -55,6 +55,18 @@
             app:layout_constraintTop_toBottomOf="@+id/textView15"
             app:shapeAppearanceOverlay="@style/circleImageView" />
 
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="16dp"/>
+
         <Button
             android:id="@+id/changeProfileImageButton"
             android:layout_width="match_parent"
@@ -62,12 +74,27 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="30dp"
+            android:backgroundTint="@color/white"
             android:text="Change Profile Image"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            app:layout_constraintTop_toBottomOf="@+id/description" />
+
+        <Button
+            android:id="@+id/changeDescriptionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="30dp"
             android:backgroundTint="@color/white"
-            android:textColor="@color/black" />
+            android:text="Change Description"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/changeProfileImageButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
