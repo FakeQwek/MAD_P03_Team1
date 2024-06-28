@@ -56,7 +56,11 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
 
     String currentFirebaseUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-    public int currentFriendId;
+    private int currentFriendId;
+
+    public static int selectedFriendId;
+
+    public static String selectedFriendEmail;
 
     private void recyclerView(ArrayList<Friend> friendList) {
         RecyclerView recyclerView = findViewById(R.id.friendRecyclerView);
@@ -171,12 +175,21 @@ public class FriendsActivity extends AppCompatActivity implements NavigationView
                                             for (QueryDocumentSnapshot document : task.getResult()) {
                                                 Log.d("apple", document.getData().get("email").toString());
                                                 if (document.getData().get("email").toString().equals(friendEditText.getText().toString())) {
+                                                    currentFriendId += 1;
+
                                                     Map<String, Object> newFriend = new HashMap<>();
                                                     newFriend.put("friendEmail", friendEditText.getText().toString());
                                                     newFriend.put("friendUid", document.getData().get("uid").toString());
                                                     newFriend.put("uid", currentFirebaseUserUid);
 
-                                                    db.collection("users").document(currentFirebaseUserUid).collection("friends").document("1").set(newFriend);
+                                                    db.collection("users").document(currentFirebaseUserUid).collection("friends").document(String.valueOf(currentFriendId)).set(newFriend);
+
+                                                    Map<String, Object> newMessage = new HashMap<>();
+                                                    newMessage.put("message", "");
+                                                    newMessage.put("uid", currentFirebaseUserUid);
+                                                    newMessage.put("type", "none");
+
+                                                    db.collection("users").document(currentFirebaseUserUid).collection("friends").document(String.valueOf(currentFriendId)).collection("messages").document("0").set(newMessage);
                                                 }
                                             }
                                         } else {

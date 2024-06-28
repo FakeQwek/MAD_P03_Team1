@@ -1,5 +1,6 @@
 package sg.edu.np.mad.inkwell;
 
+import android.content.Intent;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendViewHolder> {
 
     public FriendAdapter(ArrayList<Friend> friendList, FriendsActivity friendsActivity) {
         this.friendList = friendList;
+        this.friendsActivity = friendsActivity;
     }
 
     public FriendViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -33,6 +35,17 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendViewHolder> {
         Friend friend = friendList.get(position);
         holder.friendEmail.setText(friend.getEmail());
         holder.friendProfileImage.setImageBitmap(friend.bitmap);
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FriendsActivity.selectedFriendEmail = friend.email;
+
+                FriendsActivity.selectedFriendId = friend.getId();
+                Intent chatActivity = new Intent(friendsActivity, ChatActivity.class);
+                friendsActivity.startActivity(chatActivity);
+            }
+        });
     }
 
     public int getItemCount() { return friendList.size(); }
